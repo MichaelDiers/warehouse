@@ -142,9 +142,29 @@
                 options =>
                 {
                     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                        .RequireRole(Roles.User)
+                        .RequireRole(CustomClaims.UserRole)
+                        .RequireClaim(CustomClaims.IdClaim)
+                        .RequireAssertion(ServiceCollectionExtensions.GuidAssertion)
                         .Build();
                 });
+        }
+
+        /// <summary>
+        ///     A assertion requirement for the id claim.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns>A <see cref="Task" /> whose is true if the id claim is valid and false otherwise.</returns>
+        private static Task<bool> GuidAssertion(AuthorizationHandlerContext context)
+        {
+            var idClaim = context.User.FindFirst(claim => claim.Type == CustomClaims.IdClaim);
+
+            var result = idClaim != null &&
+                         Guid.TryParse(
+                             idClaim.Value,
+                             out var guid) &&
+                         guid != Guid.Empty;
+
+            return Task.FromResult(result);
         }
     }
 }

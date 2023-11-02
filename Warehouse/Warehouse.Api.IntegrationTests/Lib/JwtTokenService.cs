@@ -21,7 +21,10 @@
             {
                 new Claim(
                     ClaimTypes.Role,
-                    Roles.User)
+                    CustomClaims.UserRole),
+                new Claim(
+                    CustomClaims.IdClaim,
+                    Guid.NewGuid().ToString())
             };
 
             var securityKey = new SymmetricSecurityKey(
