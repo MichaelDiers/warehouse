@@ -1,0 +1,16 @@
+name: warehouse-api
+on:
+  push:
+    paths:
+      - Warehouse/**
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CONFIGURATION: Release
+      SOLUTION_PATH: Warehouse/Warehouse.sln
+    steps:
+      - uses: actions/checkout@v3
+      - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
+      - run: 'dotnet test ${{ env.SOLUTION_PATH }} --filter Type=Unit -c ${{ env.CONFIGURATION }} --no-build --no-restore'

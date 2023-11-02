@@ -6,6 +6,9 @@ namespace Warehouse.Api.IntegrationTests
     using Warehouse.Api.IntegrationTests.Lib;
     using Warehouse.Api.Models.StockItems;
 
+    [Trait(
+        "Type",
+        "Integration")]
     public class StockItemApiTests
     {
         [Fact]
@@ -18,13 +21,9 @@ namespace Warehouse.Api.IntegrationTests
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 "Bearer",
                 token);
-            var createStockItem = new CreateStockItem
-            {
-                Name = new string(
-                    'a',
-                    100),
-                Quantity = 100
-            };
+            var createStockItem = new CreateStockItem(
+                "name",
+                10);
             var content = new StringContent(
                 JsonConvert.SerializeObject(createStockItem),
                 Encoding.UTF8,
