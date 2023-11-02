@@ -9,32 +9,41 @@ namespace Warehouse.Api.IntegrationTests
     [Trait(
         "Type",
         "Integration")]
-    public class StockItemApiTests
+    public class StockItemApiTests : IDisposable
     {
+        private const string Url = "https://localhost:7107/api/StockItem";
+
+        private readonly HttpClient httpClient;
+
+        public StockItemApiTests()
+        {
+            var token = new JwtTokenService().CreateToken();
+            this.httpClient = new HttpClient();
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                token);
+        }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose()
+        {
+            this.httpClient.Dispose();
+        }
+
         [Fact]
         public async Task CreateAsync()
         {
-            const string url = "https://localhost:7107/api/StockItem";
-            var token = new JwtTokenService().CreateToken();
-
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token);
             var createStockItem = new CreateStockItem(
                 "name",
                 10);
-            var content = new StringContent(
-                JsonConvert.SerializeObject(createStockItem),
-                Encoding.UTF8,
-                "application/json");
 
-            var response = await client.PostAsync(
-                url,
+            var content = this.CreateContent(createStockItem);
+
+            var response = await this.httpClient.PostAsync(
+                StockItemApiTests.Url,
                 content);
-            response.EnsureSuccessStatusCode();
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var stockItem = JsonConvert.DeserializeObject<StockItem>(jsonResponse);
+
+            var stockItem = await this.GetResponse<StockItem>(response);
 
             Assert.NotNull(stockItem);
             Assert.Equal(
@@ -43,6 +52,48 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 createStockItem.Quantity,
                 stockItem.Quantity);
+        }
+
+        [Fact]
+        public async Task ReadAsync()
+        {
+            var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}");
+
+            var stockItems = await this.GetResponse<IEnumerable<StockItem>>(response);
+
+            Assert.NotNull(stockItems);
+        }
+
+        [Fact]
+        public async Task ReadByIdAsync()
+        {
+            var id = Guid.NewGuid().ToString();
+
+            var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}/{id}");
+
+            var stockItem = await this.GetResponse<StockItem>(response);
+
+            Assert.NotNull(stockItem);
+            Assert.Equal(
+                id,
+                stockItem.Id);
+        }
+
+        private StringContent CreateContent<T>(T obj)
+        {
+            return new StringContent(
+                JsonConvert.SerializeObject(obj),
+                Encoding.UTF8,
+                "application/json");
+        }
+
+        private async Task<T> GetResponse<T>(HttpResponseMessage response)
+        {
+            response.EnsureSuccessStatusCode();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var obj = JsonConvert.DeserializeObject<T>(jsonResponse);
+            Assert.NotNull(obj);
+            return obj;
         }
     }
 }

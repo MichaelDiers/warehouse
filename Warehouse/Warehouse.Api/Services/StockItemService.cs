@@ -38,5 +38,28 @@
 
             return stockItem;
         }
+
+        /// <summary>
+        ///     Reads all stock items of the given user.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <returns>All stock items with the specified user id.</returns>
+        public Task<IEnumerable<IStockItem>> ReadAsync(string userId)
+        {
+            return this.provider.ReadAsync(userId);
+        }
+
+        /// <summary>
+        ///     Reads a stock item by its identifier.
+        /// </summary>
+        /// <param name="userId">The user identifier of the owner.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <returns>The found stock item.</returns>
+        public Task<IStockItem> ReadByIdAsync(string userId, string stockItemId)
+        {
+            return this.provider.ReadByIdAsync(
+                userId,
+                stockItemId);
+        }
     }
 }

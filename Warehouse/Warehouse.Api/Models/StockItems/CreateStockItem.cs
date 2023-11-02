@@ -1,6 +1,7 @@
 ﻿namespace Warehouse.Api.Models.StockItems
 {
     using System.ComponentModel.DataAnnotations;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Warehouse.Api.Contracts.StockItems;
 
     /// <inheritdoc cref="ICreateStockItem" />
@@ -27,7 +28,7 @@
         /// <summary>
         ///     Gets or sets the quantity of the item in stock.
         /// </summary>
-        [Required]
+        [BindRequired]
         [Range(
             0,
             9999)]

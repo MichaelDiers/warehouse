@@ -1,9 +1,11 @@
 ﻿namespace Warehouse.Api.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.StockItems;
+    using Warehouse.Api.Validation;
 
     /// <summary>
     ///     The controller for manipulating stock items.
@@ -11,6 +13,7 @@
     /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
     [Route("api/[controller]")]
     [ApiController]
+    [GuidValidation("stockItemId")]
     public class StockItemController : ControllerBase
     {
         /// <summary>
@@ -33,22 +36,27 @@
         {
         }
 
-        // GET: api/<StockItemController>
+        /// <summary>
+        ///     Read all stock items of the current user.
+        /// </summary>
+        /// <returns>A list of stock items.</returns>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<IStockItem>> Get()
         {
-            return new[]
-            {
-                "value1",
-                "value2"
-            };
+            return await this.stockItemService.ReadAsync(this.User.Claims.RequiredId());
         }
 
-        // GET api/<StockItemController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        /// <summary>
+        ///     Gets the stock item with the specified id.
+        /// </summary>
+        /// <param name="stockItemId">The identifier of the stock item.</param>
+        /// <returns>The stock item with the given id.</returns>
+        [HttpGet("{stockItemId}")]
+        public async Task<IStockItem> Get([BindRequired] [FromRoute] string stockItemId)
         {
-            return "value";
+            return await this.stockItemService.ReadByIdAsync(
+                this.User.Claims.RequiredId(),
+                stockItemId);
         }
 
         /// <summary>
