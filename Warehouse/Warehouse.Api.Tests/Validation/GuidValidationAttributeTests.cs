@@ -1,5 +1,6 @@
 ﻿namespace Warehouse.Api.Tests.Validation
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -12,6 +13,9 @@
     /// <summary>
     ///     Tests for <see cref="GuidValidationAttribute" />.
     /// </summary>
+    [SuppressMessage(
+        "ReSharper",
+        "StringLiteralTypo")]
     public class GuidValidationAttributeTests
     {
         [Theory]
@@ -54,7 +58,7 @@
             var actionExecutingContext = new ActionExecutingContext(
                 actionContext,
                 new List<IFilterMetadata>(),
-                new Dictionary<string, object> {{parameterName, parameterValue}},
+                new Dictionary<string, object?> {{parameterName, parameterValue}},
                 Mock.Of<Controller>());
 
             validationFilter.OnActionExecuting(actionExecutingContext);

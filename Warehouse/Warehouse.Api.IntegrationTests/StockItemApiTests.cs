@@ -37,13 +37,13 @@ namespace Warehouse.Api.IntegrationTests
                 "name",
                 10);
 
-            var content = this.CreateContent(createStockItem);
+            var content = StockItemApiTests.CreateContent(createStockItem);
 
             var response = await this.httpClient.PostAsync(
                 StockItemApiTests.Url,
                 content);
 
-            var stockItem = await this.GetResponse<StockItem>(response);
+            var stockItem = await StockItemApiTests.GetResponse<StockItem>(response);
 
             Assert.NotNull(stockItem);
             Assert.Equal(
@@ -59,7 +59,7 @@ namespace Warehouse.Api.IntegrationTests
         {
             var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}");
 
-            var stockItems = await this.GetResponse<IEnumerable<StockItem>>(response);
+            var stockItems = await StockItemApiTests.GetResponse<IEnumerable<StockItem>>(response);
 
             Assert.NotNull(stockItems);
         }
@@ -71,7 +71,7 @@ namespace Warehouse.Api.IntegrationTests
 
             var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}/{id}");
 
-            var stockItem = await this.GetResponse<StockItem>(response);
+            var stockItem = await StockItemApiTests.GetResponse<StockItem>(response);
 
             Assert.NotNull(stockItem);
             Assert.Equal(
@@ -79,7 +79,7 @@ namespace Warehouse.Api.IntegrationTests
                 stockItem.Id);
         }
 
-        private StringContent CreateContent<T>(T obj)
+        private static StringContent CreateContent<T>(T obj)
         {
             return new StringContent(
                 JsonConvert.SerializeObject(obj),
@@ -87,7 +87,7 @@ namespace Warehouse.Api.IntegrationTests
                 "application/json");
         }
 
-        private async Task<T> GetResponse<T>(HttpResponseMessage response)
+        private static async Task<T> GetResponse<T>(HttpResponseMessage response)
         {
             response.EnsureSuccessStatusCode();
             var jsonResponse = await response.Content.ReadAsStringAsync();

@@ -22,14 +22,17 @@
         {
             get
             {
+                if (AppSettingsService.applicationConfiguration is not null)
+                {
+                    return AppSettingsService.applicationConfiguration;
+                }
+
+                // ReSharper disable once StringLiteralTypo
+                var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                AppSettingsService.applicationConfiguration = configuration.Get<AppConfiguration>();
                 if (AppSettingsService.applicationConfiguration is null)
                 {
-                    var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-                    AppSettingsService.applicationConfiguration = configuration.Get<AppConfiguration>();
-                    if (AppSettingsService.applicationConfiguration is null)
-                    {
-                        throw new KeyNotFoundException(nameof(AppSettingsService.ApplicationConfiguration));
-                    }
+                    throw new KeyNotFoundException(nameof(AppSettingsService.ApplicationConfiguration));
                 }
 
                 return AppSettingsService.applicationConfiguration;
