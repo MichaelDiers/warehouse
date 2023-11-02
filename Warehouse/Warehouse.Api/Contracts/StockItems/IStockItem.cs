@@ -19,5 +19,10 @@
         ///     Gets the quantity of the item in stock.
         /// </summary>
         int Quantity { get; }
+
+        /// <summary>
+        ///     Gets the unique identifier of the owner.
+        /// </summary>
+        string UserId { get; }
     }
 }

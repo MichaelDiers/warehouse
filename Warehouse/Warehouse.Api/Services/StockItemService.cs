@@ -24,15 +24,15 @@
         ///     Creates the specified stock item.
         /// </summary>
         /// <param name="createStockItem">The stock item to be created.</param>
+        /// <param name="userId">The unique id of the user.</param>
         /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
-        public async Task<IStockItem> CreateAsync(ICreateStockItem createStockItem)
+        public async Task<IStockItem> CreateAsync(ICreateStockItem createStockItem, string userId)
         {
-            var stockItem = new StockItem
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = createStockItem.Name,
-                Quantity = createStockItem.Quantity
-            };
+            var stockItem = new StockItem(
+                Guid.NewGuid().ToString(),
+                createStockItem.Name,
+                createStockItem.Quantity,
+                userId);
 
             await this.provider.CreateAsync(stockItem);
 

@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.StockItems;
 
     /// <summary>
@@ -58,7 +59,9 @@
         [HttpPost]
         public async Task<IStockItem> Post([FromBody] CreateStockItem createStockItem)
         {
-            return await this.stockItemService.CreateAsync(createStockItem);
+            return await this.stockItemService.CreateAsync(
+                createStockItem,
+                this.User.Claims.RequiredId());
         }
 
         // PUT api/<StockItemController>/5

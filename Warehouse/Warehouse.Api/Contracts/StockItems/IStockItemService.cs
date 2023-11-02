@@ -9,7 +9,8 @@
         ///     Creates the specified stock item.
         /// </summary>
         /// <param name="createStockItem">The stock item to be created.</param>
+        /// <param name="userId">The unique id of the user.</param>
         /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
-        Task<IStockItem> CreateAsync(ICreateStockItem createStockItem);
+        Task<IStockItem> CreateAsync(ICreateStockItem createStockItem, string userId);
     }
 }
