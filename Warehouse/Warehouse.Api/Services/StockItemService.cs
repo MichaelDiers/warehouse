@@ -73,6 +73,8 @@
         /// <returns>All stock items with the specified user id.</returns>
         public Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return this.provider.ReadAsync(
                 userId,
                 cancellationToken);
@@ -87,6 +89,8 @@
         /// <returns>The found stock item.</returns>
         public Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return this.provider.ReadByIdAsync(
                 userId,
                 stockItemId,
@@ -106,6 +110,8 @@
             CancellationToken cancellationToken
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var stockItem = new StockItem(
                 updateStockItem.Id,
                 updateStockItem.Name,
