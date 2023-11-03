@@ -40,6 +40,19 @@
         }
 
         /// <summary>
+        ///     Deletes the specified stock item.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
+        public Task<bool> DeleteAsync(string userId, string stockItemId)
+        {
+            return this.provider.DeleteAsync(
+                userId,
+                stockItemId);
+        }
+
+        /// <summary>
         ///     Reads all stock items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
@@ -60,6 +73,23 @@
             return this.provider.ReadByIdAsync(
                 userId,
                 stockItemId);
+        }
+
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="updateStockItem">The stock item that is updated.</param>
+        /// <param name="userId">The user identifier of the owner.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public Task<bool> UpdateAsync(IUpdateStockItem updateStockItem, string userId)
+        {
+            var stockItem = new StockItem(
+                updateStockItem.Id,
+                updateStockItem.Name,
+                updateStockItem.Quantity,
+                userId);
+
+            return this.provider.UpdateAsync(stockItem);
         }
     }
 }

@@ -19,6 +19,21 @@ namespace Warehouse.Api.IntegrationTests
         }
 
         [Fact]
+        public async Task DeleteAsync()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+            var url = $"{StockItemApiTests.Url}/{stockItem.Id}";
+            await HttpClientService.DeleteAsync(
+                userId,
+                url);
+
+            await HttpClientService.GetFailAsync(
+                userId,
+                url);
+        }
+
+        [Fact]
         public async Task ReadAsync()
         {
             var userId = Guid.NewGuid().ToString();
@@ -51,15 +66,51 @@ namespace Warehouse.Api.IntegrationTests
         {
             var userId = Guid.NewGuid().ToString();
             var expected = await StockItemApiTests.CreateStockItemAsync(userId);
-            var actual = await HttpClientService.GetAsync<StockItem>(
+            var actual = await StockItemApiTests.ReadStockItemByIdAsync(
                 userId,
-                $"{StockItemApiTests.Url}/{expected.Id}");
+                expected.Id);
 
             Assert.NotNull(actual);
             Assert.True(
                 StockItemApiTests.Compare(
                     expected,
                     actual));
+        }
+
+        [Fact]
+        public async Task UpdateAsync()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+
+            Assert.NotNull(stockItem);
+
+            var update = new UpdateStockItem(
+                stockItem.Id,
+                $"{stockItem.Name}x",
+                stockItem.Quantity + 1);
+
+            await HttpClientService.PutAsync(
+                userId,
+                StockItemApiTests.Url,
+                update);
+
+            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+                userId,
+                stockItem.Id);
+
+            Assert.Equal(
+                stockItem.Id,
+                updated.Id);
+            Assert.Equal(
+                stockItem.UserId,
+                updated.UserId);
+            Assert.Equal(
+                update.Name,
+                updated.Name);
+            Assert.Equal(
+                update.Quantity,
+                updated.Quantity);
         }
 
         private static bool Compare(IStockItem a, IStockItem b)
@@ -89,6 +140,22 @@ namespace Warehouse.Api.IntegrationTests
                 userId,
                 stockItem.UserId);
 
+            return stockItem;
+        }
+
+        private static async Task<IStockItem> ReadStockItemByIdAsync(string userId, string stockItemId)
+        {
+            var stockItem = await HttpClientService.GetAsync<StockItem>(
+                userId,
+                $"{StockItemApiTests.Url}/{stockItemId}");
+
+            Assert.NotNull(stockItem);
+            Assert.Equal(
+                userId,
+                stockItem.UserId);
+            Assert.Equal(
+                stockItemId,
+                stockItem.Id);
             return stockItem;
         }
     }

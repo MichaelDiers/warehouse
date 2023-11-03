@@ -30,10 +30,19 @@
             this.stockItemService = stockItemService;
         }
 
-        // DELETE api/<StockItemController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        /// <summary>
+        ///     Deletes the specified stock item identifier.
+        /// </summary>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <returns>An <see cref="OkResult" /> if the delete succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
+        [HttpDelete("{stockItemId}")]
+        public async Task<ActionResult> Delete([BindRequired] [FromRoute] string stockItemId)
         {
+            var success = await this.stockItemService.DeleteAsync(
+                this.User.Claims.RequiredId(),
+                stockItemId);
+
+            return success ? this.Ok() : this.NotFound();
         }
 
         /// <summary>
@@ -82,10 +91,18 @@
                 stockItem);
         }
 
-        // PUT api/<StockItemController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        /// <summary>
+        ///     Update the specified stock item.
+        /// </summary>
+        /// <param name="updateStockItem">The stock item to be updated.</param>
+        /// <returns>An <see cref="OkResult" /> if updated succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
+        [HttpPut]
+        public async Task<ActionResult> Put([FromBody] UpdateStockItem updateStockItem)
         {
+            var success = await this.stockItemService.UpdateAsync(
+                updateStockItem,
+                this.User.Claims.RequiredId());
+            return success ? this.Ok() : this.NotFound();
         }
     }
 }

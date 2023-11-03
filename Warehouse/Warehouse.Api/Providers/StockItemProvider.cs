@@ -35,6 +35,20 @@
         }
 
         /// <summary>
+        ///     Deletes the specified stock item.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
+        public async Task<bool> DeleteAsync(string userId, string stockItemId)
+        {
+            var result =
+                await this.stockItemCollection.DeleteOneAsync(
+                    doc => doc.UserId == userId && doc.StockItemId == stockItemId);
+            return result.IsAcknowledged && result.DeletedCount == 1;
+        }
+
+        /// <summary>
         ///     Reads all stock items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
@@ -56,6 +70,24 @@
             var result =
                 await this.stockItemCollection.FindAsync(doc => doc.UserId == userId && doc.StockItemId == stockItemId);
             return StockItemProvider.ToStockItem(await result.FirstOrDefaultAsync());
+        }
+
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="stockItem">The stock item that is updated.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public async Task<bool> UpdateAsync(IStockItem stockItem)
+        {
+            var result = await this.stockItemCollection.UpdateOneAsync(
+                doc => doc.StockItemId == stockItem.Id && doc.UserId == stockItem.UserId,
+                Builders<DatabaseStockItem>.Update.Set(
+                        doc => doc.Name,
+                        stockItem.Name)
+                    .Set(
+                        doc => doc.Quantity,
+                        stockItem.Quantity));
+            return result.IsAcknowledged && result.MatchedCount == 1;
         }
 
         /// <summary>
