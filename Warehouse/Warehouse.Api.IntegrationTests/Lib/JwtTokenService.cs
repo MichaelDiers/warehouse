@@ -14,8 +14,9 @@
         /// <summary>
         ///     Creates the token.
         /// </summary>
+        /// <param name="id">The id of the user.</param>
         /// <returns>The token as a string.</returns>
-        public string CreateToken()
+        public string CreateToken(string id)
         {
             var claims = new[]
             {
@@ -24,7 +25,7 @@
                     CustomClaims.UserRole),
                 new Claim(
                     CustomClaims.IdClaim,
-                    Guid.NewGuid().ToString())
+                    id)
             };
 
             var securityKey = new SymmetricSecurityKey(

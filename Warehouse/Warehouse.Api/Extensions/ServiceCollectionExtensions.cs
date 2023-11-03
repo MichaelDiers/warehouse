@@ -5,10 +5,10 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.IdentityModel.Tokens;
     using Microsoft.OpenApi.Models;
+    using MongoDB.Driver;
     using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Config;
     using Warehouse.Api.Contracts.StockItems;
-    using Warehouse.Api.Models.Config;
     using Warehouse.Api.Providers;
     using Warehouse.Api.Services;
 
@@ -25,11 +25,10 @@
         /// <returns>The given <paramref name="services" />.</returns>
         public static IServiceCollection AddAppConfiguration(
             this IServiceCollection services,
-            IConfiguration configuration
+            IAppConfiguration configuration
         )
         {
-            services.AddSingleton<IAppConfiguration>(
-                _ => configuration.Get<AppConfiguration>() ?? throw new KeyNotFoundException(nameof(AppConfiguration)));
+            services.AddSingleton(_ => configuration);
 
             return services;
         }
@@ -102,15 +101,9 @@
         /// <exception cref="System.Collections.Generic.KeyNotFoundException">AppConfiguration</exception>
         public static IServiceCollection AddJwtAuthentication(
             this IServiceCollection services,
-            IConfiguration configuration
+            IJwtConfiguration configuration
         )
         {
-            var appConfiguration = configuration.Get<AppConfiguration>();
-            if (appConfiguration is null)
-            {
-                throw new KeyNotFoundException(nameof(AppConfiguration));
-            }
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(
                     options =>
@@ -121,10 +114,9 @@
                         {
                             ValidateIssuer = false,
                             ValidateAudience = false,
-                            ValidAudience = appConfiguration.Jwt.Audience,
-                            ValidIssuer = appConfiguration.Jwt.Issuer,
-                            IssuerSigningKey =
-                                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appConfiguration.Jwt.Key))
+                            ValidAudience = configuration.Audience,
+                            ValidIssuer = configuration.Issuer,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key))
                         };
                     });
 
@@ -147,6 +139,22 @@
                         .RequireAssertion(ServiceCollectionExtensions.GuidAssertion)
                         .Build();
                 });
+        }
+
+        /// <summary>
+        ///     Adds the warehouse database.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="configuration">The database configuration.</param>
+        /// <returns>The given <paramref name="services" />.</returns>
+        public static IServiceCollection AddWarehouseDb(
+            this IServiceCollection services,
+            IDatabaseConfiguration configuration
+        )
+        {
+            services.AddSingleton<IMongoClient>(_ => new MongoClient(configuration.ConnectionString));
+
+            return services;
         }
 
         /// <summary>

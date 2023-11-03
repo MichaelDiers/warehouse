@@ -52,11 +52,17 @@
         /// <param name="stockItemId">The identifier of the stock item.</param>
         /// <returns>The stock item with the given id.</returns>
         [HttpGet("{stockItemId}")]
-        public async Task<IStockItem> Get([BindRequired] [FromRoute] string stockItemId)
+        public async Task<ActionResult<IStockItem>> Get([BindRequired] [FromRoute] string stockItemId)
         {
-            return await this.stockItemService.ReadByIdAsync(
+            var result = await this.stockItemService.ReadByIdAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId);
+            if (result is null)
+            {
+                return this.NotFound();
+            }
+
+            return this.Ok(result);
         }
 
         /// <summary>
@@ -65,11 +71,15 @@
         /// <param name="createStockItem">The stock item to be created.</param>
         /// <returns>The created stock item.</returns>
         [HttpPost]
-        public async Task<IStockItem> Post([FromBody] CreateStockItem createStockItem)
+        public async Task<ActionResult> Post([FromBody] CreateStockItem createStockItem)
         {
-            return await this.stockItemService.CreateAsync(
+            var stockItem = await this.stockItemService.CreateAsync(
                 createStockItem,
                 this.User.Claims.RequiredId());
+            return this.CreatedAtAction(
+                nameof(this.Get),
+                new {stockItemId = stockItem.Id},
+                stockItem);
         }
 
         // PUT api/<StockItemController>/5

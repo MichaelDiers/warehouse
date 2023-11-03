@@ -26,6 +26,6 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <returns>The found stock item.</returns>
-        Task<IStockItem> ReadByIdAsync(string userId, string stockItemId);
+        Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId);
     }
 }

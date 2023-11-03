@@ -1,49 +1,82 @@
 namespace Warehouse.Api.IntegrationTests
 {
-    using System.Net.Http.Headers;
-    using System.Text;
-    using Newtonsoft.Json;
+    using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.IntegrationTests.Lib;
     using Warehouse.Api.Models.StockItems;
 
     [Trait(
         "Type",
         "Integration")]
-    public class StockItemApiTests : IDisposable
+    public class StockItemApiTests
     {
         private const string Url = "https://localhost:7107/api/StockItem";
 
-        private readonly HttpClient httpClient;
-
-        public StockItemApiTests()
+        [Fact]
+        public async Task CreateAsync()
         {
-            var token = new JwtTokenService().CreateToken();
-            this.httpClient = new HttpClient();
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                token);
-        }
-
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-        public void Dispose()
-        {
-            this.httpClient.Dispose();
+            var userId = Guid.NewGuid().ToString();
+            await StockItemApiTests.CreateStockItemAsync(userId);
         }
 
         [Fact]
-        public async Task CreateAsync()
+        public async Task ReadAsync()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItems = new[]
+            {
+                await StockItemApiTests.CreateStockItemAsync(userId),
+                await StockItemApiTests.CreateStockItemAsync(userId),
+                await StockItemApiTests.CreateStockItemAsync(userId)
+            };
+
+            var response = (await HttpClientService.GetAsync<IEnumerable<StockItem>>(
+                userId,
+                $"{StockItemApiTests.Url}")).ToArray();
+
+            Assert.Equal(
+                stockItems.Length,
+                response.Length);
+            foreach (var stockItem in stockItems)
+            {
+                Assert.Contains(
+                    response,
+                    si => StockItemApiTests.Compare(
+                        stockItem,
+                        si));
+            }
+        }
+
+        [Fact]
+        public async Task ReadByIdAsync()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var expected = await StockItemApiTests.CreateStockItemAsync(userId);
+            var actual = await HttpClientService.GetAsync<StockItem>(
+                userId,
+                $"{StockItemApiTests.Url}/{expected.Id}");
+
+            Assert.NotNull(actual);
+            Assert.True(
+                StockItemApiTests.Compare(
+                    expected,
+                    actual));
+        }
+
+        private static bool Compare(IStockItem a, IStockItem b)
+        {
+            return a.Id == b.Id && a.Name == b.Name && a.Quantity == b.Quantity && a.UserId == b.UserId;
+        }
+
+        private static async Task<IStockItem> CreateStockItemAsync(string userId)
         {
             var createStockItem = new CreateStockItem(
                 "name",
                 10);
 
-            var content = StockItemApiTests.CreateContent(createStockItem);
-
-            var response = await this.httpClient.PostAsync(
+            var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
+                userId,
                 StockItemApiTests.Url,
-                content);
-
-            var stockItem = await StockItemApiTests.GetResponse<StockItem>(response);
+                createStockItem);
 
             Assert.NotNull(stockItem);
             Assert.Equal(
@@ -52,48 +85,11 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 createStockItem.Quantity,
                 stockItem.Quantity);
-        }
-
-        [Fact]
-        public async Task ReadAsync()
-        {
-            var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}");
-
-            var stockItems = await StockItemApiTests.GetResponse<IEnumerable<StockItem>>(response);
-
-            Assert.NotNull(stockItems);
-        }
-
-        [Fact]
-        public async Task ReadByIdAsync()
-        {
-            var id = Guid.NewGuid().ToString();
-
-            var response = await this.httpClient.GetAsync($"{StockItemApiTests.Url}/{id}");
-
-            var stockItem = await StockItemApiTests.GetResponse<StockItem>(response);
-
-            Assert.NotNull(stockItem);
             Assert.Equal(
-                id,
-                stockItem.Id);
-        }
+                userId,
+                stockItem.UserId);
 
-        private static StringContent CreateContent<T>(T obj)
-        {
-            return new StringContent(
-                JsonConvert.SerializeObject(obj),
-                Encoding.UTF8,
-                "application/json");
-        }
-
-        private static async Task<T> GetResponse<T>(HttpResponseMessage response)
-        {
-            response.EnsureSuccessStatusCode();
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var obj = JsonConvert.DeserializeObject<T>(jsonResponse);
-            Assert.NotNull(obj);
-            return obj;
+            return stockItem;
         }
     }
 }

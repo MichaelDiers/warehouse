@@ -55,7 +55,7 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <returns>The found stock item.</returns>
-        public Task<IStockItem> ReadByIdAsync(string userId, string stockItemId)
+        public Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId)
         {
             return this.provider.ReadByIdAsync(
                 userId,

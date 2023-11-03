@@ -102,7 +102,7 @@
                     provider => provider.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>()))
-                .Returns(Task.FromResult(expectedStockItem));
+                .Returns(Task.FromResult<IStockItem?>(expectedStockItem));
 
             var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
@@ -111,6 +111,8 @@
             var stockItem = await service.ReadByIdAsync(
                 userId,
                 expectedStockItem.Id);
+
+            Assert.NotNull(stockItem);
 
             Assert.Equal(
                 expectedStockItem.Id,
