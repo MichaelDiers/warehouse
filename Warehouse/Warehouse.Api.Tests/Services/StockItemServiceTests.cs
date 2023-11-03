@@ -18,7 +18,10 @@
         public async Task CreateAsync()
         {
             var stockItemProviderMock = new Mock<IStockItemProvider>();
-            stockItemProviderMock.Setup(provider => provider.CreateAsync(It.IsAny<IStockItem>()));
+            stockItemProviderMock.Setup(
+                provider => provider.CreateAsync(
+                    It.IsAny<IStockItem>(),
+                    It.IsAny<CancellationToken>()));
 
             var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
@@ -31,7 +34,8 @@
 
             var stockItem = await service.CreateAsync(
                 createStockItem,
-                userId);
+                userId,
+                It.IsAny<CancellationToken>());
 
             Assert.Equal(
                 createStockItem.Quantity,
@@ -64,14 +68,19 @@
                         userId))
                 .ToArray();
             var stockItemProviderMock = new Mock<IStockItemProvider>();
-            stockItemProviderMock.Setup(provider => provider.ReadAsync(It.IsAny<string>()))
+            stockItemProviderMock.Setup(
+                    provider => provider.ReadAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(expectedStockItems as IEnumerable<IStockItem>));
 
             var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
-            var stockItems = (await service.ReadAsync(userId)).ToArray();
+            var stockItems = (await service.ReadAsync(
+                userId,
+                It.IsAny<CancellationToken>())).ToArray();
 
             Assert.Equal(
                 expectedStockItems.Length,
@@ -101,7 +110,8 @@
             stockItemProviderMock.Setup(
                     provider => provider.ReadByIdAsync(
                         It.IsAny<string>(),
-                        It.IsAny<string>()))
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IStockItem?>(expectedStockItem));
 
             var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
@@ -110,7 +120,8 @@
 
             var stockItem = await service.ReadByIdAsync(
                 userId,
-                expectedStockItem.Id);
+                expectedStockItem.Id,
+                It.IsAny<CancellationToken>());
 
             Assert.NotNull(stockItem);
 

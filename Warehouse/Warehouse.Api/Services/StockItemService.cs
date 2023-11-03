@@ -25,16 +25,25 @@
         /// </summary>
         /// <param name="createStockItem">The stock item to be created.</param>
         /// <param name="userId">The unique id of the user.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
-        public async Task<IStockItem> CreateAsync(ICreateStockItem createStockItem, string userId)
+        public async Task<IStockItem> CreateAsync(
+            ICreateStockItem createStockItem,
+            string userId,
+            CancellationToken cancellationToken
+        )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var stockItem = new StockItem(
                 Guid.NewGuid().ToString(),
                 createStockItem.Name,
                 createStockItem.Quantity,
                 userId);
 
-            await this.provider.CreateAsync(stockItem);
+            await this.provider.CreateAsync(
+                stockItem,
+                cancellationToken);
 
             return stockItem;
         }
@@ -44,22 +53,29 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public Task<bool> DeleteAsync(string userId, string stockItemId)
+        public Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return this.provider.DeleteAsync(
                 userId,
-                stockItemId);
+                stockItemId,
+                cancellationToken);
         }
 
         /// <summary>
         ///     Reads all stock items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>All stock items with the specified user id.</returns>
-        public Task<IEnumerable<IStockItem>> ReadAsync(string userId)
+        public Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken)
         {
-            return this.provider.ReadAsync(userId);
+            return this.provider.ReadAsync(
+                userId,
+                cancellationToken);
         }
 
         /// <summary>
@@ -67,12 +83,14 @@
         /// </summary>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The found stock item.</returns>
-        public Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId)
+        public Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
             return this.provider.ReadByIdAsync(
                 userId,
-                stockItemId);
+                stockItemId,
+                cancellationToken);
         }
 
         /// <summary>
@@ -80,8 +98,13 @@
         /// </summary>
         /// <param name="updateStockItem">The stock item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public Task<bool> UpdateAsync(IUpdateStockItem updateStockItem, string userId)
+        public Task<bool> UpdateAsync(
+            IUpdateStockItem updateStockItem,
+            string userId,
+            CancellationToken cancellationToken
+        )
         {
             var stockItem = new StockItem(
                 updateStockItem.Id,
@@ -89,7 +112,9 @@
                 updateStockItem.Quantity,
                 userId);
 
-            return this.provider.UpdateAsync(stockItem);
+            return this.provider.UpdateAsync(
+                stockItem,
+                cancellationToken);
         }
     }
 }

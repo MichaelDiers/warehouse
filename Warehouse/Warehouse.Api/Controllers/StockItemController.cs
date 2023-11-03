@@ -34,38 +34,50 @@
         ///     Deletes the specified stock item identifier.
         /// </summary>
         /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if the delete succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
         [HttpDelete("{stockItemId}")]
-        public async Task<ActionResult> Delete([BindRequired] [FromRoute] string stockItemId)
+        public async Task<ActionResult> Delete(
+            [BindRequired] [FromRoute] string stockItemId,
+            CancellationToken cancellationToken
+        )
         {
             var success = await this.stockItemService.DeleteAsync(
                 this.User.Claims.RequiredId(),
-                stockItemId);
-
+                stockItemId,
+                cancellationToken);
             return success ? this.Ok() : this.NotFound();
         }
 
         /// <summary>
         ///     Read all stock items of the current user.
         /// </summary>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A list of stock items.</returns>
         [HttpGet]
-        public async Task<IEnumerable<IStockItem>> Get()
+        public async Task<IEnumerable<IStockItem>> Get(CancellationToken cancellationToken)
         {
-            return await this.stockItemService.ReadAsync(this.User.Claims.RequiredId());
+            return await this.stockItemService.ReadAsync(
+                this.User.Claims.RequiredId(),
+                cancellationToken);
         }
 
         /// <summary>
         ///     Gets the stock item with the specified id.
         /// </summary>
         /// <param name="stockItemId">The identifier of the stock item.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The stock item with the given id.</returns>
         [HttpGet("{stockItemId}")]
-        public async Task<ActionResult<IStockItem>> Get([BindRequired] [FromRoute] string stockItemId)
+        public async Task<ActionResult<IStockItem>> Get(
+            [BindRequired] [FromRoute] string stockItemId,
+            CancellationToken cancellationToken
+        )
         {
             var result = await this.stockItemService.ReadByIdAsync(
                 this.User.Claims.RequiredId(),
-                stockItemId);
+                stockItemId,
+                cancellationToken);
             if (result is null)
             {
                 return this.NotFound();
@@ -78,13 +90,18 @@
         ///     Posts the specified stock item.
         /// </summary>
         /// <param name="createStockItem">The stock item to be created.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The created stock item.</returns>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] CreateStockItem createStockItem)
+        public async Task<ActionResult> Post(
+            [FromBody] CreateStockItem createStockItem,
+            CancellationToken cancellationToken
+        )
         {
             var stockItem = await this.stockItemService.CreateAsync(
                 createStockItem,
-                this.User.Claims.RequiredId());
+                this.User.Claims.RequiredId(),
+                cancellationToken);
             return this.CreatedAtAction(
                 nameof(this.Get),
                 new {stockItemId = stockItem.Id},
@@ -95,13 +112,18 @@
         ///     Update the specified stock item.
         /// </summary>
         /// <param name="updateStockItem">The stock item to be updated.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if updated succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
         [HttpPut]
-        public async Task<ActionResult> Put([FromBody] UpdateStockItem updateStockItem)
+        public async Task<ActionResult> Put(
+            [FromBody] UpdateStockItem updateStockItem,
+            CancellationToken cancellationToken
+        )
         {
             var success = await this.stockItemService.UpdateAsync(
                 updateStockItem,
-                this.User.Claims.RequiredId());
+                this.User.Claims.RequiredId(),
+                cancellationToken);
             return success ? this.Ok() : this.NotFound();
         }
     }

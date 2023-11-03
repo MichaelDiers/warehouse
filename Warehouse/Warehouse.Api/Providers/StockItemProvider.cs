@@ -28,10 +28,13 @@
         ///     Creates the specified stock item.
         /// </summary>
         /// <param name="stockItem">The stock item to be created.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task CreateAsync(IStockItem stockItem)
+        public async Task CreateAsync(IStockItem stockItem, CancellationToken cancellationToken)
         {
-            await this.stockItemCollection.InsertOneAsync(new DatabaseStockItem(stockItem));
+            await this.stockItemCollection.InsertOneAsync(
+                new DatabaseStockItem(stockItem),
+                cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -39,12 +42,13 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public async Task<bool> DeleteAsync(string userId, string stockItemId)
+        public async Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
-            var result =
-                await this.stockItemCollection.DeleteOneAsync(
-                    doc => doc.UserId == userId && doc.StockItemId == stockItemId);
+            var result = await this.stockItemCollection.DeleteOneAsync(
+                doc => doc.UserId == userId && doc.StockItemId == stockItemId,
+                cancellationToken);
             return result.IsAcknowledged && result.DeletedCount == 1;
         }
 
@@ -52,11 +56,16 @@
         ///     Reads all stock items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>All stock items with the specified user id.</returns>
-        public async Task<IEnumerable<IStockItem>> ReadAsync(string userId)
+        public async Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken)
         {
-            var result = await this.stockItemCollection.FindAsync(doc => doc.UserId == userId);
-            return await StockItemProvider.ToStockItems(result);
+            var result = await this.stockItemCollection.FindAsync(
+                doc => doc.UserId == userId,
+                cancellationToken: cancellationToken);
+            return await StockItemProvider.ToStockItems(
+                result,
+                cancellationToken);
         }
 
         /// <summary>
@@ -64,20 +73,27 @@
         /// </summary>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The found stock item.</returns>
-        public async Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId)
+        public async Task<IStockItem?> ReadByIdAsync(
+            string userId,
+            string stockItemId,
+            CancellationToken cancellationToken
+        )
         {
-            var result =
-                await this.stockItemCollection.FindAsync(doc => doc.UserId == userId && doc.StockItemId == stockItemId);
-            return StockItemProvider.ToStockItem(await result.FirstOrDefaultAsync());
+            var result = await this.stockItemCollection.FindAsync(
+                doc => doc.UserId == userId && doc.StockItemId == stockItemId,
+                cancellationToken: cancellationToken);
+            return StockItemProvider.ToStockItem(await result.FirstOrDefaultAsync(cancellationToken));
         }
 
         /// <summary>
         ///     Updates the specified stock item.
         /// </summary>
         /// <param name="stockItem">The stock item that is updated.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(IStockItem stockItem)
+        public async Task<bool> UpdateAsync(IStockItem stockItem, CancellationToken cancellationToken)
         {
             var result = await this.stockItemCollection.UpdateOneAsync(
                 doc => doc.StockItemId == stockItem.Id && doc.UserId == stockItem.UserId,
@@ -86,7 +102,8 @@
                         stockItem.Name)
                     .Set(
                         doc => doc.Quantity,
-                        stockItem.Quantity));
+                        stockItem.Quantity),
+                cancellationToken: cancellationToken);
             return result.IsAcknowledged && result.MatchedCount == 1;
         }
 
@@ -124,15 +141,20 @@
         ///     <see cref="IStockItem" />.
         /// </summary>
         /// <param name="cursor">The database cursor.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The converted stock items.</returns>
-        private static async Task<IEnumerable<IStockItem>> ToStockItems(IAsyncCursor<DatabaseStockItem> cursor)
+        private static async Task<IEnumerable<IStockItem>> ToStockItems(
+            IAsyncCursor<DatabaseStockItem> cursor,
+            CancellationToken cancellationToken
+        )
         {
             var result = new List<IStockItem>();
             await cursor.ForEachAsync(
                 databaseStockItem =>
                 {
                     result.Add(StockItemProvider.ToStockItem(databaseStockItem) ?? throw new NotImplementedException());
-                });
+                },
+                cancellationToken);
             return result;
         }
     }
