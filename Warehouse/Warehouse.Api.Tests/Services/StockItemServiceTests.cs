@@ -53,6 +53,41 @@
                 guid != Guid.Empty);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task DeleteAsync(bool isDeleted)
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
+
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
+                    mock => mock.DeleteAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(isDeleted));
+
+            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+                new[] {ServiceCollectionExtensions.AddDependencies},
+                stockItemProviderMock.Object);
+
+            Assert.Equal(
+                isDeleted,
+                await service.DeleteAsync(
+                    userId,
+                    stockItemId,
+                    CancellationToken.None));
+
+            stockItemProviderMock.Verify(
+                mock => mock.DeleteAsync(
+                    userId,
+                    stockItemId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
         [Fact]
         public async Task ReadAsync()
         {
@@ -137,6 +172,36 @@
             Assert.Equal(
                 expectedStockItem.UserId,
                 stockItem.UserId);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task UpdateAsync(bool isUpdated)
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
+
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
+                    mock => mock.UpdateAsync(
+                        It.IsAny<IStockItem>(),
+                        It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(isUpdated));
+
+            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+                new[] {ServiceCollectionExtensions.AddDependencies},
+                stockItemProviderMock.Object);
+
+            Assert.Equal(
+                isUpdated,
+                await service.UpdateAsync(
+                    new UpdateStockItem(
+                        stockItemId,
+                        "name",
+                        10),
+                    userId,
+                    CancellationToken.None));
         }
     }
 }
