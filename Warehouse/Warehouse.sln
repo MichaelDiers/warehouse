@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Api", "Warehouse.Api\Warehouse.Api.csproj", "{416FD0BB-AC16-4E75-A02D-1204FC2914B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Api", "Warehouse.Api\Warehouse.Api.csproj", "{416FD0BB-AC16-4E75-A02D-1204FC2914B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Api.IntegrationTests", "Warehouse.Api.IntegrationTests\Warehouse.Api.IntegrationTests.csproj", "{06AFA557-AAAF-45FF-918C-ECC60669C3B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Api.IntegrationTests", "Warehouse.Api.IntegrationTests\Warehouse.Api.IntegrationTests.csproj", "{06AFA557-AAAF-45FF-918C-ECC60669C3B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Api.Tests", "Warehouse.Api.Tests\Warehouse.Api.Tests.csproj", "{A4689A96-F37B-4CCA-8FA2-ECCCD795EC15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Api.Tests", "Warehouse.Api.Tests\Warehouse.Api.Tests.csproj", "{A4689A96-F37B-4CCA-8FA2-ECCCD795EC15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{75AC0DAB-E77F-4357-8156-0AF6EDCC0631}"
+	ProjectSection(SolutionItems) = preProject
+		docker.txt = docker.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
