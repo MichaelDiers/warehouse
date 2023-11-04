@@ -15,6 +15,7 @@
         Constants.TraitValueUnitTest)]
     public class StockItemControllerTests
     {
+        private const int MinimumQuantity = StockItemControllerTests.Quantity / 2;
         private const int Quantity = 100;
 
         private readonly CreateStockItem createStockItem;
@@ -33,18 +34,21 @@
         {
             this.createStockItem = new CreateStockItem(
                 this.name,
-                StockItemControllerTests.Quantity);
+                StockItemControllerTests.Quantity,
+                StockItemControllerTests.MinimumQuantity);
 
             this.stockItem = new StockItem(
                 this.stockItemId,
                 this.name,
                 StockItemControllerTests.Quantity,
+                StockItemControllerTests.MinimumQuantity,
                 this.userId);
 
             this.updateStockItem = new UpdateStockItem(
                 this.stockItemId,
                 $"{this.name}_update",
-                StockItemControllerTests.Quantity + 1);
+                StockItemControllerTests.Quantity + 1,
+                StockItemControllerTests.MinimumQuantity + 1);
         }
 
         [Fact]
@@ -79,6 +83,9 @@
             Assert.Equal(
                 StockItemControllerTests.Quantity,
                 actual.Quantity);
+            Assert.Equal(
+                StockItemControllerTests.MinimumQuantity,
+                actual.MinimumQuantity);
             Assert.Equal(
                 this.name,
                 actual.Name);
@@ -144,6 +151,9 @@
                 StockItemControllerTests.Quantity,
                 actual.Quantity);
             Assert.Equal(
+                StockItemControllerTests.MinimumQuantity,
+                actual.MinimumQuantity);
+            Assert.Equal(
                 this.name,
                 actual.Name);
         }
@@ -189,6 +199,9 @@
                 Assert.Equal(
                     StockItemControllerTests.Quantity,
                     actual.Quantity);
+                Assert.Equal(
+                    StockItemControllerTests.MinimumQuantity,
+                    actual.MinimumQuantity);
                 Assert.Equal(
                     this.name,
                     actual.Name);

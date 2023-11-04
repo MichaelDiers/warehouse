@@ -11,17 +11,20 @@
         /// <param name="id">The identifier.</param>
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
+        /// <param name="minimumQuantity">The minimal required quantity.</param>
         /// <param name="userId">The user identifier.</param>
         public StockItem(
             string id,
             string name,
             int quantity,
+            int minimumQuantity,
             string userId
         )
         {
             this.Id = id;
             this.Name = name;
             this.Quantity = quantity;
+            this.MinimumQuantity = minimumQuantity;
             this.UserId = userId;
         }
 
@@ -29,6 +32,11 @@
         ///     Gets or sets the id of the item.
         /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the minimum required quantity of the item in stock.
+        /// </summary>
+        public int MinimumQuantity { get; set; }
 
         /// <summary>
         ///     Gets or sets the name of the item.

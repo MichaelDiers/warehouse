@@ -17,11 +17,22 @@
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
-        public CreateStockItem(string name, int quantity)
+        /// <param name="minimumQuantity">The minimal required quantity.</param>
+        public CreateStockItem(string name, int quantity, int minimumQuantity)
         {
             this.Name = name;
             this.Quantity = quantity;
+            this.MinimumQuantity = minimumQuantity;
         }
+
+        /// <summary>
+        ///     Gets or sets the minimum required quantity of the item in stock.
+        /// </summary>
+        [BindRequired]
+        [Range(
+            0,
+            CreateStockItem.MaxQuantity)]
+        public int MinimumQuantity { get; set; }
 
         /// <summary>
         ///     Gets or sets the name of the item.

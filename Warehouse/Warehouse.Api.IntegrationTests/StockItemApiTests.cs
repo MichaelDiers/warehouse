@@ -90,7 +90,8 @@ namespace Warehouse.Api.IntegrationTests
             var update = new UpdateStockItem(
                 stockItem.Id,
                 $"{stockItem.Name}x",
-                stockItem.Quantity + 1);
+                stockItem.Quantity + 1,
+                stockItem.MinimumQuantity + 1);
 
             await HttpClientService.PutAsync(
                 userId,
@@ -113,6 +114,9 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 update.Quantity,
                 updated.Quantity);
+            Assert.Equal(
+                update.MinimumQuantity,
+                updated.MinimumQuantity);
         }
 
         [Theory]
@@ -166,6 +170,9 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 stockItem.Quantity + update,
                 updated.Quantity);
+            Assert.Equal(
+                stockItem.MinimumQuantity,
+                updated.MinimumQuantity);
         }
 
         [Theory]
@@ -211,18 +218,26 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 stockItem.Quantity,
                 updated.Quantity);
+            Assert.Equal(
+                stockItem.MinimumQuantity,
+                updated.MinimumQuantity);
         }
 
         private static bool Compare(IStockItem a, IStockItem b)
         {
-            return a.Id == b.Id && a.Name == b.Name && a.Quantity == b.Quantity && a.UserId == b.UserId;
+            return a.Id == b.Id &&
+                   a.Name == b.Name &&
+                   a.Quantity == b.Quantity &&
+                   a.UserId == b.UserId &&
+                   a.MinimumQuantity == b.MinimumQuantity;
         }
 
         private static async Task<IStockItem> CreateStockItemAsync(string userId)
         {
             var createStockItem = new CreateStockItem(
                 "name",
-                10);
+                10,
+                11);
 
             var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
                 userId,
@@ -236,6 +251,9 @@ namespace Warehouse.Api.IntegrationTests
             Assert.Equal(
                 createStockItem.Quantity,
                 stockItem.Quantity);
+            Assert.Equal(
+                createStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
             Assert.Equal(
                 userId,
                 stockItem.UserId);

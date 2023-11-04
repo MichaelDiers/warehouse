@@ -24,6 +24,7 @@
         {
             this.Name = stockItem.Name;
             this.Quantity = stockItem.Quantity;
+            this.MinimumQuantity = stockItem.MinimumQuantity;
             this.StockItemId = stockItem.Id;
             this.UserId = stockItem.UserId;
         }
@@ -34,6 +35,11 @@
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the minimum required quantity of the item in stock.
+        /// </summary>
+        public int? MinimumQuantity { get; set; }
 
         /// <summary>
         ///     Gets the name of the item.

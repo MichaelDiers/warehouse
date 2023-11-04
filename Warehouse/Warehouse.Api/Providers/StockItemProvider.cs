@@ -102,7 +102,10 @@
                         stockItem.Name)
                     .Set(
                         doc => doc.Quantity,
-                        stockItem.Quantity),
+                        stockItem.Quantity)
+                    .Set(
+                        doc => doc.MinimumQuantity,
+                        stockItem.MinimumQuantity),
                 cancellationToken: cancellationToken);
             return result.IsAcknowledged && result.MatchedCount == 1;
         }
@@ -147,7 +150,8 @@
             if (databaseStockItem.Name is null ||
                 databaseStockItem.Quantity is null ||
                 databaseStockItem.StockItemId is null ||
-                databaseStockItem.UserId is null)
+                databaseStockItem.UserId is null ||
+                databaseStockItem.MinimumQuantity is null)
             {
                 // Todo
                 throw new NotImplementedException();
@@ -157,6 +161,7 @@
                 databaseStockItem.StockItemId,
                 databaseStockItem.Name,
                 databaseStockItem.Quantity.Value,
+                databaseStockItem.MinimumQuantity.Value,
                 databaseStockItem.UserId);
         }
 

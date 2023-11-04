@@ -30,7 +30,8 @@
 
             var createStockItem = new CreateStockItem(
                 "name",
-                100);
+                100,
+                50);
             var userId = Guid.NewGuid().ToString();
 
             var stockItem = await service.CreateAsync(
@@ -41,6 +42,9 @@
             Assert.Equal(
                 createStockItem.Quantity,
                 stockItem.Quantity);
+            Assert.Equal(
+                createStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
             Assert.Equal(
                 createStockItem.Name,
                 stockItem.Name);
@@ -101,6 +105,7 @@
                         Guid.NewGuid().ToString(),
                         $"{i}",
                         i,
+                        i + 1,
                         userId))
                 .ToArray();
             var stockItemProviderMock = new Mock<IStockItemProvider>();
@@ -126,6 +131,7 @@
                 Assert.NotNull(
                     stockItems.FirstOrDefault(
                         si => si.Quantity == expectedStockItem.Quantity &&
+                              si.MinimumQuantity == expectedStockItem.MinimumQuantity &&
                               si.Name == expectedStockItem.Name &&
                               si.Id == expectedStockItem.Id &&
                               si.UserId == expectedStockItem.UserId));
@@ -140,6 +146,7 @@
                 Guid.NewGuid().ToString(),
                 "name",
                 1,
+                2,
                 userId) as IStockItem;
 
             var stockItemProviderMock = new Mock<IStockItemProvider>();
@@ -171,6 +178,9 @@
                 expectedStockItem.Quantity,
                 stockItem.Quantity);
             Assert.Equal(
+                expectedStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
+            Assert.Equal(
                 expectedStockItem.UserId,
                 stockItem.UserId);
         }
@@ -200,7 +210,8 @@
                     new UpdateStockItem(
                         stockItemId,
                         "name",
-                        10),
+                        10,
+                        11),
                     userId,
                     CancellationToken.None));
         }

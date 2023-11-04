@@ -40,6 +40,7 @@
                 Guid.NewGuid().ToString(),
                 createStockItem.Name,
                 createStockItem.Quantity,
+                createStockItem.MinimumQuantity,
                 userId);
 
             await this.provider.CreateAsync(
@@ -159,6 +160,7 @@
                 updateStockItem.Id,
                 updateStockItem.Name,
                 updateStockItem.Quantity,
+                updateStockItem.MinimumQuantity,
                 userId);
 
             return this.provider.UpdateAsync(

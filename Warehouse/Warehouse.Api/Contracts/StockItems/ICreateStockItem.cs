@@ -6,6 +6,11 @@
     public interface ICreateStockItem
     {
         /// <summary>
+        ///     Gets the minimum required quantity of the item in stock.
+        /// </summary>
+        int MinimumQuantity { get; }
+
+        /// <summary>
         ///     Gets the name of the item.
         /// </summary>
         string Name { get; }
