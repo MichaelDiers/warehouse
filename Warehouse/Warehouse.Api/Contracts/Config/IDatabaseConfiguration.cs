@@ -16,6 +16,11 @@
         string DatabaseName { get; }
 
         /// <summary>
+        ///     Gets the name of the shopping item collection.
+        /// </summary>
+        string ShoppingItemCollectionName { get; }
+
+        /// <summary>
         ///     Gets the name of the stock item collection.
         /// </summary>
         string StockItemCollectionName { get; }

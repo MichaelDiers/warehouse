@@ -1,4 +1,4 @@
-﻿namespace Warehouse.Api.Contracts.StockItems
+﻿namespace Warehouse.Api.Contracts
 {
     /// <summary>
     ///     Specifies the type of an update operation.
