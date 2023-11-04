@@ -8,6 +8,7 @@
     using MongoDB.Driver;
     using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Config;
+    using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Providers;
     using Warehouse.Api.Services;
@@ -88,6 +89,9 @@
         {
             services.AddScoped<IStockItemProvider, StockItemProvider>();
             services.AddScoped<IStockItemService, StockItemService>();
+
+            services.AddScoped<IShoppingItemProvider, ShoppingItemProvider>();
+            services.AddScoped<IShoppingItemService, ShoppingItemService>();
 
             return services;
         }

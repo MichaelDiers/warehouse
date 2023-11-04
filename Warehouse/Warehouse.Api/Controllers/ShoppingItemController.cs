@@ -4,19 +4,19 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Warehouse.Api.Contracts;
-    using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Extensions;
-    using Warehouse.Api.Models.StockItems;
+    using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Validation;
 
     /// <summary>
-    ///     The controller for manipulating stock items.
+    ///     The controller for manipulating shopping items.
     /// </summary>
     /// <seealso cref="Microsoft.AspNetCore.Mvc.ControllerBase" />
     [Route("api/[controller]")]
     [ApiController]
-    [GuidValidation("stockItemId")]
-    public class StockItemController : ControllerBase
+    [GuidValidation("shoppingItemId")]
+    public class ShoppingItemController : ControllerBase
     {
         /// <summary>
         ///     The decrease operation for <see cref="Put(string, string, int, System.Threading.CancellationToken)" />.
@@ -29,66 +29,66 @@
         private const string OperationIncrease = "increase";
 
         /// <summary>
-        ///     The business logic for handling stock items.
+        ///     The business logic for handling shopping items.
         /// </summary>
-        private readonly IStockItemService stockItemService;
+        private readonly IShoppingItemService shoppingItemService;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="StockItemController" /> class.
+        ///     Initializes a new instance of the <see cref="ShoppingItemController" /> class.
         /// </summary>
-        /// <param name="stockItemService">The business logic for handling stock items.</param>
-        public StockItemController(IStockItemService stockItemService)
+        /// <param name="shoppingItemService">The business logic for handling shopping items.</param>
+        public ShoppingItemController(IShoppingItemService shoppingItemService)
         {
-            this.stockItemService = stockItemService;
+            this.shoppingItemService = shoppingItemService;
         }
 
         /// <summary>
-        ///     Deletes the specified stock item identifier.
+        ///     Deletes the specified shopping item identifier.
         /// </summary>
-        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if the delete succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpDelete("{stockItemId}")]
+        [HttpDelete("{shoppingItemId}")]
         public async Task<ActionResult> Delete(
-            [BindRequired] [FromRoute] string stockItemId,
+            [BindRequired] [FromRoute] string shoppingItemId,
             CancellationToken cancellationToken
         )
         {
-            var success = await this.stockItemService.DeleteAsync(
+            var success = await this.shoppingItemService.DeleteAsync(
                 this.User.Claims.RequiredId(),
-                stockItemId,
+                shoppingItemId,
                 cancellationToken);
             return success ? this.Ok() : this.NotFound();
         }
 
         /// <summary>
-        ///     Read all stock items of the current user.
+        ///     Read all shopping items of the current user.
         /// </summary>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A list of stock items.</returns>
+        /// <returns>A list of shopping items.</returns>
         [HttpGet]
-        public async Task<IEnumerable<IStockItem>> Get(CancellationToken cancellationToken)
+        public async Task<IEnumerable<IShoppingItem>> Get(CancellationToken cancellationToken)
         {
-            return await this.stockItemService.ReadAsync(
+            return await this.shoppingItemService.ReadAsync(
                 this.User.Claims.RequiredId(),
                 cancellationToken);
         }
 
         /// <summary>
-        ///     Gets the stock item with the specified id.
+        ///     Gets the shopping item with the specified id.
         /// </summary>
-        /// <param name="stockItemId">The identifier of the stock item.</param>
+        /// <param name="shoppingItemId">The identifier of the shopping item.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>The stock item with the given id.</returns>
-        [HttpGet("{stockItemId}")]
-        public async Task<ActionResult<IStockItem>> Get(
-            [BindRequired] [FromRoute] string stockItemId,
+        /// <returns>The shopping item with the given id.</returns>
+        [HttpGet("{shoppingItemId}")]
+        public async Task<ActionResult<IShoppingItem>> Get(
+            [BindRequired] [FromRoute] string shoppingItemId,
             CancellationToken cancellationToken
         )
         {
-            var result = await this.stockItemService.ReadByIdAsync(
+            var result = await this.shoppingItemService.ReadByIdAsync(
                 this.User.Claims.RequiredId(),
-                stockItemId,
+                shoppingItemId,
                 cancellationToken);
             if (result is null)
             {
@@ -99,66 +99,67 @@
         }
 
         /// <summary>
-        ///     Posts the specified stock item.
+        ///     Posts the specified shopping item.
         /// </summary>
-        /// <param name="createStockItem">The stock item to be created.</param>
+        /// <param name="createShoppingItem">The shopping item to be created.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>The created stock item.</returns>
+        /// <returns>The created shopping item.</returns>
         [HttpPost]
         public async Task<ActionResult> Post(
-            [FromBody] CreateStockItem createStockItem,
+            [FromBody] CreateShoppingItem createShoppingItem,
             CancellationToken cancellationToken
         )
         {
-            var stockItem = await this.stockItemService.CreateAsync(
-                createStockItem,
+            var shoppingItem = await this.shoppingItemService.CreateAsync(
+                createShoppingItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
             return this.CreatedAtAction(
                 nameof(this.Get),
-                new {stockItemId = stockItem.Id},
-                stockItem);
+                new {shoppingItemId = shoppingItem.Id},
+                shoppingItem);
         }
 
         /// <summary>
-        ///     Update the specified stock item.
+        ///     Update the specified shopping item.
         /// </summary>
-        /// <param name="updateStockItem">The stock item to be updated.</param>
+        /// <param name="updateShoppingItem">The shopping item to be updated.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if the update succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
         [HttpPut]
         public async Task<ActionResult> Put(
-            [FromBody] UpdateStockItem updateStockItem,
+            [FromBody] UpdateShoppingItem updateShoppingItem,
             CancellationToken cancellationToken
         )
         {
-            var success = await this.stockItemService.UpdateAsync(
-                updateStockItem,
+            var success = await this.shoppingItemService.UpdateAsync(
+                updateShoppingItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
             return success ? this.Ok() : this.NotFound();
         }
 
         /// <summary>
-        ///     Increase or decrease the quantity of the specified stock item by the given amount.
+        ///     Increase or decrease the quantity of the specified shopping item by the given amount.
         /// </summary>
-        /// <param name="stockItemId">The stock item to be updated.</param>
+        /// <param name="shoppingItemId">The shopping item to be updated.</param>
         /// <param name="amount">The quantity is increased or decreased by this amount.</param>
         /// <param name="operation">Specifies if it is a increase or decrease update.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if the update succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpPut("{operation}/{stockItemId}/{amount:int}")]
+        [HttpPut("{operation}/{shoppingItemId}/{amount:int}")]
         public async Task<ActionResult> Put(
             [FromRoute]
             [BindRequired]
-            [RegularExpression($"^({StockItemController.OperationIncrease}|{StockItemController.OperationDecrease})$")]
+            [RegularExpression(
+                $"^({ShoppingItemController.OperationIncrease}|{ShoppingItemController.OperationDecrease})$")]
             string operation,
-            [FromRoute] [BindRequired] string stockItemId,
+            [FromRoute] [BindRequired] string shoppingItemId,
             [FromRoute]
             [BindRequired]
             [Range(
                 1,
-                CreateStockItem.MaxQuantity)]
+                CreateShoppingItem.MaxQuantity)]
             int amount,
             CancellationToken cancellationToken
         )
@@ -172,9 +173,9 @@
                 return this.BadRequest();
             }
 
-            var success = await this.stockItemService.UpdateAsync(
+            var success = await this.shoppingItemService.UpdateAsync(
                 this.User.Claims.RequiredId(),
-                stockItemId,
+                shoppingItemId,
                 updateOperation,
                 amount,
                 cancellationToken);

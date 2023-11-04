@@ -8,6 +8,7 @@
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Routing;
     using Moq;
+    using Warehouse.Api.Tests.Utilities;
     using Warehouse.Api.Validation;
 
     /// <summary>
@@ -16,6 +17,9 @@
     [SuppressMessage(
         "ReSharper",
         "StringLiteralTypo")]
+    [Trait(
+        Constants.TraitType,
+        Constants.TraitValueUnitTest)]
     public class GuidValidationAttributeTests
     {
         [Theory]

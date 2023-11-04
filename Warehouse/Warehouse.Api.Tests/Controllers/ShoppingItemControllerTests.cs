@@ -2,82 +2,82 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Moq;
-    using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Controllers;
-    using Warehouse.Api.Models.StockItems;
+    using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Tests.Utilities;
 
     /// <summary>
-    ///     Tests for <see cref="StockItemController" />.
+    ///     Tests for <see cref="ShoppingItemController" />.
     /// </summary>
     [Trait(
         Constants.TraitType,
         Constants.TraitValueUnitTest)]
-    public class StockItemControllerTests
+    public class ShoppingItemControllerTests
     {
         private const int Quantity = 100;
 
-        private readonly CreateStockItem createStockItem;
+        private readonly CreateShoppingItem createShoppingItem;
 
         private readonly string name = Guid.NewGuid().ToString();
 
-        private readonly StockItem stockItem;
+        private readonly ShoppingItem shoppingItem;
 
-        private readonly string stockItemId = Guid.NewGuid().ToString();
+        private readonly string shoppingItemId = Guid.NewGuid().ToString();
 
-        private readonly UpdateStockItem updateStockItem;
+        private readonly UpdateShoppingItem updateShoppingItem;
 
         private readonly string userId = Guid.NewGuid().ToString();
 
-        public StockItemControllerTests()
+        public ShoppingItemControllerTests()
         {
-            this.createStockItem = new CreateStockItem(
+            this.createShoppingItem = new CreateShoppingItem(
                 this.name,
-                StockItemControllerTests.Quantity);
+                ShoppingItemControllerTests.Quantity);
 
-            this.stockItem = new StockItem(
-                this.stockItemId,
+            this.shoppingItem = new ShoppingItem(
+                this.shoppingItemId,
                 this.name,
-                StockItemControllerTests.Quantity,
+                ShoppingItemControllerTests.Quantity,
                 this.userId);
 
-            this.updateStockItem = new UpdateStockItem(
-                this.stockItemId,
+            this.updateShoppingItem = new UpdateShoppingItem(
+                this.shoppingItemId,
                 $"{this.name}_update",
-                StockItemControllerTests.Quantity + 1);
+                ShoppingItemControllerTests.Quantity + 1);
         }
 
         [Fact]
         public async Task CreateAsync()
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
+            var shoppingItemService = new Mock<IShoppingItemService>();
+            shoppingItemService.Setup(
                     mock => mock.CreateAsync(
-                        It.IsAny<ICreateStockItem>(),
+                        It.IsAny<ICreateShoppingItem>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IStockItem>(this.stockItem));
+                .Returns(Task.FromResult<IShoppingItem>(this.shoppingItem));
 
-            var controller = new StockItemController(stockItemService.Object)
+            var controller = new ShoppingItemController(shoppingItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
             var result = await controller.Post(
-                this.createStockItem,
+                this.createShoppingItem,
                 new CancellationToken());
 
             var actionResult = Assert.IsType<CreatedAtActionResult>(result);
-            var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
+            var actual = Assert.IsAssignableFrom<IShoppingItem>(actionResult.Value);
 
             Assert.Equal(
                 this.userId,
                 actual.UserId);
             Assert.Equal(
-                this.stockItemId,
+                this.shoppingItemId,
                 actual.Id);
             Assert.Equal(
-                StockItemControllerTests.Quantity,
+                ShoppingItemControllerTests.Quantity,
                 actual.Quantity);
             Assert.Equal(
                 this.name,
@@ -89,21 +89,21 @@
         [InlineData(false)]
         public async Task DeleteAsync(bool isDeleted)
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
+            var shoppingItemService = new Mock<IShoppingItemService>();
+            shoppingItemService.Setup(
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isDeleted));
 
-            var controller = new StockItemController(stockItemService.Object)
+            var controller = new ShoppingItemController(shoppingItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
             var result = await controller.Delete(
-                this.stockItemId,
+                this.shoppingItemId,
                 new CancellationToken());
 
             if (isDeleted)
@@ -119,14 +119,14 @@
         [Fact]
         public async Task ReadAsync()
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
+            var shoppingItemService = new Mock<IShoppingItemService>();
+            shoppingItemService.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {this.stockItem}));
+                .Returns(Task.FromResult<IEnumerable<IShoppingItem>>(new[] {this.shoppingItem}));
 
-            var controller = new StockItemController(stockItemService.Object)
+            var controller = new ShoppingItemController(shoppingItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
@@ -138,10 +138,10 @@
                 this.userId,
                 actual.UserId);
             Assert.Equal(
-                this.stockItemId,
+                this.shoppingItemId,
                 actual.Id);
             Assert.Equal(
-                StockItemControllerTests.Quantity,
+                ShoppingItemControllerTests.Quantity,
                 actual.Quantity);
             Assert.Equal(
                 this.name,
@@ -153,21 +153,21 @@
         [InlineData(false)]
         public async Task ReadByIdAsync(bool hasResult)
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
+            var shoppingItemService = new Mock<IShoppingItemService>();
+            shoppingItemService.Setup(
                     mock => mock.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IStockItem?>(hasResult ? this.stockItem : null));
+                .Returns(Task.FromResult<IShoppingItem?>(hasResult ? this.shoppingItem : null));
 
-            var controller = new StockItemController(stockItemService.Object)
+            var controller = new ShoppingItemController(shoppingItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
             var result = await controller.Get(
-                this.stockItemId,
+                this.shoppingItemId,
                 new CancellationToken());
 
             if (!hasResult)
@@ -178,16 +178,16 @@
             {
                 var actionResult = Assert.IsType<OkObjectResult>(result.Result);
 
-                var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
+                var actual = Assert.IsAssignableFrom<IShoppingItem>(actionResult.Value);
 
                 Assert.Equal(
                     this.userId,
                     actual.UserId);
                 Assert.Equal(
-                    this.stockItemId,
+                    this.shoppingItemId,
                     actual.Id);
                 Assert.Equal(
-                    StockItemControllerTests.Quantity,
+                    ShoppingItemControllerTests.Quantity,
                     actual.Quantity);
                 Assert.Equal(
                     this.name,
@@ -200,21 +200,21 @@
         [InlineData(false)]
         public async Task UpdateAsync(bool isUpdated)
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
+            var shoppingItemService = new Mock<IShoppingItemService>();
+            shoppingItemService.Setup(
                     mock => mock.UpdateAsync(
-                        It.IsAny<UpdateStockItem>(),
+                        It.IsAny<UpdateShoppingItem>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var controller = new StockItemController(stockItemService.Object)
+            var controller = new ShoppingItemController(shoppingItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
             var result = await controller.Put(
-                this.updateStockItem,
+                this.updateShoppingItem,
                 new CancellationToken());
 
             if (isUpdated)

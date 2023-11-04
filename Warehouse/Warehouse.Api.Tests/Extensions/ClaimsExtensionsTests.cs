@@ -3,10 +3,14 @@
     using System.Security.Claims;
     using Warehouse.Api.Contracts;
     using Warehouse.Api.Extensions;
+    using Warehouse.Api.Tests.Utilities;
 
     /// <summary>
     ///     Tests for <see cref="ClaimsExtensions" />.
     /// </summary>
+    [Trait(
+        Constants.TraitType,
+        Constants.TraitValueUnitTest)]
     public class ClaimsExtensionsTests
     {
         [Theory]

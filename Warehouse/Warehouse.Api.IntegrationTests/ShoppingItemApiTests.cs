@@ -1,31 +1,31 @@
 namespace Warehouse.Api.IntegrationTests
 {
     using System.Net;
-    using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.IntegrationTests.Lib;
-    using Warehouse.Api.Models.StockItems;
+    using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Tests.Utilities;
 
     [Trait(
         Constants.TraitType,
         Constants.TraitValueIntegration)]
-    public class StockItemApiTests
+    public class ShoppingItemApiTests
     {
-        private const string Url = "https://localhost:7107/api/StockItem";
+        private const string Url = "https://localhost:7107/api/ShoppingItem";
 
         [Fact]
         public async Task CreateAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            await StockItemApiTests.CreateStockItemAsync(userId);
+            await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
         }
 
         [Fact]
         public async Task DeleteAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
-            var url = $"{StockItemApiTests.Url}/{stockItem.Id}";
+            var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
+            var url = $"{ShoppingItemApiTests.Url}/{shoppingItem.Id}";
             await HttpClientService.DeleteAsync(
                 userId,
                 url);
@@ -39,26 +39,26 @@ namespace Warehouse.Api.IntegrationTests
         public async Task ReadAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var stockItems = new[]
+            var shoppingItems = new[]
             {
-                await StockItemApiTests.CreateStockItemAsync(userId),
-                await StockItemApiTests.CreateStockItemAsync(userId),
-                await StockItemApiTests.CreateStockItemAsync(userId)
+                await ShoppingItemApiTests.CreateShoppingItemAsync(userId),
+                await ShoppingItemApiTests.CreateShoppingItemAsync(userId),
+                await ShoppingItemApiTests.CreateShoppingItemAsync(userId)
             };
 
-            var response = (await HttpClientService.GetAsync<IEnumerable<StockItem>>(
+            var response = (await HttpClientService.GetAsync<IEnumerable<ShoppingItem>>(
                 userId,
-                $"{StockItemApiTests.Url}")).ToArray();
+                $"{ShoppingItemApiTests.Url}")).ToArray();
 
             Assert.Equal(
-                stockItems.Length,
+                shoppingItems.Length,
                 response.Length);
-            foreach (var stockItem in stockItems)
+            foreach (var shoppingItem in shoppingItems)
             {
                 Assert.Contains(
                     response,
-                    si => StockItemApiTests.Compare(
-                        stockItem,
+                    si => ShoppingItemApiTests.Compare(
+                        shoppingItem,
                         si));
             }
         }
@@ -67,14 +67,14 @@ namespace Warehouse.Api.IntegrationTests
         public async Task ReadByIdAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var expected = await StockItemApiTests.CreateStockItemAsync(userId);
-            var actual = await StockItemApiTests.ReadStockItemByIdAsync(
+            var expected = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
+            var actual = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
                 expected.Id);
 
             Assert.NotNull(actual);
             Assert.True(
-                StockItemApiTests.Compare(
+                ShoppingItemApiTests.Compare(
                     expected,
                     actual));
         }
@@ -83,29 +83,29 @@ namespace Warehouse.Api.IntegrationTests
         public async Task UpdateAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+            var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
 
-            Assert.NotNull(stockItem);
+            Assert.NotNull(shoppingItem);
 
-            var update = new UpdateStockItem(
-                stockItem.Id,
-                $"{stockItem.Name}x",
-                stockItem.Quantity + 1);
+            var update = new UpdateShoppingItem(
+                shoppingItem.Id,
+                $"{shoppingItem.Name}x",
+                shoppingItem.Quantity + 1);
 
             await HttpClientService.PutAsync(
                 userId,
-                StockItemApiTests.Url,
+                ShoppingItemApiTests.Url,
                 update);
 
-            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+            var updated = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
-                stockItem.Id);
+                shoppingItem.Id);
 
             Assert.Equal(
-                stockItem.Id,
+                shoppingItem.Id,
                 updated.Id);
             Assert.Equal(
-                stockItem.UserId,
+                shoppingItem.UserId,
                 updated.UserId);
             Assert.Equal(
                 update.Name,
@@ -122,23 +122,23 @@ namespace Warehouse.Api.IntegrationTests
         public async Task UpdateOperationAsync(string operation)
         {
             var userId = Guid.NewGuid().ToString();
-            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+            var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
             const int delta = 2;
 
-            Assert.NotNull(stockItem);
+            Assert.NotNull(shoppingItem);
 
             if (operation is "increase" or "decrease")
             {
                 await HttpClientService.PutAsync(
                     userId,
-                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}");
+                    $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}");
             }
             else
             {
                 var response = await Assert.ThrowsAsync<HttpRequestException>(
                     () => HttpClientService.PutAsync(
                         userId,
-                        $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
+                        $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}"));
                 Assert.Equal(
                     HttpStatusCode.BadRequest,
                     response.StatusCode);
@@ -151,20 +151,20 @@ namespace Warehouse.Api.IntegrationTests
                 _ => 0
             };
 
-            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+            var updated = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
-                stockItem.Id);
+                shoppingItem.Id);
             Assert.Equal(
-                stockItem.Id,
+                shoppingItem.Id,
                 updated.Id);
             Assert.Equal(
-                stockItem.UserId,
+                shoppingItem.UserId,
                 updated.UserId);
             Assert.Equal(
-                stockItem.Name,
+                shoppingItem.Name,
                 updated.Name);
             Assert.Equal(
-                stockItem.Quantity + update,
+                shoppingItem.Quantity + update,
                 updated.Quantity);
         }
 
@@ -184,79 +184,79 @@ namespace Warehouse.Api.IntegrationTests
         public async Task UpdateOperationAsyncFail(string operation, HttpStatusCode statusCode, int delta)
         {
             var userId = Guid.NewGuid().ToString();
-            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+            var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
 
-            Assert.NotNull(stockItem);
+            Assert.NotNull(shoppingItem);
 
             var response = await Assert.ThrowsAsync<HttpRequestException>(
                 () => HttpClientService.PutAsync(
                     userId,
-                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
+                    $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}"));
             Assert.Equal(
                 statusCode,
                 response.StatusCode);
 
-            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+            var updated = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
-                stockItem.Id);
+                shoppingItem.Id);
             Assert.Equal(
-                stockItem.Id,
+                shoppingItem.Id,
                 updated.Id);
             Assert.Equal(
-                stockItem.UserId,
+                shoppingItem.UserId,
                 updated.UserId);
             Assert.Equal(
-                stockItem.Name,
+                shoppingItem.Name,
                 updated.Name);
             Assert.Equal(
-                stockItem.Quantity,
+                shoppingItem.Quantity,
                 updated.Quantity);
         }
 
-        private static bool Compare(IStockItem a, IStockItem b)
+        private static bool Compare(IShoppingItem a, IShoppingItem b)
         {
             return a.Id == b.Id && a.Name == b.Name && a.Quantity == b.Quantity && a.UserId == b.UserId;
         }
 
-        private static async Task<IStockItem> CreateStockItemAsync(string userId)
+        private static async Task<IShoppingItem> CreateShoppingItemAsync(string userId)
         {
-            var createStockItem = new CreateStockItem(
+            var createShoppingItem = new CreateShoppingItem(
                 "name",
                 10);
 
-            var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
+            var shoppingItem = await HttpClientService.PostAsync<CreateShoppingItem, ShoppingItem>(
                 userId,
-                StockItemApiTests.Url,
-                createStockItem);
+                ShoppingItemApiTests.Url,
+                createShoppingItem);
 
-            Assert.NotNull(stockItem);
+            Assert.NotNull(shoppingItem);
             Assert.Equal(
-                createStockItem.Name,
-                stockItem.Name);
+                createShoppingItem.Name,
+                shoppingItem.Name);
             Assert.Equal(
-                createStockItem.Quantity,
-                stockItem.Quantity);
+                createShoppingItem.Quantity,
+                shoppingItem.Quantity);
             Assert.Equal(
                 userId,
-                stockItem.UserId);
+                shoppingItem.UserId);
 
-            return stockItem;
+            return shoppingItem;
         }
 
-        private static async Task<IStockItem> ReadStockItemByIdAsync(string userId, string stockItemId)
+        private static async Task<IShoppingItem> ReadShoppingItemByIdAsync(string userId, string shoppingItemId)
         {
-            var stockItem = await HttpClientService.GetAsync<StockItem>(
+            var shoppingItem = await HttpClientService.GetAsync<ShoppingItem>(
                 userId,
-                $"{StockItemApiTests.Url}/{stockItemId}");
+                $"{ShoppingItemApiTests.Url}/{shoppingItemId}");
 
-            Assert.NotNull(stockItem);
+            Assert.NotNull(shoppingItem);
             Assert.Equal(
                 userId,
-                stockItem.UserId);
+                shoppingItem.UserId);
             Assert.Equal(
-                stockItemId,
-                stockItem.Id);
-            return stockItem;
+                shoppingItemId,
+                shoppingItem.Id);
+            return shoppingItem;
         }
     }
 }
