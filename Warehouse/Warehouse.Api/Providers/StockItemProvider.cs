@@ -108,6 +108,30 @@
         }
 
         /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The stock item that is updated.</param>
+        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public async Task<bool> UpdateAsync(
+            string userId,
+            string stockItemId,
+            int quantityDelta,
+            CancellationToken cancellationToken
+        )
+        {
+            var result = await this.stockItemCollection.UpdateOneAsync(
+                doc => doc.StockItemId == stockItemId && doc.UserId == userId,
+                Builders<DatabaseStockItem>.Update.Inc(
+                    doc => doc.Quantity,
+                    quantityDelta),
+                cancellationToken: cancellationToken);
+            return result.IsAcknowledged && result.MatchedCount == 1;
+        }
+
+        /// <summary>
         ///     Converts from <see cref="DatabaseStockItem" /> to <see cref="IStockItem" />.
         /// </summary>
         /// <param name="databaseStockItem">The database stock item.</param>

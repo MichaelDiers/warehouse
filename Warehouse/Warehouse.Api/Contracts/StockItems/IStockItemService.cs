@@ -47,6 +47,23 @@
         /// <summary>
         ///     Updates the specified stock item.
         /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The stock item that is updated.</param>
+        /// <param name="operation">Specifies the type of the update.</param>
+        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        Task<bool> UpdateAsync(
+            string userId,
+            string stockItemId,
+            UpdateOperation operation,
+            int quantityDelta,
+            CancellationToken cancellationToken
+        );
+
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
         /// <param name="updateStockItem">The stock item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>

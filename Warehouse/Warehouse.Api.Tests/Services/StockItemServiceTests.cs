@@ -203,5 +203,94 @@
                     userId,
                     CancellationToken.None));
         }
+
+        [Theory]
+        [InlineData(
+            UpdateOperation.Decrease,
+            10,
+            true)]
+        [InlineData(
+            UpdateOperation.Decrease,
+            10,
+            false)]
+        [InlineData(
+            UpdateOperation.Increase,
+            10,
+            true)]
+        [InlineData(
+            UpdateOperation.Increase,
+            10,
+            false)]
+        [InlineData(
+            (UpdateOperation) int.MaxValue,
+            10,
+            false)]
+        [InlineData(
+            UpdateOperation.Decrease,
+            0,
+            true)]
+        [InlineData(
+            UpdateOperation.Increase,
+            0,
+            true)]
+        public async Task UpdateByQuantityDeltaAsync(UpdateOperation operation, int quantity, bool isUpdated)
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
+
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
+                    mock => mock.UpdateAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<int>(),
+                        It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(isUpdated));
+
+            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+                new[] {ServiceCollectionExtensions.AddDependencies},
+                stockItemProviderMock.Object);
+
+            var isOperationValid = operation switch
+            {
+                UpdateOperation.Decrease => true,
+                UpdateOperation.Increase => true,
+                _ => false
+            };
+
+            if (isOperationValid)
+            {
+                Assert.Equal(
+                    isUpdated,
+                    await service.UpdateAsync(
+                        userId,
+                        stockItemId,
+                        operation,
+                        quantity,
+                        new CancellationToken()));
+            }
+            else
+            {
+                await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                    () => service.UpdateAsync(
+                        userId,
+                        stockItemId,
+                        operation,
+                        quantity,
+                        new CancellationToken()));
+            }
+
+            if (operation is UpdateOperation.Decrease or UpdateOperation.Increase && quantity != 0)
+            {
+                stockItemProviderMock.Verify(
+                    mock => mock.UpdateAsync(
+                        userId,
+                        stockItemId,
+                        operation == UpdateOperation.Increase ? quantity : -quantity,
+                        It.IsAny<CancellationToken>()));
+            }
+
+            stockItemProviderMock.VerifyNoOtherCalls();
+        }
     }
 }

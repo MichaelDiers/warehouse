@@ -8,6 +8,11 @@
     public class CreateStockItem : ICreateStockItem
     {
         /// <summary>
+        ///     The maximum allowed quantity.
+        /// </summary>
+        public const int MaxQuantity = 9999;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="CreateStockItem" /> class.
         /// </summary>
         /// <param name="name">The name.</param>
@@ -31,7 +36,7 @@
         [BindRequired]
         [Range(
             0,
-            9999)]
+            CreateStockItem.MaxQuantity)]
         public int Quantity { get; set; }
     }
 }

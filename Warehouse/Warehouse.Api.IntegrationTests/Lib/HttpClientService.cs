@@ -81,19 +81,46 @@
             return responseData;
         }
 
-        public static async Task PutAsync<TRequest>(string userid, string url, TRequest requestData)
+        public static async Task<HttpResponseMessage> PutAsync(
+            string userid,
+            string url,
+            bool ensureSuccessStatusCode = true
+        )
+        {
+            return await HttpClientService.PutAsync<object>(
+                userid,
+                url,
+                null,
+                ensureSuccessStatusCode);
+        }
+
+        public static async Task<HttpResponseMessage> PutAsync<TRequest>(
+            string userid,
+            string url,
+            TRequest? requestData = null,
+            bool ensureSuccessStatusCode = true
+        ) where TRequest : class
         {
             using var httpClient = HttpClientService.Create(userid);
-            var content = new StringContent(
-                JsonConvert.SerializeObject(requestData),
-                Encoding.UTF8,
-                "application/json");
+            HttpContent? content = null;
+            if (requestData != null)
+            {
+                content = new StringContent(
+                    JsonConvert.SerializeObject(requestData),
+                    Encoding.UTF8,
+                    "application/json");
+            }
 
             var response = await httpClient.PutAsync(
                 url,
                 content);
 
-            response.EnsureSuccessStatusCode();
+            if (ensureSuccessStatusCode)
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            return response;
         }
     }
 }

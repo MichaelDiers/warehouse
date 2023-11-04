@@ -1,5 +1,6 @@
 namespace Warehouse.Api.IntegrationTests
 {
+    using System.Net;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.IntegrationTests.Lib;
     using Warehouse.Api.Models.StockItems;
@@ -110,6 +111,104 @@ namespace Warehouse.Api.IntegrationTests
                 updated.Name);
             Assert.Equal(
                 update.Quantity,
+                updated.Quantity);
+        }
+
+        [Theory]
+        [InlineData("increase")]
+        [InlineData("decrease")]
+        [InlineData("foo")]
+        public async Task UpdateOperationAsync(string operation)
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+            const int delta = 2;
+
+            Assert.NotNull(stockItem);
+
+            if (operation is "increase" or "decrease")
+            {
+                await HttpClientService.PutAsync(
+                    userId,
+                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}");
+            }
+            else
+            {
+                var response = await Assert.ThrowsAsync<HttpRequestException>(
+                    () => HttpClientService.PutAsync(
+                        userId,
+                        $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
+                Assert.Equal(
+                    HttpStatusCode.BadRequest,
+                    response.StatusCode);
+            }
+
+            var update = operation switch
+            {
+                "increase" => delta,
+                "decrease" => -delta,
+                _ => 0
+            };
+
+            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+                userId,
+                stockItem.Id);
+            Assert.Equal(
+                stockItem.Id,
+                updated.Id);
+            Assert.Equal(
+                stockItem.UserId,
+                updated.UserId);
+            Assert.Equal(
+                stockItem.Name,
+                updated.Name);
+            Assert.Equal(
+                stockItem.Quantity + update,
+                updated.Quantity);
+        }
+
+        [Theory]
+        [InlineData(
+            "increase",
+            HttpStatusCode.BadRequest,
+            -1)]
+        [InlineData(
+            "decrease",
+            HttpStatusCode.BadRequest,
+            0)]
+        [InlineData(
+            "foo",
+            HttpStatusCode.BadRequest,
+            1)]
+        public async Task UpdateOperationAsyncFail(string operation, HttpStatusCode statusCode, int delta)
+        {
+            var userId = Guid.NewGuid().ToString();
+            var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
+
+            Assert.NotNull(stockItem);
+
+            var response = await Assert.ThrowsAsync<HttpRequestException>(
+                () => HttpClientService.PutAsync(
+                    userId,
+                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
+            Assert.Equal(
+                statusCode,
+                response.StatusCode);
+
+            var updated = await StockItemApiTests.ReadStockItemByIdAsync(
+                userId,
+                stockItem.Id);
+            Assert.Equal(
+                stockItem.Id,
+                updated.Id);
+            Assert.Equal(
+                stockItem.UserId,
+                updated.UserId);
+            Assert.Equal(
+                stockItem.Name,
+                updated.Name);
+            Assert.Equal(
+                stockItem.Quantity,
                 updated.Quantity);
         }
 
