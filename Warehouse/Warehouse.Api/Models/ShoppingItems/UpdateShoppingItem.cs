@@ -11,11 +11,18 @@
         /// <param name="id">The identifier.</param>
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
-        public UpdateShoppingItem(string id, string name, int quantity)
+        /// <param name="stockItemId">The stock item identifier</param>
+        public UpdateShoppingItem(
+            string id,
+            string name,
+            int quantity,
+            string stockItemId
+        )
         {
             this.Id = id;
             this.Name = name;
             this.Quantity = quantity;
+            this.StockItemId = stockItemId;
         }
 
         /// <summary>
@@ -32,5 +39,10 @@
         ///     Gets or sets the required quantity of the item.
         /// </summary>
         public int Quantity { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the stock item identifier.
+        /// </summary>
+        public string StockItemId { get; set; }
     }
 }

@@ -40,7 +40,8 @@
                 Guid.NewGuid().ToString(),
                 createShoppingItem.Name,
                 createShoppingItem.Quantity,
-                userId);
+                userId,
+                createShoppingItem.StockItemId);
 
             await this.provider.CreateAsync(
                 shoppingItem,
@@ -163,7 +164,8 @@
                 updateShoppingItem.Id,
                 updateShoppingItem.Name,
                 updateShoppingItem.Quantity,
-                userId);
+                userId,
+                updateShoppingItem.StockItemId);
 
             return this.provider.UpdateAsync(
                 shoppingItem,

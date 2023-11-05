@@ -26,6 +26,7 @@
             this.Quantity = shoppingItem.Quantity;
             this.ShoppingItemId = shoppingItem.Id;
             this.UserId = shoppingItem.UserId;
+            this.StockItemId = shoppingItem.StockItemId;
         }
 
         /// <summary>
@@ -49,6 +50,11 @@
         ///     Gets or sets the shopping item id of the item.
         /// </summary>
         public string? ShoppingItemId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the stock item identifier.
+        /// </summary>
+        public string StockItemId { get; set; }
 
         /// <summary>
         ///     Gets the unique identifier of the owner.

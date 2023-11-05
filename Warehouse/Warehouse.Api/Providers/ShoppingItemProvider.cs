@@ -96,7 +96,9 @@
         public async Task<bool> UpdateAsync(IShoppingItem shoppingItem, CancellationToken cancellationToken)
         {
             var result = await this.shoppingItemCollection.UpdateOneAsync(
-                doc => doc.ShoppingItemId == shoppingItem.Id && doc.UserId == shoppingItem.UserId,
+                doc => doc.ShoppingItemId == shoppingItem.Id &&
+                       doc.UserId == shoppingItem.UserId &&
+                       doc.StockItemId == shoppingItem.StockItemId,
                 Builders<DatabaseShoppingItem>.Update.Set(
                         doc => doc.Name,
                         shoppingItem.Name)
@@ -157,7 +159,8 @@
                 databaseShoppingItem.ShoppingItemId,
                 databaseShoppingItem.Name,
                 databaseShoppingItem.Quantity.Value,
-                databaseShoppingItem.UserId);
+                databaseShoppingItem.UserId,
+                databaseShoppingItem.StockItemId);
         }
 
         /// <summary>

@@ -30,7 +30,8 @@
 
             var createShoppingItem = new CreateShoppingItem(
                 "name",
-                100);
+                100,
+                Guid.NewGuid().ToString());
             var userId = Guid.NewGuid().ToString();
 
             var shoppingItem = await service.CreateAsync(
@@ -101,7 +102,8 @@
                         Guid.NewGuid().ToString(),
                         $"{i}",
                         i,
-                        userId))
+                        userId,
+                        Guid.NewGuid().ToString()))
                 .ToArray();
             var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
             shoppingItemProviderMock.Setup(
@@ -140,7 +142,8 @@
                 Guid.NewGuid().ToString(),
                 "name",
                 1,
-                userId) as IShoppingItem;
+                userId,
+                Guid.NewGuid().ToString()) as IShoppingItem;
 
             var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
             shoppingItemProviderMock.Setup(
@@ -200,7 +203,8 @@
                     new UpdateShoppingItem(
                         shoppingItemId,
                         "name",
-                        10),
+                        10,
+                        Guid.NewGuid().ToString()),
                     userId,
                     CancellationToken.None));
         }

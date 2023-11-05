@@ -17,10 +17,12 @@
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
-        public CreateShoppingItem(string name, int quantity)
+        /// <param name="stockItemId">The stock item identifier.</param>
+        public CreateShoppingItem(string name, int quantity, string stockItemId)
         {
             this.Name = name;
             this.Quantity = quantity;
+            this.StockItemId = stockItemId;
         }
 
         /// <summary>
@@ -38,5 +40,10 @@
             0,
             CreateShoppingItem.MaxQuantity)]
         public int Quantity { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the stock item identifier.
+        /// </summary>
+        public string StockItemId { get; set; }
     }
 }

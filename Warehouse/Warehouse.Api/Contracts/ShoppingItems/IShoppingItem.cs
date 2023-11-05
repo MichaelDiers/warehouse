@@ -21,6 +21,11 @@
         int Quantity { get; }
 
         /// <summary>
+        ///     Gets the stock item identifier.
+        /// </summary>
+        string StockItemId { get; }
+
+        /// <summary>
         ///     Gets the unique identifier of the owner.
         /// </summary>
         string UserId { get; }

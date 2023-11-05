@@ -25,6 +25,8 @@
 
         private readonly string shoppingItemId = Guid.NewGuid().ToString();
 
+        private readonly string stockItemId = Guid.NewGuid().ToString();
+
         private readonly UpdateShoppingItem updateShoppingItem;
 
         private readonly string userId = Guid.NewGuid().ToString();
@@ -33,18 +35,21 @@
         {
             this.createShoppingItem = new CreateShoppingItem(
                 this.name,
-                ShoppingItemControllerTests.Quantity);
+                ShoppingItemControllerTests.Quantity,
+                this.stockItemId);
 
             this.shoppingItem = new ShoppingItem(
                 this.shoppingItemId,
                 this.name,
                 ShoppingItemControllerTests.Quantity,
-                this.userId);
+                this.userId,
+                this.stockItemId);
 
             this.updateShoppingItem = new UpdateShoppingItem(
                 this.shoppingItemId,
                 $"{this.name}_update",
-                ShoppingItemControllerTests.Quantity + 1);
+                ShoppingItemControllerTests.Quantity + 1,
+                this.stockItemId);
         }
 
         [Fact]

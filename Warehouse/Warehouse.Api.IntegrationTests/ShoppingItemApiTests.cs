@@ -35,6 +35,15 @@ namespace Warehouse.Api.IntegrationTests
                 url);
         }
 
+        public static async Task<IEnumerable<IShoppingItem>> ReadAllAsync(string userId)
+        {
+            var response = (await HttpClientService.GetAsync<IEnumerable<ShoppingItem>>(
+                userId,
+                $"{ShoppingItemApiTests.Url}")).ToArray();
+
+            return response;
+        }
+
         [Fact]
         public async Task ReadAsync()
         {
@@ -46,9 +55,7 @@ namespace Warehouse.Api.IntegrationTests
                 await ShoppingItemApiTests.CreateShoppingItemAsync(userId)
             };
 
-            var response = (await HttpClientService.GetAsync<IEnumerable<ShoppingItem>>(
-                userId,
-                $"{ShoppingItemApiTests.Url}")).ToArray();
+            var response = (await ShoppingItemApiTests.ReadAllAsync(userId)).ToArray();
 
             Assert.Equal(
                 shoppingItems.Length,
@@ -90,7 +97,8 @@ namespace Warehouse.Api.IntegrationTests
             var update = new UpdateShoppingItem(
                 shoppingItem.Id,
                 $"{shoppingItem.Name}x",
-                shoppingItem.Quantity + 1);
+                shoppingItem.Quantity + 1,
+                shoppingItem.StockItemId);
 
             await HttpClientService.PutAsync(
                 userId,
@@ -222,7 +230,8 @@ namespace Warehouse.Api.IntegrationTests
         {
             var createShoppingItem = new CreateShoppingItem(
                 "name",
-                10);
+                10,
+                Guid.NewGuid().ToString());
 
             var shoppingItem = await HttpClientService.PostAsync<CreateShoppingItem, ShoppingItem>(
                 userId,

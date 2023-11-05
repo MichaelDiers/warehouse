@@ -14,5 +14,10 @@
         ///     Gets the required quantity.
         /// </summary>
         int Quantity { get; }
+
+        /// <summary>
+        ///     Gets the stock item identifier.
+        /// </summary>
+        string StockItemId { get; }
     }
 }
