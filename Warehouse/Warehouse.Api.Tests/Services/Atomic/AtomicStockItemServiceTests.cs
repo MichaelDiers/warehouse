@@ -79,7 +79,8 @@
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isDeleted));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
@@ -97,7 +98,8 @@
                 mock => mock.DeleteAsync(
                     userId,
                     stockItemId,
-                    It.IsAny<CancellationToken>()),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle?>()),
                 Times.Once);
         }
 
@@ -120,7 +122,8 @@
             stockItemProviderMock.Setup(
                     provider => provider.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(expectedStockItems as IEnumerable<IStockItem>));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
@@ -162,7 +165,8 @@
                     provider => provider.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult<IStockItem?>(expectedStockItem));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
@@ -205,7 +209,8 @@
             stockItemProviderMock.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<IStockItem>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
@@ -264,7 +269,8 @@
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<int>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
@@ -307,7 +313,8 @@
                         userId,
                         stockItemId,
                         operation == UpdateOperation.Increase ? quantity : -quantity,
-                        It.IsAny<CancellationToken>()));
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()));
             }
 
             stockItemProviderMock.VerifyNoOtherCalls();
