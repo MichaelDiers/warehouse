@@ -28,7 +28,7 @@
                 }
 
                 // ReSharper disable once StringLiteralTypo
-                var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
                 AppSettingsService.applicationConfiguration = configuration.Get<AppConfiguration>();
                 if (AppSettingsService.applicationConfiguration is null)
                 {
