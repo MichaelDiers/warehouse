@@ -1,7 +1,10 @@
 ﻿namespace Warehouse.Api.Services.Domain
 {
     using Warehouse.Api.Contracts;
+    using Warehouse.Api.Contracts.Database;
+    using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Models.ShoppingItems;
 
     /// <summary>
     ///     The domain service for handling stock items.
@@ -10,17 +13,35 @@
     public class DomainStockItemService : IStockItemService
     {
         /// <summary>
+        ///     The atomic shopping item service.
+        /// </summary>
+        private readonly IAtomicShoppingItemService atomicShoppingItemService;
+
+        /// <summary>
         ///     The atomic stock item service.
         /// </summary>
         private readonly IAtomicStockItemService atomicStockItemService;
 
         /// <summary>
+        ///     The database transaction handler.
+        /// </summary>
+        private readonly ITransactionHandler transactionHandler;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DomainStockItemService" /> class.
         /// </summary>
         /// <param name="atomicStockItemService">The atomic stock item service.</param>
-        public DomainStockItemService(IAtomicStockItemService atomicStockItemService)
+        /// <param name="atomicShoppingItemService">The atomic shopping item service.</param>
+        /// <param name="transactionHandler">The database transaction handler.</param>
+        public DomainStockItemService(
+            IAtomicStockItemService atomicStockItemService,
+            IAtomicShoppingItemService atomicShoppingItemService,
+            ITransactionHandler transactionHandler
+        )
         {
             this.atomicStockItemService = atomicStockItemService;
+            this.atomicShoppingItemService = atomicShoppingItemService;
+            this.transactionHandler = transactionHandler;
         }
 
         /// <summary>
@@ -30,16 +51,38 @@
         /// <param name="userId">The unique id of the user.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
-        public Task<IStockItem> CreateAsync(
+        public async Task<IStockItem> CreateAsync(
             ICreateStockItem createStockItem,
             string userId,
             CancellationToken cancellationToken
         )
         {
-            return this.atomicStockItemService.CreateAsync(
-                createStockItem,
-                userId,
-                cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
+            try
+            {
+                var stockItem = await this.atomicStockItemService.CreateAsync(
+                    createStockItem,
+                    userId,
+                    cancellationToken,
+                    session);
+                var createShoppingItem = new CreateShoppingItem(
+                    stockItem.Name,
+                    stockItem.Quantity > stockItem.MinimumQuantity ? 0 : stockItem.MinimumQuantity - stockItem.Quantity,
+                    stockItem.Id);
+                var _ = await this.atomicShoppingItemService.CreateAsync(
+                    createShoppingItem,
+                    userId,
+                    cancellationToken);
+                await session.CommitTransactionAsync(cancellationToken);
+                return stockItem;
+            }
+            catch
+            {
+                await session.AbortTransactionAsync(cancellationToken);
+                throw;
+            }
         }
 
         /// <summary>

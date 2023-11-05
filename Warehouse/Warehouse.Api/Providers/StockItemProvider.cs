@@ -2,6 +2,7 @@
 {
     using MongoDB.Driver;
     using Warehouse.Api.Contracts.Config;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Models.StockItems;
 
@@ -29,12 +30,27 @@
         /// </summary>
         /// <param name="stockItem">The stock item to be created.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task CreateAsync(IStockItem stockItem, CancellationToken cancellationToken)
+        public async Task CreateAsync(
+            IStockItem stockItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle
+        )
         {
-            await this.stockItemCollection.InsertOneAsync(
-                new DatabaseStockItem(stockItem),
-                cancellationToken: cancellationToken);
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                await this.stockItemCollection.InsertOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    new DatabaseStockItem(stockItem),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                await this.stockItemCollection.InsertOneAsync(
+                    new DatabaseStockItem(stockItem),
+                    cancellationToken: cancellationToken);
+            }
         }
 
         /// <summary>

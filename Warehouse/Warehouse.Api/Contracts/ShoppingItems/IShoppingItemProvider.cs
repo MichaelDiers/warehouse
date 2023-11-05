@@ -1,5 +1,7 @@
 ﻿namespace Warehouse.Api.Contracts.ShoppingItems
 {
+    using Warehouse.Api.Contracts.Database;
+
     /// <summary>
     ///     The provider for handling shopping items.
     /// </summary>
@@ -10,8 +12,13 @@
         /// </summary>
         /// <param name="shoppingItem">The shopping item to be created.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task CreateAsync(IShoppingItem shoppingItem, CancellationToken cancellationToken);
+        Task CreateAsync(
+            IShoppingItem shoppingItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle
+        );
 
         /// <summary>
         ///     Deletes the specified shopping item.

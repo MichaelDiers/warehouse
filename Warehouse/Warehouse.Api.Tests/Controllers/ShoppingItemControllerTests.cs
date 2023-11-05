@@ -60,7 +60,8 @@
                     mock => mock.CreateAsync(
                         It.IsAny<ICreateShoppingItem>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        null))
                 .Returns(Task.FromResult<IShoppingItem>(this.shoppingItem));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)

@@ -1,6 +1,7 @@
 ﻿namespace Warehouse.Api.Services.Atomic
 {
     using Warehouse.Api.Contracts;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Models.ShoppingItems;
 
@@ -27,11 +28,13 @@
         /// <param name="createShoppingItem">The shopping item to be created.</param>
         /// <param name="userId">The unique id of the user.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result is the created shopping item.</returns>
         public async Task<IShoppingItem> CreateAsync(
             ICreateShoppingItem createShoppingItem,
             string userId,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -45,7 +48,8 @@
 
             await this.provider.CreateAsync(
                 shoppingItem,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
 
             return shoppingItem;
         }

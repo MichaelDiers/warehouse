@@ -13,11 +13,42 @@ namespace Warehouse.Api.IntegrationTests
     {
         private const string Url = "https://localhost:7107/api/StockItem";
 
-        [Fact]
-        public async Task CreateAsync()
+        [Theory]
+        [InlineData(
+            0,
+            0)]
+        [InlineData(
+            1,
+            1)]
+        [InlineData(
+            1,
+            2)]
+        [InlineData(
+            2,
+            1)]
+        public async Task CreateAsync(int quantity, int minimumQuantity)
         {
             var userId = Guid.NewGuid().ToString();
-            await StockItemApiTests.CreateStockItemAsync(userId);
+            var stockItem = await StockItemApiTests.CreateStockItemAsync(
+                userId,
+                quantity,
+                minimumQuantity);
+
+            var shoppingItems = await ShoppingItemApiTests.ReadAllAsync(userId);
+            var shoppingItem = shoppingItems.First(si => si.StockItemId == stockItem.Id);
+
+            Assert.Equal(
+                stockItem.Id,
+                shoppingItem.StockItemId);
+            Assert.Equal(
+                stockItem.Name,
+                shoppingItem.Name);
+            Assert.Equal(
+                stockItem.UserId,
+                shoppingItem.UserId);
+            Assert.Equal(
+                stockItem.Quantity > stockItem.MinimumQuantity ? 0 : stockItem.MinimumQuantity - stockItem.Quantity,
+                shoppingItem.Quantity);
         }
 
         [Fact]
@@ -232,12 +263,16 @@ namespace Warehouse.Api.IntegrationTests
                    a.MinimumQuantity == b.MinimumQuantity;
         }
 
-        private static async Task<IStockItem> CreateStockItemAsync(string userId)
+        private static async Task<IStockItem> CreateStockItemAsync(
+            string userId,
+            int quantity = 10,
+            int minimumQuantity = 20
+        )
         {
             var createStockItem = new CreateStockItem(
                 "name",
-                10,
-                11);
+                quantity,
+                minimumQuantity);
 
             var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
                 userId,

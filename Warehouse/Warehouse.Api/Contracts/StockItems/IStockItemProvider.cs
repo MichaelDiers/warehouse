@@ -1,5 +1,7 @@
 ﻿namespace Warehouse.Api.Contracts.StockItems
 {
+    using Warehouse.Api.Contracts.Database;
+
     /// <summary>
     ///     The provider for handling stock items.
     /// </summary>
@@ -10,8 +12,13 @@
         /// </summary>
         /// <param name="stockItem">The stock item to be created.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task CreateAsync(IStockItem stockItem, CancellationToken cancellationToken);
+        Task CreateAsync(
+            IStockItem stockItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        );
 
         /// <summary>
         ///     Deletes the specified stock item.

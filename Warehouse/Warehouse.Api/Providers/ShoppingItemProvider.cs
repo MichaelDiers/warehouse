@@ -2,6 +2,7 @@
 {
     using MongoDB.Driver;
     using Warehouse.Api.Contracts.Config;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Models.ShoppingItems;
 
@@ -29,12 +30,27 @@
         /// </summary>
         /// <param name="shoppingItem">The shopping item to be created.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task CreateAsync(IShoppingItem shoppingItem, CancellationToken cancellationToken)
+        public async Task CreateAsync(
+            IShoppingItem shoppingItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
-            await this.shoppingItemCollection.InsertOneAsync(
-                new DatabaseShoppingItem(shoppingItem),
-                cancellationToken: cancellationToken);
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                await this.shoppingItemCollection.InsertOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    new DatabaseShoppingItem(shoppingItem),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                await this.shoppingItemCollection.InsertOneAsync(
+                    new DatabaseShoppingItem(shoppingItem),
+                    cancellationToken: cancellationToken);
+            }
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 {
     using Moq;
     using Warehouse.Api.Contracts;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.ShoppingItems;
@@ -15,14 +16,18 @@
         Constants.TraitValueUnitTest)]
     public class AtomicShoppingItemServiceTests
     {
-        [Fact]
-        public async Task CreateAsync()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task CreateAsync(bool hasTransactionHandle)
         {
+            var session = new Mock<ITransactionHandle>();
             var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
             shoppingItemProviderMock.Setup(
                 provider => provider.CreateAsync(
                     It.IsAny<IShoppingItem>(),
-                    It.IsAny<CancellationToken>()));
+                    It.IsAny<CancellationToken>(),
+                    null));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
@@ -37,7 +42,8 @@
             var shoppingItem = await service.CreateAsync(
                 createShoppingItem,
                 userId,
-                It.IsAny<CancellationToken>());
+                new CancellationToken(),
+                hasTransactionHandle ? session.Object : null);
 
             Assert.Equal(
                 createShoppingItem.Quantity,
@@ -53,6 +59,8 @@
                     shoppingItem.Id,
                     out var guid) &&
                 guid != Guid.Empty);
+
+            session.VerifyNoOtherCalls();
         }
 
         [Theory]

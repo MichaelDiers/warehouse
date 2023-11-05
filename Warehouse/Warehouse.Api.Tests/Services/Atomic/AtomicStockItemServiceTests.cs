@@ -2,6 +2,7 @@
 {
     using Moq;
     using Warehouse.Api.Contracts;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.StockItems;
@@ -15,14 +16,18 @@
         Constants.TraitValueUnitTest)]
     public class AtomicStockItemServiceTests
     {
-        [Fact]
-        public async Task CreateAsync()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task CreateAsync(bool hasTransactionHandle)
         {
+            var session = new Mock<ITransactionHandle>();
             var stockItemProviderMock = new Mock<IStockItemProvider>();
             stockItemProviderMock.Setup(
                 provider => provider.CreateAsync(
                     It.IsAny<IStockItem>(),
-                    It.IsAny<CancellationToken>()));
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle?>()));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
@@ -37,7 +42,8 @@
             var stockItem = await service.CreateAsync(
                 createStockItem,
                 userId,
-                It.IsAny<CancellationToken>());
+                It.IsAny<CancellationToken>(),
+                hasTransactionHandle ? session.Object : null);
 
             Assert.Equal(
                 createStockItem.Quantity,
@@ -56,6 +62,8 @@
                     stockItem.Id,
                     out var guid) &&
                 guid != Guid.Empty);
+
+            session.VerifyNoOtherCalls();
         }
 
         [Theory]

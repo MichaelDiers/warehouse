@@ -1,6 +1,7 @@
 ﻿namespace Warehouse.Api.Services.Atomic
 {
     using Warehouse.Api.Contracts;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Models.StockItems;
 
@@ -26,12 +27,14 @@
         /// </summary>
         /// <param name="createStockItem">The stock item to be created.</param>
         /// <param name="userId">The unique id of the user.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
         public async Task<IStockItem> CreateAsync(
             ICreateStockItem createStockItem,
             string userId,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -45,7 +48,8 @@
 
             await this.provider.CreateAsync(
                 stockItem,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
 
             return stockItem;
         }
