@@ -1,56 +1,59 @@
-﻿namespace Warehouse.Api.Tests.Services
+﻿namespace Warehouse.Api.Tests.Services.Atomic
 {
     using Moq;
     using Warehouse.Api.Contracts;
-    using Warehouse.Api.Contracts.ShoppingItems;
+    using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Extensions;
-    using Warehouse.Api.Models.ShoppingItems;
+    using Warehouse.Api.Models.StockItems;
     using Warehouse.Api.Tests.Utilities;
 
     /// <summary>
-    ///     Tests for <see cref="IAtomicShoppingItemService" />
+    ///     Tests for <see cref="IAtomicStockItemService" />
     /// </summary>
     [Trait(
         Constants.TraitType,
         Constants.TraitValueUnitTest)]
-    public class ShoppingItemServiceTests
+    public class AtomicStockItemServiceTests
     {
         [Fact]
         public async Task CreateAsync()
         {
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                 provider => provider.CreateAsync(
-                    It.IsAny<IShoppingItem>(),
+                    It.IsAny<IStockItem>(),
                     It.IsAny<CancellationToken>()));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
-            var createShoppingItem = new CreateShoppingItem(
+            var createStockItem = new CreateStockItem(
                 "name",
                 100,
-                Guid.NewGuid().ToString());
+                50);
             var userId = Guid.NewGuid().ToString();
 
-            var shoppingItem = await service.CreateAsync(
-                createShoppingItem,
+            var stockItem = await service.CreateAsync(
+                createStockItem,
                 userId,
                 It.IsAny<CancellationToken>());
 
             Assert.Equal(
-                createShoppingItem.Quantity,
-                shoppingItem.Quantity);
+                createStockItem.Quantity,
+                stockItem.Quantity);
             Assert.Equal(
-                createShoppingItem.Name,
-                shoppingItem.Name);
+                createStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
+            Assert.Equal(
+                createStockItem.Name,
+                stockItem.Name);
             Assert.Equal(
                 userId,
-                shoppingItem.UserId);
+                stockItem.UserId);
             Assert.True(
                 Guid.TryParse(
-                    shoppingItem.Id,
+                    stockItem.Id,
                     out var guid) &&
                 guid != Guid.Empty);
         }
@@ -61,31 +64,31 @@
         public async Task DeleteAsync(bool isDeleted)
         {
             var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isDeleted));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
             Assert.Equal(
                 isDeleted,
                 await service.DeleteAsync(
                     userId,
-                    shoppingItemId,
+                    stockItemId,
                     CancellationToken.None));
 
-            shoppingItemProviderMock.Verify(
+            stockItemProviderMock.Verify(
                 mock => mock.DeleteAsync(
                     userId,
-                    shoppingItemId,
+                    stockItemId,
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -94,43 +97,44 @@
         public async Task ReadAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var expectedShoppingItems = Enumerable.Range(
+            var expectedStockItems = Enumerable.Range(
                     1,
                     10)
                 .Select(
-                    i => new ShoppingItem(
+                    i => new StockItem(
                         Guid.NewGuid().ToString(),
                         $"{i}",
                         i,
-                        userId,
-                        Guid.NewGuid().ToString()))
+                        i + 1,
+                        userId))
                 .ToArray();
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                     provider => provider.ReadAsync(
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(expectedShoppingItems as IEnumerable<IShoppingItem>));
+                .Returns(Task.FromResult(expectedStockItems as IEnumerable<IStockItem>));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
-            var shoppingItems = (await service.ReadAsync(
+            var stockItems = (await service.ReadAsync(
                 userId,
                 It.IsAny<CancellationToken>())).ToArray();
 
             Assert.Equal(
-                expectedShoppingItems.Length,
-                shoppingItems.Length);
-            foreach (var expectedShoppingItem in expectedShoppingItems)
+                expectedStockItems.Length,
+                stockItems.Length);
+            foreach (var expectedStockItem in expectedStockItems)
             {
                 Assert.NotNull(
-                    shoppingItems.FirstOrDefault(
-                        si => si.Quantity == expectedShoppingItem.Quantity &&
-                              si.Name == expectedShoppingItem.Name &&
-                              si.Id == expectedShoppingItem.Id &&
-                              si.UserId == expectedShoppingItem.UserId));
+                    stockItems.FirstOrDefault(
+                        si => si.Quantity == expectedStockItem.Quantity &&
+                              si.MinimumQuantity == expectedStockItem.MinimumQuantity &&
+                              si.Name == expectedStockItem.Name &&
+                              si.Id == expectedStockItem.Id &&
+                              si.UserId == expectedStockItem.UserId));
             }
         }
 
@@ -138,44 +142,47 @@
         public async Task ReadByIdAsync()
         {
             var userId = Guid.NewGuid().ToString();
-            var expectedShoppingItem = new ShoppingItem(
+            var expectedStockItem = new StockItem(
                 Guid.NewGuid().ToString(),
                 "name",
                 1,
-                userId,
-                Guid.NewGuid().ToString()) as IShoppingItem;
+                2,
+                userId) as IStockItem;
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                     provider => provider.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IShoppingItem?>(expectedShoppingItem));
+                .Returns(Task.FromResult<IStockItem?>(expectedStockItem));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
-            var shoppingItem = await service.ReadByIdAsync(
+            var stockItem = await service.ReadByIdAsync(
                 userId,
-                expectedShoppingItem.Id,
+                expectedStockItem.Id,
                 It.IsAny<CancellationToken>());
 
-            Assert.NotNull(shoppingItem);
+            Assert.NotNull(stockItem);
 
             Assert.Equal(
-                expectedShoppingItem.Id,
-                shoppingItem.Id);
+                expectedStockItem.Id,
+                stockItem.Id);
             Assert.Equal(
-                expectedShoppingItem.Name,
-                shoppingItem.Name);
+                expectedStockItem.Name,
+                stockItem.Name);
             Assert.Equal(
-                expectedShoppingItem.Quantity,
-                shoppingItem.Quantity);
+                expectedStockItem.Quantity,
+                stockItem.Quantity);
             Assert.Equal(
-                expectedShoppingItem.UserId,
-                shoppingItem.UserId);
+                expectedStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
+            Assert.Equal(
+                expectedStockItem.UserId,
+                stockItem.UserId);
         }
 
         [Theory]
@@ -184,27 +191,27 @@
         public async Task UpdateAsync(bool isUpdated)
         {
             var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                     mock => mock.UpdateAsync(
-                        It.IsAny<IShoppingItem>(),
+                        It.IsAny<IStockItem>(),
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
             Assert.Equal(
                 isUpdated,
                 await service.UpdateAsync(
-                    new UpdateShoppingItem(
-                        shoppingItemId,
+                    new UpdateStockItem(
+                        stockItemId,
                         "name",
                         10,
-                        Guid.NewGuid().ToString()),
+                        11),
                     userId,
                     CancellationToken.None));
         }
@@ -241,10 +248,10 @@
         public async Task UpdateByQuantityDeltaAsync(UpdateOperation operation, int quantity, bool isUpdated)
         {
             var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var stockItemId = Guid.NewGuid().ToString();
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
+            var stockItemProviderMock = new Mock<IStockItemProvider>();
+            stockItemProviderMock.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
@@ -252,9 +259,9 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+                stockItemProviderMock.Object);
 
             var isOperationValid = operation switch
             {
@@ -269,7 +276,7 @@
                     isUpdated,
                     await service.UpdateAsync(
                         userId,
-                        shoppingItemId,
+                        stockItemId,
                         operation,
                         quantity,
                         new CancellationToken()));
@@ -279,7 +286,7 @@
                 await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
                     () => service.UpdateAsync(
                         userId,
-                        shoppingItemId,
+                        stockItemId,
                         operation,
                         quantity,
                         new CancellationToken()));
@@ -287,15 +294,15 @@
 
             if (operation is UpdateOperation.Decrease or UpdateOperation.Increase && quantity != 0)
             {
-                shoppingItemProviderMock.Verify(
+                stockItemProviderMock.Verify(
                     mock => mock.UpdateAsync(
                         userId,
-                        shoppingItemId,
+                        stockItemId,
                         operation == UpdateOperation.Increase ? quantity : -quantity,
                         It.IsAny<CancellationToken>()));
             }
 
-            shoppingItemProviderMock.VerifyNoOtherCalls();
+            stockItemProviderMock.VerifyNoOtherCalls();
         }
     }
 }

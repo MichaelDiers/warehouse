@@ -12,6 +12,7 @@
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Providers;
     using Warehouse.Api.Services.Atomic;
+    using Warehouse.Api.Services.Domain;
 
     /// <summary>
     ///     Extensions for <see cref="IServiceCollection" />.
@@ -92,6 +93,8 @@
 
             services.AddScoped<IShoppingItemProvider, ShoppingItemProvider>();
             services.AddScoped<IAtomicShoppingItemService, AtomicShoppingItemService>();
+
+            services.AddScoped<IStockItemService, DomainStockItemService>();
 
             return services;
         }

@@ -31,15 +31,15 @@
         /// <summary>
         ///     The business logic for handling stock items.
         /// </summary>
-        private readonly IAtomicStockItemService atomicStockItemService;
+        private readonly IStockItemService stockItemService;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="StockItemController" /> class.
         /// </summary>
-        /// <param name="atomicStockItemService">The business logic for handling stock items.</param>
-        public StockItemController(IAtomicStockItemService atomicStockItemService)
+        /// <param name="stockItemService">The business logic for handling stock items.</param>
+        public StockItemController(IStockItemService stockItemService)
         {
-            this.atomicStockItemService = atomicStockItemService;
+            this.stockItemService = stockItemService;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.atomicStockItemService.DeleteAsync(
+            var success = await this.stockItemService.DeleteAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 cancellationToken);
@@ -69,7 +69,7 @@
         [HttpGet]
         public async Task<IEnumerable<IStockItem>> Get(CancellationToken cancellationToken)
         {
-            return await this.atomicStockItemService.ReadAsync(
+            return await this.stockItemService.ReadAsync(
                 this.User.Claims.RequiredId(),
                 cancellationToken);
         }
@@ -86,7 +86,7 @@
             CancellationToken cancellationToken
         )
         {
-            var result = await this.atomicStockItemService.ReadByIdAsync(
+            var result = await this.stockItemService.ReadByIdAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 cancellationToken);
@@ -110,7 +110,7 @@
             CancellationToken cancellationToken
         )
         {
-            var stockItem = await this.atomicStockItemService.CreateAsync(
+            var stockItem = await this.stockItemService.CreateAsync(
                 createStockItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
@@ -132,7 +132,7 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.atomicStockItemService.UpdateAsync(
+            var success = await this.stockItemService.UpdateAsync(
                 updateStockItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
@@ -172,7 +172,7 @@
                 return this.BadRequest();
             }
 
-            var success = await this.atomicStockItemService.UpdateAsync(
+            var success = await this.stockItemService.UpdateAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 updateOperation,
