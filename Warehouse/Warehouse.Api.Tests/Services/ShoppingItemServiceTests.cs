@@ -8,7 +8,7 @@
     using Warehouse.Api.Tests.Utilities;
 
     /// <summary>
-    ///     Tests for <see cref="IShoppingItemService" />
+    ///     Tests for <see cref="IAtomicShoppingItemService" />
     /// </summary>
     [Trait(
         Constants.TraitType,
@@ -24,7 +24,7 @@
                     It.IsAny<IShoppingItem>(),
                     It.IsAny<CancellationToken>()));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 
@@ -71,7 +71,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isDeleted));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 
@@ -112,7 +112,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(expectedShoppingItems as IEnumerable<IShoppingItem>));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 
@@ -153,7 +153,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IShoppingItem?>(expectedShoppingItem));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 
@@ -193,7 +193,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 
@@ -252,7 +252,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IShoppingItemService, IShoppingItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 shoppingItemProviderMock.Object);
 

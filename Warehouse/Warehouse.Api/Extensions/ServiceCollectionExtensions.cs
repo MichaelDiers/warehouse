@@ -11,7 +11,7 @@
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Providers;
-    using Warehouse.Api.Services;
+    using Warehouse.Api.Services.Atomic;
 
     /// <summary>
     ///     Extensions for <see cref="IServiceCollection" />.
@@ -88,10 +88,10 @@
         public static IServiceCollection AddDependencies(this IServiceCollection services)
         {
             services.AddScoped<IStockItemProvider, StockItemProvider>();
-            services.AddScoped<IStockItemService, StockItemService>();
+            services.AddScoped<IAtomicStockItemService, AtomicStockItemService>();
 
             services.AddScoped<IShoppingItemProvider, ShoppingItemProvider>();
-            services.AddScoped<IShoppingItemService, ShoppingItemService>();
+            services.AddScoped<IAtomicShoppingItemService, AtomicShoppingItemService>();
 
             return services;
         }

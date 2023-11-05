@@ -8,7 +8,7 @@
     using Warehouse.Api.Tests.Utilities;
 
     /// <summary>
-    ///     Tests for <see cref="IStockItemService" />
+    ///     Tests for <see cref="IAtomicStockItemService" />
     /// </summary>
     [Trait(
         Constants.TraitType,
@@ -24,7 +24,7 @@
                     It.IsAny<IStockItem>(),
                     It.IsAny<CancellationToken>()));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
@@ -74,7 +74,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isDeleted));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
@@ -115,7 +115,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(expectedStockItems as IEnumerable<IStockItem>));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
@@ -157,7 +157,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IStockItem?>(expectedStockItem));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
@@ -200,7 +200,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 
@@ -259,7 +259,7 @@
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isUpdated));
 
-            var service = TestHostApplicationBuilder.GetService<IStockItemService, IStockItemProvider>(
+            var service = TestHostApplicationBuilder.GetService<IAtomicStockItemService, IStockItemProvider>(
                 new[] {ServiceCollectionExtensions.AddDependencies},
                 stockItemProviderMock.Object);
 

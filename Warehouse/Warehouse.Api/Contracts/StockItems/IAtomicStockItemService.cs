@@ -1,77 +1,73 @@
-﻿namespace Warehouse.Api.Contracts.ShoppingItems
+﻿namespace Warehouse.Api.Contracts.StockItems
 {
     /// <summary>
-    ///     The business logic for handling shopping items.
+    ///     The business logic for handling stock items.
     /// </summary>
-    public interface IShoppingItemService
+    public interface IAtomicStockItemService
     {
         /// <summary>
-        ///     Creates the specified shopping item.
+        ///     Creates the specified stock item.
         /// </summary>
-        /// <param name="createShoppingItem">The shopping item to be created.</param>
+        /// <param name="createStockItem">The stock item to be created.</param>
         /// <param name="userId">The unique id of the user.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task" /> whose result is the created shopping item.</returns>
-        Task<IShoppingItem> CreateAsync(
-            ICreateShoppingItem createShoppingItem,
+        /// <returns>A <see cref="Task" /> whose result is the created stock item.</returns>
+        Task<IStockItem> CreateAsync(
+            ICreateStockItem createStockItem,
             string userId,
             CancellationToken cancellationToken
         );
 
         /// <summary>
-        ///     Deletes the specified shopping item.
+        ///     Deletes the specified stock item.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
-        /// <param name="shoppingItemId">The shopping item identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        Task<bool> DeleteAsync(string userId, string shoppingItemId, CancellationToken cancellationToken);
+        Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Reads all shopping items of the given user.
+        ///     Reads all stock items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>All shopping items with the specified user id.</returns>
-        Task<IEnumerable<IShoppingItem>> ReadAsync(string userId, CancellationToken cancellationToken);
+        /// <returns>All stock items with the specified user id.</returns>
+        Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Reads a shopping item by its identifier.
+        ///     Reads a stock item by its identifier.
         /// </summary>
         /// <param name="userId">The user identifier of the owner.</param>
-        /// <param name="shoppingItemId">The shopping item identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>The found shopping item.</returns>
-        Task<IShoppingItem?> ReadByIdAsync(string userId, string shoppingItemId, CancellationToken cancellationToken);
+        /// <returns>The found stock item.</returns>
+        Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken);
 
         /// <summary>
-        ///     Updates the specified shopping item.
+        ///     Updates the specified stock item.
         /// </summary>
         /// <param name="userId">The id of the owner.</param>
-        /// <param name="shoppingItemId">The shopping item that is updated.</param>
+        /// <param name="stockItemId">The stock item that is updated.</param>
         /// <param name="operation">Specifies the type of the update.</param>
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
         Task<bool> UpdateAsync(
             string userId,
-            string shoppingItemId,
+            string stockItemId,
             UpdateOperation operation,
             int quantityDelta,
             CancellationToken cancellationToken
         );
 
         /// <summary>
-        ///     Updates the specified shopping item.
+        ///     Updates the specified stock item.
         /// </summary>
-        /// <param name="updateShoppingItem">The shopping item that is updated.</param>
+        /// <param name="updateStockItem">The stock item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateAsync(
-            IUpdateShoppingItem updateShoppingItem,
-            string userId,
-            CancellationToken cancellationToken
-        );
+        Task<bool> UpdateAsync(IUpdateStockItem updateStockItem, string userId, CancellationToken cancellationToken);
     }
 }

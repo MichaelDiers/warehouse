@@ -55,7 +55,7 @@
         [Fact]
         public async Task CreateAsync()
         {
-            var shoppingItemService = new Mock<IShoppingItemService>();
+            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.CreateAsync(
                         It.IsAny<ICreateShoppingItem>(),
@@ -94,7 +94,7 @@
         [InlineData(false)]
         public async Task DeleteAsync(bool isDeleted)
         {
-            var shoppingItemService = new Mock<IShoppingItemService>();
+            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
@@ -124,7 +124,7 @@
         [Fact]
         public async Task ReadAsync()
         {
-            var shoppingItemService = new Mock<IShoppingItemService>();
+            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
@@ -158,7 +158,7 @@
         [InlineData(false)]
         public async Task ReadByIdAsync(bool hasResult)
         {
-            var shoppingItemService = new Mock<IShoppingItemService>();
+            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.ReadByIdAsync(
                         It.IsAny<string>(),
@@ -205,7 +205,7 @@
         [InlineData(false)]
         public async Task UpdateAsync(bool isUpdated)
         {
-            var shoppingItemService = new Mock<IShoppingItemService>();
+            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<UpdateShoppingItem>(),
