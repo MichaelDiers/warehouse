@@ -59,12 +59,30 @@
         /// <param name="userId">The user identifier.</param>
         /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public async Task<bool> DeleteAsync(string userId, string shoppingItemId, CancellationToken cancellationToken)
+        public async Task<bool> DeleteAsync(
+            string userId,
+            string shoppingItemId,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
-            var result = await this.shoppingItemCollection.DeleteOneAsync(
-                doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
-                cancellationToken);
+            DeleteResult result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.DeleteOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.DeleteOneAsync(
+                    doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
+                    cancellationToken);
+            }
+
             return result.IsAcknowledged && result.DeletedCount == 1;
         }
 
@@ -73,12 +91,29 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>All shopping items with the specified user id.</returns>
-        public async Task<IEnumerable<IShoppingItem>> ReadAsync(string userId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<IShoppingItem>> ReadAsync(
+            string userId,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
-            var result = await this.shoppingItemCollection.FindAsync(
-                doc => doc.UserId == userId,
-                cancellationToken: cancellationToken);
+            IAsyncCursor<DatabaseShoppingItem> result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.FindAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.UserId == userId,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.FindAsync(
+                    doc => doc.UserId == userId,
+                    cancellationToken: cancellationToken);
+            }
+
             return await ShoppingItemProvider.ToShoppingItems(
                 result,
                 cancellationToken);
@@ -90,16 +125,30 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>The found shopping item.</returns>
         public async Task<IShoppingItem?> ReadByIdAsync(
             string userId,
             string shoppingItemId,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
-            var result = await this.shoppingItemCollection.FindAsync(
-                doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
-                cancellationToken: cancellationToken);
+            IAsyncCursor<DatabaseShoppingItem> result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.FindAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.FindAsync(
+                    doc => doc.UserId == userId && doc.ShoppingItemId == shoppingItemId,
+                    cancellationToken: cancellationToken);
+            }
+
             return ShoppingItemProvider.ToShoppingItem(await result.FirstOrDefaultAsync(cancellationToken));
         }
 
@@ -108,20 +157,45 @@
         /// </summary>
         /// <param name="shoppingItem">The shopping item that is updated.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(IShoppingItem shoppingItem, CancellationToken cancellationToken)
+        public async Task<bool> UpdateAsync(
+            IShoppingItem shoppingItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
-            var result = await this.shoppingItemCollection.UpdateOneAsync(
-                doc => doc.ShoppingItemId == shoppingItem.Id &&
-                       doc.UserId == shoppingItem.UserId &&
-                       doc.StockItemId == shoppingItem.StockItemId,
-                Builders<DatabaseShoppingItem>.Update.Set(
-                        doc => doc.Name,
-                        shoppingItem.Name)
-                    .Set(
-                        doc => doc.Quantity,
-                        shoppingItem.Quantity),
-                cancellationToken: cancellationToken);
+            UpdateResult result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.ShoppingItemId == shoppingItem.Id &&
+                           doc.UserId == shoppingItem.UserId &&
+                           doc.StockItemId == shoppingItem.StockItemId,
+                    Builders<DatabaseShoppingItem>.Update.Set(
+                            doc => doc.Name,
+                            shoppingItem.Name)
+                        .Set(
+                            doc => doc.Quantity,
+                            shoppingItem.Quantity),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    doc => doc.ShoppingItemId == shoppingItem.Id &&
+                           doc.UserId == shoppingItem.UserId &&
+                           doc.StockItemId == shoppingItem.StockItemId,
+                    Builders<DatabaseShoppingItem>.Update.Set(
+                            doc => doc.Name,
+                            shoppingItem.Name)
+                        .Set(
+                            doc => doc.Quantity,
+                            shoppingItem.Quantity),
+                    cancellationToken: cancellationToken);
+            }
+
             return result.IsAcknowledged && result.MatchedCount == 1;
         }
 
@@ -132,20 +206,37 @@
         /// <param name="shoppingItemId">The shopping item that is updated.</param>
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
         public async Task<bool> UpdateAsync(
             string userId,
             string shoppingItemId,
             int quantityDelta,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
-            var result = await this.shoppingItemCollection.UpdateOneAsync(
-                doc => doc.ShoppingItemId == shoppingItemId && doc.UserId == userId,
-                Builders<DatabaseShoppingItem>.Update.Inc(
-                    doc => doc.Quantity,
-                    quantityDelta),
-                cancellationToken: cancellationToken);
+            UpdateResult result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.ShoppingItemId == shoppingItemId && doc.UserId == userId,
+                    Builders<DatabaseShoppingItem>.Update.Inc(
+                        doc => doc.Quantity,
+                        quantityDelta),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    doc => doc.ShoppingItemId == shoppingItemId && doc.UserId == userId,
+                    Builders<DatabaseShoppingItem>.Update.Inc(
+                        doc => doc.Quantity,
+                        quantityDelta),
+                    cancellationToken: cancellationToken);
+            }
+
             return result.IsAcknowledged && result.MatchedCount == 1;
         }
 

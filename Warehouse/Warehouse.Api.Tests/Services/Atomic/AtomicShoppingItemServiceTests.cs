@@ -76,7 +76,8 @@
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isDeleted));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
@@ -94,7 +95,8 @@
                 mock => mock.DeleteAsync(
                     userId,
                     shoppingItemId,
-                    It.IsAny<CancellationToken>()),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle?>()),
                 Times.Once);
         }
 
@@ -117,7 +119,8 @@
             shoppingItemProviderMock.Setup(
                     provider => provider.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(expectedShoppingItems as IEnumerable<IShoppingItem>));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
@@ -158,7 +161,8 @@
                     provider => provider.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult<IShoppingItem?>(expectedShoppingItem));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
@@ -198,7 +202,8 @@
             shoppingItemProviderMock.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<IShoppingItem>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
@@ -257,7 +262,8 @@
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<int>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
@@ -300,7 +306,8 @@
                         userId,
                         shoppingItemId,
                         operation == UpdateOperation.Increase ? quantity : -quantity,
-                        It.IsAny<CancellationToken>()));
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()));
             }
 
             shoppingItemProviderMock.VerifyNoOtherCalls();
