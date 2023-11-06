@@ -60,15 +60,22 @@
         /// <param name="userId">The user identifier.</param>
         /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public Task<bool> DeleteAsync(string userId, string shoppingItemId, CancellationToken cancellationToken)
+        public Task<bool> DeleteAsync(
+            string userId,
+            string shoppingItemId,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             return this.provider.DeleteAsync(
                 userId,
                 shoppingItemId,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
         }
 
         /// <summary>
@@ -76,14 +83,20 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>All shopping items with the specified user id.</returns>
-        public Task<IEnumerable<IShoppingItem>> ReadAsync(string userId, CancellationToken cancellationToken)
+        public Task<IEnumerable<IShoppingItem>> ReadAsync(
+            string userId,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             return this.provider.ReadAsync(
                 userId,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
         }
 
         /// <summary>
@@ -92,11 +105,13 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>The found shopping item.</returns>
         public Task<IShoppingItem?> ReadByIdAsync(
             string userId,
             string shoppingItemId,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -104,7 +119,8 @@
             return this.provider.ReadByIdAsync(
                 userId,
                 shoppingItemId,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
         }
 
         /// <summary>
@@ -115,13 +131,15 @@
         /// <param name="operation">Specifies the type of the update.</param>
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
         public async Task<bool> UpdateAsync(
             string userId,
             string shoppingItemId,
             UpdateOperation operation,
             int quantityDelta,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -146,7 +164,8 @@
                 userId,
                 shoppingItemId,
                 delta,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
         }
 
         /// <summary>
@@ -155,11 +174,13 @@
         /// <param name="updateShoppingItem">The shopping item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
         public Task<bool> UpdateAsync(
             IUpdateShoppingItem updateShoppingItem,
             string userId,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -173,7 +194,8 @@
 
             return this.provider.UpdateAsync(
                 shoppingItem,
-                cancellationToken);
+                cancellationToken,
+                transactionHandle);
         }
     }
 }

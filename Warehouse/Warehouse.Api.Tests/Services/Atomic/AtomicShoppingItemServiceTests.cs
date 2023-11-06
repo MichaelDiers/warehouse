@@ -21,254 +21,326 @@
         [InlineData(false)]
         public async Task CreateAsync(bool hasTransactionHandle)
         {
-            var session = new Mock<ITransactionHandle>();
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                provider => provider.CreateAsync(
-                    It.IsAny<IShoppingItem>(),
-                    It.IsAny<CancellationToken>(),
-                    null));
+            var services = AtomicShoppingItemServiceTests.Init();
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
-
-            var createShoppingItem = new CreateShoppingItem(
-                "name",
-                100,
-                Guid.NewGuid().ToString());
-            var userId = Guid.NewGuid().ToString();
-
-            var shoppingItem = await service.CreateAsync(
-                createShoppingItem,
-                userId,
+            var shoppingItem = await services.atomicShoppingItemService.CreateAsync(
+                services.createShoppingItem,
+                services.shoppingItem.UserId,
                 new CancellationToken(),
-                hasTransactionHandle ? session.Object : null);
+                hasTransactionHandle ? services.transactionHandle.Object : null);
 
-            Assert.Equal(
-                createShoppingItem.Quantity,
-                shoppingItem.Quantity);
-            Assert.Equal(
-                createShoppingItem.Name,
-                shoppingItem.Name);
-            Assert.Equal(
-                userId,
-                shoppingItem.UserId);
-            Assert.True(
-                Guid.TryParse(
-                    shoppingItem.Id,
-                    out var guid) &&
-                guid != Guid.Empty);
+            Asserts.Assert(
+                services.createShoppingItem,
+                services.shoppingItem.UserId,
+                shoppingItem);
 
-            session.VerifyNoOtherCalls();
+            if (hasTransactionHandle)
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.CreateAsync(
+                        It.Is<IShoppingItem>(
+                            value => Guid.Parse(value.Id) != Guid.Empty &&
+                                     value.Name == services.shoppingItem.Name &&
+                                     value.Quantity == services.shoppingItem.Quantity &&
+                                     value.StockItemId == services.shoppingItem.StockItemId &&
+                                     value.UserId == services.shoppingItem.UserId),
+                        It.IsAny<CancellationToken>(),
+                        It.IsNotNull<ITransactionHandle?>()));
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.CreateAsync(
+                        It.Is<IShoppingItem>(
+                            value => Guid.Parse(value.Id) != Guid.Empty &&
+                                     value.Name == services.shoppingItem.Name &&
+                                     value.Quantity == services.shoppingItem.Quantity &&
+                                     value.StockItemId == services.shoppingItem.StockItemId &&
+                                     value.UserId == services.shoppingItem.UserId),
+                        It.IsAny<CancellationToken>(),
+                        null),
+                    Times.Once);
+            }
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task DeleteAsync(bool isDeleted)
+        [InlineData(
+            true,
+            true)]
+        [InlineData(
+            true,
+            false)]
+        [InlineData(
+            false,
+            true)]
+        [InlineData(
+            false,
+            false)]
+        public async Task DeleteAsync(bool isDeleted, bool hasTransactionHandle)
         {
-            var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var services = AtomicShoppingItemServiceTests.Init(isDeleted);
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                    mock => mock.DeleteAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(isDeleted));
-
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+            var result = await services.atomicShoppingItemService.DeleteAsync(
+                services.shoppingItem.UserId,
+                services.shoppingItem.Id,
+                new CancellationToken(),
+                hasTransactionHandle ? services.transactionHandle.Object : null);
 
             Assert.Equal(
                 isDeleted,
-                await service.DeleteAsync(
-                    userId,
-                    shoppingItemId,
-                    CancellationToken.None));
+                result);
 
-            shoppingItemProviderMock.Verify(
-                mock => mock.DeleteAsync(
-                    userId,
-                    shoppingItemId,
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<ITransactionHandle?>()),
-                Times.Once);
-        }
-
-        [Fact]
-        public async Task ReadAsync()
-        {
-            var userId = Guid.NewGuid().ToString();
-            var expectedShoppingItems = Enumerable.Range(
-                    1,
-                    10)
-                .Select(
-                    i => new ShoppingItem(
-                        Guid.NewGuid().ToString(),
-                        $"{i}",
-                        i,
-                        userId,
-                        Guid.NewGuid().ToString()))
-                .ToArray();
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                    provider => provider.ReadAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(expectedShoppingItems as IEnumerable<IShoppingItem>));
-
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
-
-            var shoppingItems = (await service.ReadAsync(
-                userId,
-                It.IsAny<CancellationToken>())).ToArray();
-
-            Assert.Equal(
-                expectedShoppingItems.Length,
-                shoppingItems.Length);
-            foreach (var expectedShoppingItem in expectedShoppingItems)
+            if (hasTransactionHandle)
             {
-                Assert.NotNull(
-                    shoppingItems.FirstOrDefault(
-                        si => si.Quantity == expectedShoppingItem.Quantity &&
-                              si.Name == expectedShoppingItem.Name &&
-                              si.Id == expectedShoppingItem.Id &&
-                              si.UserId == expectedShoppingItem.UserId));
-            }
-        }
-
-        [Fact]
-        public async Task ReadByIdAsync()
-        {
-            var userId = Guid.NewGuid().ToString();
-            var expectedShoppingItem = new ShoppingItem(
-                Guid.NewGuid().ToString(),
-                "name",
-                1,
-                userId,
-                Guid.NewGuid().ToString()) as IShoppingItem;
-
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                    provider => provider.ReadByIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
+                services.shoppingItemProvider.Verify(
+                    mock => mock.DeleteAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult<IShoppingItem?>(expectedShoppingItem));
+                        It.IsNotNull<ITransactionHandle?>()),
+                    Times.Once);
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.DeleteAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
+                        It.IsAny<CancellationToken>(),
+                        null),
+                    Times.Once);
+            }
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
-
-            var shoppingItem = await service.ReadByIdAsync(
-                userId,
-                expectedShoppingItem.Id,
-                It.IsAny<CancellationToken>());
-
-            Assert.NotNull(shoppingItem);
-
-            Assert.Equal(
-                expectedShoppingItem.Id,
-                shoppingItem.Id);
-            Assert.Equal(
-                expectedShoppingItem.Name,
-                shoppingItem.Name);
-            Assert.Equal(
-                expectedShoppingItem.Quantity,
-                shoppingItem.Quantity);
-            Assert.Equal(
-                expectedShoppingItem.UserId,
-                shoppingItem.UserId);
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
         }
 
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task UpdateAsync(bool isUpdated)
+        public async Task ReadAsync(bool hasTransactionHandle)
         {
-            var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var services = AtomicShoppingItemServiceTests.Init();
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                    mock => mock.UpdateAsync(
-                        It.IsAny<IShoppingItem>(),
+            var result = await services.atomicShoppingItemService.ReadAsync(
+                services.shoppingItem.UserId,
+                new CancellationToken(),
+                hasTransactionHandle ? services.transactionHandle.Object : null);
+
+            Asserts.Assert(
+                services.shoppingItem,
+                result.Single());
+
+            if (hasTransactionHandle)
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.ReadAsync(
+                        services.shoppingItem.UserId,
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(isUpdated));
+                        It.IsNotNull<ITransactionHandle?>()));
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.ReadAsync(
+                        services.shoppingItem.UserId,
+                        It.IsAny<CancellationToken>(),
+                        null));
+            }
+        }
 
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+        [Theory]
+        [InlineData(
+            true,
+            false)]
+        [InlineData(
+            true,
+            true)]
+        [InlineData(
+            false,
+            false)]
+        [InlineData(
+            false,
+            true)]
+        public async Task ReadByIdAsync(bool hasTransactionHandle, bool found)
+        {
+            var services = AtomicShoppingItemServiceTests.Init(readById: found);
+
+            var result = await services.atomicShoppingItemService.ReadByIdAsync(
+                services.shoppingItem.UserId,
+                services.shoppingItem.Id,
+                new CancellationToken(),
+                hasTransactionHandle ? services.transactionHandle.Object : null);
+
+            if (found)
+            {
+                Assert.NotNull(result);
+                Asserts.Assert(
+                    services.shoppingItem,
+                    result);
+            }
+            else
+            {
+                Assert.Null(result);
+            }
+
+            if (hasTransactionHandle)
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.ReadByIdAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
+                        It.IsAny<CancellationToken>(),
+                        It.IsNotNull<ITransactionHandle?>()));
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.ReadByIdAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
+                        It.IsAny<CancellationToken>(),
+                        null));
+            }
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
+        }
+
+        [Theory]
+        [InlineData(
+            true,
+            false)]
+        [InlineData(
+            true,
+            true)]
+        [InlineData(
+            false,
+            false)]
+        [InlineData(
+            false,
+            true)]
+        public async Task UpdateAsync(bool isUpdated, bool hasTransactionHandle)
+        {
+            var services = AtomicShoppingItemServiceTests.Init(isUpdated: isUpdated);
+
+            var result = await services.atomicShoppingItemService.UpdateAsync(
+                services.updateShoppingItem,
+                services.shoppingItem.UserId,
+                new CancellationToken(),
+                hasTransactionHandle ? services.transactionHandle.Object : null);
 
             Assert.Equal(
                 isUpdated,
-                await service.UpdateAsync(
-                    new UpdateShoppingItem(
-                        shoppingItemId,
-                        "name",
-                        10,
-                        Guid.NewGuid().ToString()),
-                    userId,
-                    CancellationToken.None));
+                result);
+
+            if (hasTransactionHandle)
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.UpdateAsync(
+                        It.Is<IShoppingItem>(
+                            value => Asserts.Assert(
+                                services.shoppingItem,
+                                value)),
+                        It.IsAny<CancellationToken>(),
+                        It.IsNotNull<ITransactionHandle?>()));
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.UpdateAsync(
+                        It.Is<IShoppingItem>(
+                            value => Asserts.Assert(
+                                services.shoppingItem,
+                                value)),
+                        It.IsAny<CancellationToken>(),
+                        null));
+            }
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
         }
 
         [Theory]
         [InlineData(
             UpdateOperation.Decrease,
             10,
+            true,
             true)]
         [InlineData(
             UpdateOperation.Decrease,
             10,
+            false,
+            true)]
+        [InlineData(
+            UpdateOperation.Increase,
+            10,
+            true,
+            true)]
+        [InlineData(
+            UpdateOperation.Increase,
+            10,
+            false,
+            true)]
+        [InlineData(
+            (UpdateOperation) int.MaxValue,
+            10,
+            false,
+            true)]
+        [InlineData(
+            UpdateOperation.Decrease,
+            0,
+            true,
+            true)]
+        [InlineData(
+            UpdateOperation.Increase,
+            0,
+            true,
+            true)]
+        [InlineData(
+            UpdateOperation.Decrease,
+            10,
+            true,
+            false)]
+        [InlineData(
+            UpdateOperation.Decrease,
+            10,
+            false,
             false)]
         [InlineData(
             UpdateOperation.Increase,
             10,
-            true)]
+            true,
+            false)]
         [InlineData(
             UpdateOperation.Increase,
             10,
+            false,
             false)]
         [InlineData(
             (UpdateOperation) int.MaxValue,
             10,
+            false,
             false)]
         [InlineData(
             UpdateOperation.Decrease,
             0,
-            true)]
+            true,
+            false)]
         [InlineData(
             UpdateOperation.Increase,
             0,
-            true)]
-        public async Task UpdateByQuantityDeltaAsync(UpdateOperation operation, int quantity, bool isUpdated)
+            true,
+            false)]
+        public async Task UpdateByQuantityDeltaAsync(
+            UpdateOperation operation,
+            int quantity,
+            bool isUpdated,
+            bool hasTransactionHandle
+        )
         {
-            var userId = Guid.NewGuid().ToString();
-            var shoppingItemId = Guid.NewGuid().ToString();
+            var services = AtomicShoppingItemServiceTests.Init(isUpdated: isUpdated);
 
-            var shoppingItemProviderMock = new Mock<IShoppingItemProvider>();
-            shoppingItemProviderMock.Setup(
-                    mock => mock.UpdateAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<int>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(isUpdated));
-
-            var service = TestHostApplicationBuilder.GetService<IAtomicShoppingItemService, IShoppingItemProvider>(
-                new[] {ServiceCollectionExtensions.AddDependencies},
-                shoppingItemProviderMock.Object);
+            var delta = operation == UpdateOperation.Decrease ? -quantity : quantity;
 
             var isOperationValid = operation switch
             {
@@ -277,40 +349,144 @@
                 _ => false
             };
 
-            if (isOperationValid)
+            if (isOperationValid || quantity == 0)
             {
+                var result = await services.atomicShoppingItemService.UpdateAsync(
+                    services.shoppingItem.UserId,
+                    services.shoppingItem.Id,
+                    operation,
+                    quantity,
+                    new CancellationToken(),
+                    hasTransactionHandle ? services.transactionHandle.Object : null);
                 Assert.Equal(
                     isUpdated,
-                    await service.UpdateAsync(
-                        userId,
-                        shoppingItemId,
-                        operation,
-                        quantity,
-                        new CancellationToken()));
+                    result);
+
+                if (quantity != 0)
+                {
+                    if (hasTransactionHandle)
+                    {
+                        services.shoppingItemProvider.Verify(
+                            mock => mock.UpdateAsync(
+                                services.shoppingItem.UserId,
+                                services.shoppingItem.Id,
+                                delta,
+                                It.IsAny<CancellationToken>(),
+                                It.IsNotNull<ITransactionHandle?>()));
+                    }
+                    else
+                    {
+                        services.shoppingItemProvider.Verify(
+                            mock => mock.UpdateAsync(
+                                services.shoppingItem.UserId,
+                                services.shoppingItem.Id,
+                                delta,
+                                It.IsAny<CancellationToken>(),
+                                null));
+                    }
+                }
             }
             else
             {
                 await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => service.UpdateAsync(
-                        userId,
-                        shoppingItemId,
+                    () => services.atomicShoppingItemService.UpdateAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
                         operation,
                         quantity,
-                        new CancellationToken()));
+                        new CancellationToken(),
+                        hasTransactionHandle ? services.transactionHandle.Object : null));
             }
 
-            if (operation is UpdateOperation.Decrease or UpdateOperation.Increase && quantity != 0)
-            {
-                shoppingItemProviderMock.Verify(
-                    mock => mock.UpdateAsync(
-                        userId,
-                        shoppingItemId,
-                        operation == UpdateOperation.Increase ? quantity : -quantity,
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
+        }
+
+        private static (IAtomicShoppingItemService atomicShoppingItemService, Mock<IShoppingItemProvider>
+            shoppingItemProvider, Mock<ITransactionHandle> transactionHandle, IShoppingItem shoppingItem,
+            ICreateShoppingItem createShoppingItem, IUpdateShoppingItem updateShoppingItem) Init(
+                bool isDeleted = true,
+                bool readById = true,
+                bool isUpdated = true
+            )
+        {
+            var shoppingItem = new ShoppingItem(
+                Guid.NewGuid().ToString(),
+                "name",
+                10,
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString());
+            var createShoppingItem = new CreateShoppingItem(
+                shoppingItem.Name,
+                shoppingItem.Quantity,
+                shoppingItem.StockItemId);
+            var updateShoppingItem = new UpdateShoppingItem(
+                shoppingItem.Id,
+                shoppingItem.Name,
+                shoppingItem.Quantity,
+                shoppingItem.StockItemId);
+            var transactionHandle = new Mock<ITransactionHandle>();
+
+            var shoppingItemProvider = new Mock<IShoppingItemProvider>();
+            shoppingItemProvider.Setup(
+                    mock => mock.CreateAsync(
+                        It.IsAny<IShoppingItem>(),
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()));
-            }
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.CompletedTask);
+            shoppingItemProvider.Setup(
+                    mock => mock.DeleteAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult(isDeleted));
+            shoppingItemProvider.Setup(
+                    mock => mock.ReadAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult<IEnumerable<IShoppingItem>>(new[] {shoppingItem}));
+            shoppingItemProvider.Setup(
+                    mock => mock.ReadByIdAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult<IShoppingItem?>(readById ? shoppingItem : null));
+            shoppingItemProvider.Setup(
+                    mock => mock.UpdateAsync(
+                        It.IsAny<IShoppingItem>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle>()))
+                .Returns(Task.FromResult(isUpdated));
+            shoppingItemProvider.Setup(
+                    mock => mock.UpdateAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<int>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult(isUpdated));
 
-            shoppingItemProviderMock.VerifyNoOtherCalls();
+            var atomicShoppingItemService =
+                TestHostApplicationBuilder
+                    .GetService<IAtomicShoppingItemService, IShoppingItemProvider, ITransactionHandle>(
+                        new[] {ServiceCollectionExtensions.AddDependencies},
+                        shoppingItemProvider.Object,
+                        transactionHandle.Object);
+
+            return (atomicShoppingItemService, shoppingItemProvider, transactionHandle, shoppingItem,
+                createShoppingItem, updateShoppingItem);
+        }
+
+        private static void NoOtherCalls(
+            (IAtomicShoppingItemService atomicShoppingItemService, Mock<IShoppingItemProvider> shoppingItemProvider,
+                Mock<ITransactionHandle> transactionHandle, IShoppingItem shoppingItem, ICreateShoppingItem
+                createShoppingItem, IUpdateShoppingItem updateShoppingItem) services
+        )
+        {
+            services.transactionHandle.VerifyNoOtherCalls();
+            services.shoppingItemProvider.VerifyNoOtherCalls();
         }
     }
 }

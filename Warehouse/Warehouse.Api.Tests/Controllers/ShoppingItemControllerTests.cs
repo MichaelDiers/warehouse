@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Controllers;
     using Warehouse.Api.Models.ShoppingItems;
@@ -100,7 +101,8 @@
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isDeleted));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -129,7 +131,8 @@
             shoppingItemService.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult<IEnumerable<IShoppingItem>>(new[] {this.shoppingItem}));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -164,7 +167,8 @@
                     mock => mock.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult<IShoppingItem?>(hasResult ? this.shoppingItem : null));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -211,7 +215,8 @@
                     mock => mock.UpdateAsync(
                         It.IsAny<UpdateShoppingItem>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
