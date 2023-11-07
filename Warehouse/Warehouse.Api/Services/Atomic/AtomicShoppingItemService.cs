@@ -79,6 +79,30 @@
         }
 
         /// <summary>
+        ///     Deletes the specified shopping item by its stock item id.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
+        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
+        public Task<bool> DeleteByStockItemIdAsync(
+            string userId,
+            string stockItemId,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return this.provider.DeleteByStockItemIdAsync(
+                userId,
+                stockItemId,
+                cancellationToken,
+                transactionHandle);
+        }
+
+        /// <summary>
         ///     Reads all shopping items of the given user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>

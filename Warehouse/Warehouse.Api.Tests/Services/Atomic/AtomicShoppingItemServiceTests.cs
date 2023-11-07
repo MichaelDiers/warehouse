@@ -117,6 +117,57 @@
         }
 
         [Theory]
+        [InlineData(
+            true,
+            true)]
+        [InlineData(
+            true,
+            false)]
+        [InlineData(
+            false,
+            true)]
+        [InlineData(
+            false,
+            false)]
+        public async Task DeleteByStockItemIdAsync(bool isDeleted, bool hasTransactionHandle)
+        {
+            var services = AtomicShoppingItemServiceTests.Init(isDeleted);
+
+            var result = await services.atomicShoppingItemService.DeleteByStockItemIdAsync(
+                services.shoppingItem.UserId,
+                services.shoppingItem.StockItemId,
+                new CancellationToken(),
+                hasTransactionHandle ? services.transactionHandle.Object : null);
+
+            Assert.Equal(
+                isDeleted,
+                result);
+
+            if (hasTransactionHandle)
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.DeleteByStockItemIdAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.StockItemId,
+                        It.IsAny<CancellationToken>(),
+                        It.IsNotNull<ITransactionHandle?>()),
+                    Times.Once);
+            }
+            else
+            {
+                services.shoppingItemProvider.Verify(
+                    mock => mock.DeleteByStockItemIdAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.StockItemId,
+                        It.IsAny<CancellationToken>(),
+                        null),
+                    Times.Once);
+            }
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
+        }
+
+        [Theory]
         [InlineData(true)]
         [InlineData(false)]
         public async Task ReadAsync(bool hasTransactionHandle)
@@ -467,6 +518,13 @@
                         It.IsAny<CancellationToken>(),
                         It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isUpdated));
+            shoppingItemProvider.Setup(
+                    mock => mock.DeleteByStockItemIdAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult(isDeleted));
 
             var atomicShoppingItemService =
                 TestHostApplicationBuilder

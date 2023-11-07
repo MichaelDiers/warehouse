@@ -270,6 +270,11 @@
             false,
             true)]
         [InlineData(
+            UpdateOperation.None,
+            10,
+            false,
+            false)]
+        [InlineData(
             UpdateOperation.Decrease,
             0,
             true,
@@ -312,6 +317,11 @@
         [InlineData(
             UpdateOperation.Increase,
             0,
+            true,
+            false)]
+        [InlineData(
+            UpdateOperation.None,
+            10,
             true,
             false)]
         public async Task UpdateByQuantityDeltaAsync(

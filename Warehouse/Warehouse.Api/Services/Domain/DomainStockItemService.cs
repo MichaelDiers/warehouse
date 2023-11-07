@@ -92,12 +92,31 @@
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
+        public async Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
-            return this.atomicStockItemService.DeleteAsync(
-                userId,
-                stockItemId,
-                cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
+            try
+            {
+                var result = await this.atomicStockItemService.DeleteAsync(
+                    userId,
+                    stockItemId,
+                    cancellationToken,
+                    session);
+                await this.atomicShoppingItemService.DeleteByStockItemIdAsync(
+                    userId,
+                    stockItemId,
+                    cancellationToken,
+                    session);
+                await session.CommitTransactionAsync(cancellationToken);
+                return result;
+            }
+            catch
+            {
+                await session.AbortTransactionAsync(cancellationToken);
+                throw;
+            }
         }
 
         /// <summary>

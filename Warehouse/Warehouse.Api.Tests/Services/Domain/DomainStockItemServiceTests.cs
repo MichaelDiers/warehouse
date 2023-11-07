@@ -40,23 +40,10 @@
                     services.stockItem.UserId,
                     new CancellationToken());
 
-                Assert.Equal(
-                    services.createStockItem.Quantity,
-                    stockItem.Quantity);
-                Assert.Equal(
-                    services.createStockItem.MinimumQuantity,
-                    stockItem.MinimumQuantity);
-                Assert.Equal(
-                    services.createStockItem.Name,
-                    stockItem.Name);
-                Assert.Equal(
+                Asserts.Assert(
+                    services.createStockItem,
                     services.stockItem.UserId,
-                    stockItem.UserId);
-                Assert.True(
-                    Guid.TryParse(
-                        stockItem.Id,
-                        out var guid) &&
-                    guid != Guid.Empty);
+                    stockItem);
             }
             else
             {
@@ -114,16 +101,119 @@
                 mock => mock.Dispose(),
                 Times.Once);
 
-            services.atomicStockItemService.VerifyNoOtherCalls();
-            services.atomicShoppingItemService.VerifyNoOtherCalls();
-            services.transactionHandler.VerifyNoOtherCalls();
-            services.transactionHandle.VerifyNoOtherCalls();
+            DomainStockItemServiceTests.NoOtherCalls(services);
+        }
+
+        /// <summary>
+        ///     Test for <see cref="IStockItemService" />.
+        /// </summary>
+        [Theory]
+        [InlineData(
+            true,
+            false,
+            true)]
+        [InlineData(
+            false,
+            false,
+            true)]
+        [InlineData(
+            false,
+            true,
+            true)]
+        [InlineData(
+            true,
+            false,
+            false)]
+        [InlineData(
+            false,
+            false,
+            false)]
+        [InlineData(
+            false,
+            true,
+            false)]
+        public async Task DeleteAsync(
+            bool atomicStockItemServiceThrows,
+            bool atomicShoppingItemServiceThrows,
+            bool isDeleted
+        )
+        {
+            var services = DomainStockItemServiceTests.Init(
+                atomicStockItemServiceThrows,
+                atomicShoppingItemServiceThrows,
+                isDeleted);
+
+            if (!atomicShoppingItemServiceThrows && !atomicStockItemServiceThrows)
+            {
+                var result = await services.domainStockItemService.DeleteAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    new CancellationToken());
+
+                Assert.Equal(
+                    isDeleted,
+                    result);
+            }
+            else
+            {
+                await Assert.ThrowsAsync<Exception>(
+                    () => services.domainStockItemService.DeleteAsync(
+                        services.stockItem.UserId,
+                        services.stockItem.Id,
+                        new CancellationToken()));
+            }
+
+            services.atomicStockItemService.Verify(
+                mock => mock.DeleteAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>(),
+                    It.IsNotNull<ITransactionHandle?>()),
+                Times.Once);
+
+            if (!atomicStockItemServiceThrows)
+            {
+                services.atomicShoppingItemService.Verify(
+                    mock => mock.DeleteByStockItemIdAsync(
+                        services.stockItem.UserId,
+                        services.stockItem.Id,
+                        It.IsAny<CancellationToken>(),
+                        It.IsNotNull<ITransactionHandle>()),
+                    Times.Once);
+            }
+
+            services.transactionHandler.Verify(
+                mock => mock.StartTransactionAsync(It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            if (!atomicShoppingItemServiceThrows && !atomicStockItemServiceThrows)
+            {
+                services.transactionHandle.Verify(
+                    mock => mock.CommitTransactionAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+            }
+            else
+            {
+                services.transactionHandle.Verify(
+                    mock => mock.AbortTransactionAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+            }
+
+            services.transactionHandle.Verify(
+                mock => mock.Dispose(),
+                Times.Once);
+
+            DomainStockItemServiceTests.NoOtherCalls(services);
         }
 
         private static (Mock<IAtomicStockItemService> atomicStockItemService, Mock<IAtomicShoppingItemService>
             atomicShoppingItemService, Mock<ITransactionHandler> transactionHandler, Mock<ITransactionHandle>
             transactionHandle, IStockItemService domainStockItemService, ICreateStockItem createStockItem, IStockItem
-            stockItem) Init(bool atomicStockItemServiceThrows = false, bool atomicShoppingItemServiceThrows = false)
+            stockItem) Init(
+                bool atomicStockItemServiceThrows = false,
+                bool atomicShoppingItemServiceThrows = false,
+                bool isDeleted = true
+            )
         {
             return DomainStockItemServiceTests.Init(
                 new StockItem(
@@ -133,7 +223,8 @@
                     20,
                     Guid.NewGuid().ToString()),
                 atomicStockItemServiceThrows,
-                atomicShoppingItemServiceThrows);
+                atomicShoppingItemServiceThrows,
+                isDeleted);
         }
 
         private static (Mock<IAtomicStockItemService> atomicStockItemService, Mock<IAtomicShoppingItemService>
@@ -142,7 +233,8 @@
             stockItem ) Init(
                 IStockItem stockItem,
                 bool atomicStockItemServiceThrows,
-                bool atomicShoppingItemServiceThrows
+                bool atomicShoppingItemServiceThrows,
+                bool isDeleted
             )
         {
             var createStockItem = new CreateStockItem(
@@ -157,14 +249,22 @@
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<ITransactionHandle>()));
+            var atomicStockItemServiceDeleteSetup = atomicStockItemService.Setup(
+                mock => mock.DeleteAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle?>()));
 
             if (atomicStockItemServiceThrows)
             {
                 atomicStockItemServiceCreateSetup.Throws<Exception>();
+                atomicStockItemServiceDeleteSetup.Throws<Exception>();
             }
             else
             {
                 atomicStockItemServiceCreateSetup.Returns(Task.FromResult(stockItem));
+                atomicStockItemServiceDeleteSetup.Returns(Task.FromResult(isDeleted));
             }
 
             var atomicShoppingItemService = new Mock<IAtomicShoppingItemService>();
@@ -174,9 +274,16 @@
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<ITransactionHandle>()));
+            var atomicShoppingItemServiceDeleteByStockItemIdSetup = atomicShoppingItemService.Setup(
+                mock => mock.DeleteByStockItemIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle?>()));
             if (atomicShoppingItemServiceThrows)
             {
                 atomicShoppingItemServiceCreateSetup.Throws<Exception>();
+                atomicShoppingItemServiceDeleteByStockItemIdSetup.Throws<Exception>();
             }
             else
             {
@@ -190,6 +297,7 @@
                                 : stockItem.MinimumQuantity - stockItem.Quantity,
                             stockItem.UserId,
                             stockItem.Id)));
+                atomicShoppingItemServiceDeleteByStockItemIdSetup.Returns(Task.FromResult(isDeleted));
             }
 
             var transactionHandle = new Mock<ITransactionHandle>();
@@ -208,6 +316,19 @@
 
             return (atomicStockItemService, atomicShoppingItemService, transactionHandler, transactionHandle,
                 domainStockItemService, createStockItem, stockItem);
+        }
+
+        private static void NoOtherCalls(
+            (Mock<IAtomicStockItemService> atomicStockItemService, Mock<IAtomicShoppingItemService>
+                atomicShoppingItemService, Mock<ITransactionHandler> transactionHandler, Mock<ITransactionHandle>
+                transactionHandle, IStockItemService domainStockItemService, ICreateStockItem createStockItem,
+                IStockItem stockItem) services
+        )
+        {
+            services.atomicStockItemService.VerifyNoOtherCalls();
+            services.atomicShoppingItemService.VerifyNoOtherCalls();
+            services.transactionHandler.VerifyNoOtherCalls();
+            services.transactionHandle.VerifyNoOtherCalls();
         }
     }
 }
