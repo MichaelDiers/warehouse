@@ -6,8 +6,17 @@
     /// <inheritdoc cref="IStockItem" />
     public class StockItem : IStockItem
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="StockItem" /> class.
+        /// </summary>
         [JsonConstructor]
         public StockItem()
+            : this(
+                string.Empty,
+                string.Empty,
+                0,
+                0,
+                string.Empty)
         {
         }
 
