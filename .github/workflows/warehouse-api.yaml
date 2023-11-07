@@ -12,6 +12,8 @@ jobs:
       SOLUTION_PATH: Warehouse/Warehouse.sln
       TEST_PROJ_PATH: Warehouse/Warehouse.Api.Tests/Warehouse.Api.Tests.csproj
       ALTCOVER_XML: ../../doc/coverage/altcover.xml
+      REPORT_XML: doc/coverage/altcover.xml
+      REPORT_TARGET: doc/coverage
     steps:
       - uses: actions/checkout@v3
       - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
@@ -25,8 +27,8 @@ jobs:
       - name: ReportGenerator
         uses: danielpalme/ReportGenerator-GitHub-Action@5.1.26
         with:
-          reports: doc\coverage\altcover.xml
-          targetdir: doc\coverage
+          reports: ${{ env.REPORT_XML }}
+          targetdir: ${{ env.REPORT_TARGET }}
           reporttypes: Html_Dark
           assemblyfilters: +Warehouse.Api
-          classfilters: -Program
+          classfilters: -Microsoft.*;-System.*;-*Program
