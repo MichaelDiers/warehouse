@@ -17,6 +17,16 @@ jobs:
     env:
       CONFIGURATION: Release
       SOLUTION_PATH: Warehouse/Warehouse.sln
+    steps:
+      - uses: actions/checkout@v3
+      - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
+      - run: 'dotnet test ${{ env.SOLUTION_PATH }} --filter Type=Unit -c ${{ env.CONFIGURATION }} --no-build --no-restore'
+  doc:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      CONFIGURATION: Release
+      SOLUTION_PATH: Warehouse/Warehouse.sln
       TEST_PROJ_PATH: Warehouse/Warehouse.Api.Tests/Warehouse.Api.Tests.csproj
       ALTCOVER_XML: ../../doc/coverage/altcover.xml
       REPORT_XML: doc/coverage/altcover.xml
@@ -24,7 +34,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
-      - run: 'dotnet test ${{ env.SOLUTION_PATH }} --filter Type=Unit -c ${{ env.CONFIGURATION }} --no-build --no-restore'
       - run: 'dotnet test ${{ env.TEST_PROJ_PATH }} /p:AltCover=true --no-build --no-restore /p:AltCoverReport="${{ env.ALTCOVER_XML }}"'
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
