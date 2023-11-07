@@ -1,6 +1,5 @@
 ﻿namespace Warehouse.Api.Services.Domain
 {
-    using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
@@ -150,31 +149,6 @@
         /// <summary>
         ///     Updates the specified stock item.
         /// </summary>
-        /// <param name="userId">The id of the owner.</param>
-        /// <param name="stockItemId">The stock item that is updated.</param>
-        /// <param name="operation">Specifies the type of the update.</param>
-        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public Task<bool> UpdateAsync(
-            string userId,
-            string stockItemId,
-            UpdateOperation operation,
-            int quantityDelta,
-            CancellationToken cancellationToken
-        )
-        {
-            return this.atomicStockItemService.UpdateAsync(
-                userId,
-                stockItemId,
-                operation,
-                quantityDelta,
-                cancellationToken);
-        }
-
-        /// <summary>
-        ///     Updates the specified stock item.
-        /// </summary>
         /// <param name="updateStockItem">The stock item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
@@ -189,6 +163,55 @@
                 updateStockItem,
                 userId,
                 cancellationToken);
+        }
+
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The stock item that is updated.</param>
+        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public async Task<bool> UpdateQuantityAsync(
+            string userId,
+            string stockItemId,
+            int quantityDelta,
+            CancellationToken cancellationToken
+        )
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
+            try
+            {
+                var stockItem = await this.atomicStockItemService.UpdateQuantityAsync(
+                    userId,
+                    stockItemId,
+                    quantityDelta,
+                    cancellationToken,
+                    session);
+                if (stockItem is null)
+                {
+                    return false;
+                }
+
+                await this.atomicShoppingItemService.UpdateQuantityByStockItemIdAsync(
+                    userId,
+                    stockItemId,
+                    Math.Max(
+                        stockItem.MinimumQuantity - stockItem.Quantity,
+                        0),
+                    cancellationToken,
+                    session);
+                await session.CommitTransactionAsync(cancellationToken);
+                return true;
+            }
+            catch
+            {
+                await session.AbortTransactionAsync(cancellationToken);
+                throw;
+            }
         }
     }
 }

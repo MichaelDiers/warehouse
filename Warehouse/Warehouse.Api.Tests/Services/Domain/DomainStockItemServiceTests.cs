@@ -206,6 +206,36 @@
             DomainStockItemServiceTests.NoOtherCalls(services);
         }
 
+        [Fact]
+        public async Task ReadAsync()
+        {
+            var services = DomainStockItemServiceTests.Init();
+
+            var result = await services.domainStockItemService.ReadAsync(
+                services.stockItem.UserId,
+                new CancellationToken());
+
+            Asserts.Assert(
+                services.stockItem,
+                result.Single());
+        }
+
+        [Fact]
+        public async Task ReadByIdAsync()
+        {
+            var services = DomainStockItemServiceTests.Init();
+
+            var result = await services.domainStockItemService.ReadByIdAsync(
+                services.stockItem.UserId,
+                services.stockItem.Id,
+                new CancellationToken());
+
+            Assert.NotNull(result);
+            Asserts.Assert(
+                services.stockItem,
+                result);
+        }
+
         private static (Mock<IAtomicStockItemService> atomicStockItemService, Mock<IAtomicShoppingItemService>
             atomicShoppingItemService, Mock<ITransactionHandler> transactionHandler, Mock<ITransactionHandle>
             transactionHandle, IStockItemService domainStockItemService, ICreateStockItem createStockItem, IStockItem
@@ -255,6 +285,19 @@
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<ITransactionHandle?>()));
+            atomicStockItemService.Setup(
+                    mock => mock.ReadAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {stockItem}));
+            atomicStockItemService.Setup(
+                    mock => mock.ReadByIdAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult(stockItem));
 
             if (atomicStockItemServiceThrows)
             {

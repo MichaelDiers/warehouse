@@ -241,7 +241,7 @@
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(
+        public async Task<bool> UpdateQuantityAsync(
             string userId,
             string shoppingItemId,
             int quantityDelta,
@@ -267,6 +267,47 @@
                     Builders<DatabaseShoppingItem>.Update.Inc(
                         doc => doc.Quantity,
                         quantityDelta),
+                    cancellationToken: cancellationToken);
+            }
+
+            return result.IsAcknowledged && result.MatchedCount == 1;
+        }
+
+        /// <summary>
+        ///     Updates the specified shopping item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The referenced stock item id of the shopping item.</param>
+        /// <param name="quantity">The quantity is updated to this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public async Task<bool> UpdateQuantityByStockItemIdAsync(
+            string userId,
+            string stockItemId,
+            int quantity,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
+        {
+            UpdateResult result;
+            if (transactionHandle?.ClientSessionHandle is not null)
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    transactionHandle.ClientSessionHandle,
+                    doc => doc.StockItemId == stockItemId && doc.UserId == userId,
+                    Builders<DatabaseShoppingItem>.Update.Set(
+                        doc => doc.Quantity,
+                        quantity),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                result = await this.shoppingItemCollection.UpdateOneAsync(
+                    doc => doc.StockItemId == stockItemId && doc.UserId == userId,
+                    Builders<DatabaseShoppingItem>.Update.Set(
+                        doc => doc.Quantity,
+                        quantity),
                     cancellationToken: cancellationToken);
             }
 

@@ -81,13 +81,26 @@
         /// <summary>
         ///     Updates the specified shopping item.
         /// </summary>
+        /// <param name="shoppingItem">The shopping item that is updated.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        Task<bool> UpdateAsync(
+            IShoppingItem shoppingItem,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        );
+
+        /// <summary>
+        ///     Updates the specified shopping item.
+        /// </summary>
         /// <param name="userId">The id of the owner.</param>
         /// <param name="shoppingItemId">The shopping item that is updated.</param>
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateAsync(
+        Task<bool> UpdateQuantityAsync(
             string userId,
             string shoppingItemId,
             int quantityDelta,
@@ -98,12 +111,16 @@
         /// <summary>
         ///     Updates the specified shopping item.
         /// </summary>
-        /// <param name="shoppingItem">The shopping item that is updated.</param>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The referenced stock item id of the shopping item.</param>
+        /// <param name="quantity">The quantity is updated to this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateAsync(
-            IShoppingItem shoppingItem,
+        Task<bool> UpdateQuantityByStockItemIdAsync(
+            string userId,
+            string stockItemId,
+            int quantity,
             CancellationToken cancellationToken,
             ITransactionHandle? transactionHandle = null
         );

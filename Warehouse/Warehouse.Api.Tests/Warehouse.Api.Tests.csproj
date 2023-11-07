@@ -35,8 +35,4 @@
     <Folder Include="coverage\" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet test /p:AltCover=true --no-build --no-restore /p:AltCoverReport=&quot;.\coverage\altcover.xml&quot;&#xD;&#xA;dotnet %25userprofile%25\.nuget\packages\reportgenerator\5.1.26\\tools\net6.0\ReportGenerator.dll -reports:coverage\altcover.xml -targetdir:coverage\report -reporttypes:Html_Dark -assemblyfilters:+Warehouse.Api -classfilters:&quot;-Microsoft.*;-System.*;-*Program&quot;" />
-  </Target>
-
 </Project>

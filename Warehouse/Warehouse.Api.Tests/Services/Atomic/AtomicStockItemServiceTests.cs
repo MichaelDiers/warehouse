@@ -1,7 +1,6 @@
 ﻿namespace Warehouse.Api.Tests.Services.Atomic
 {
     using Moq;
-    using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Extensions;
@@ -245,150 +244,76 @@
 
         [Theory]
         [InlineData(
-            UpdateOperation.Decrease,
             10,
-            true,
             true)]
         [InlineData(
-            UpdateOperation.Decrease,
             10,
-            false,
+            false)]
+        [InlineData(
+            -10,
             true)]
         [InlineData(
-            UpdateOperation.Increase,
-            10,
-            true,
-            true)]
-        [InlineData(
-            UpdateOperation.Increase,
-            10,
-            false,
-            true)]
-        [InlineData(
-            (UpdateOperation) int.MaxValue,
-            10,
-            false,
-            true)]
-        [InlineData(
-            UpdateOperation.None,
-            10,
-            false,
+            -10,
             false)]
-        [InlineData(
-            UpdateOperation.Decrease,
-            0,
-            true,
-            true)]
-        [InlineData(
-            UpdateOperation.Increase,
-            0,
-            true,
-            true)]
-        [InlineData(
-            UpdateOperation.Decrease,
-            10,
-            true,
-            false)]
-        [InlineData(
-            UpdateOperation.Decrease,
-            10,
-            false,
-            false)]
-        [InlineData(
-            UpdateOperation.Increase,
-            10,
-            true,
-            false)]
-        [InlineData(
-            UpdateOperation.Increase,
-            10,
-            false,
-            false)]
-        [InlineData(
-            (UpdateOperation) int.MaxValue,
-            10,
-            false,
-            false)]
-        [InlineData(
-            UpdateOperation.Decrease,
-            0,
-            true,
-            false)]
-        [InlineData(
-            UpdateOperation.Increase,
-            0,
-            true,
-            false)]
-        [InlineData(
-            UpdateOperation.None,
-            10,
-            true,
-            false)]
-        public async Task UpdateByQuantityDeltaAsync(
-            UpdateOperation operation,
-            int quantity,
-            bool isUpdated,
-            bool hasTransactionHandle
-        )
+        public async Task UpdateQuantityAsync_QuantityNonZero(int quantityDelta, bool isUpdated)
         {
-            var services = AtomicStockItemServiceTests.Init(isUpdated: isUpdated);
+            var services = AtomicStockItemServiceTests.Init(
+                isUpdated: isUpdated,
+                deltaQuantity: quantityDelta);
 
-            var isOperationValid = operation switch
+            var result = await services.atomicStockItemService.UpdateQuantityAsync(
+                services.stockItem.UserId,
+                services.stockItem.Id,
+                quantityDelta,
+                new CancellationToken(),
+                services.transactionHandle.Object);
+
+            if (isUpdated)
             {
-                UpdateOperation.Decrease => true,
-                UpdateOperation.Increase => true,
-                _ => false
-            };
-
-            if (isOperationValid || quantity == 0)
-            {
-                var result = await services.atomicStockItemService.UpdateAsync(
-                    services.stockItem.UserId,
-                    services.stockItem.Id,
-                    operation,
-                    quantity,
-                    new CancellationToken(),
-                    hasTransactionHandle ? services.transactionHandle.Object : null);
-
-                Assert.Equal(
-                    isUpdated,
-                    result);
+                Assert.NotNull(result);
+                Asserts.Assert(
+                    services.stockItem,
+                    new StockItem(result) {Quantity = result.Quantity - quantityDelta});
             }
             else
             {
-                await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => services.atomicStockItemService.UpdateAsync(
-                        services.stockItem.UserId,
-                        services.stockItem.Id,
-                        operation,
-                        quantity,
-                        new CancellationToken(),
-                        hasTransactionHandle ? services.transactionHandle.Object : null));
+                Assert.Null(result);
             }
 
-            if (operation is UpdateOperation.Decrease or UpdateOperation.Increase && quantity != 0)
-            {
-                if (hasTransactionHandle)
-                {
-                    services.stockItemProvider.Verify(
-                        mock => mock.UpdateAsync(
-                            services.stockItem.UserId,
-                            services.stockItem.Id,
-                            operation == UpdateOperation.Increase ? quantity : -quantity,
-                            It.IsAny<CancellationToken>(),
-                            It.IsNotNull<ITransactionHandle?>()));
-                }
-                else
-                {
-                    services.stockItemProvider.Verify(
-                        mock => mock.UpdateAsync(
-                            services.stockItem.UserId,
-                            services.stockItem.Id,
-                            operation == UpdateOperation.Increase ? quantity : -quantity,
-                            It.IsAny<CancellationToken>(),
-                            null));
-                }
-            }
+            services.stockItemProvider.Verify(
+                mock => mock.UpdateQuantityAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    quantityDelta,
+                    It.IsAny<CancellationToken>(),
+                    It.IsNotNull<ITransactionHandle?>()));
+
+            AtomicStockItemServiceTests.NoOtherCalls(services);
+        }
+
+        [Fact]
+        public async Task UpdateQuantityAsync_QuantityZero()
+        {
+            var services = AtomicStockItemServiceTests.Init();
+
+            var result = await services.atomicStockItemService.UpdateQuantityAsync(
+                services.stockItem.UserId,
+                services.stockItem.Id,
+                0,
+                new CancellationToken(),
+                services.transactionHandle.Object);
+
+            Assert.NotNull(result);
+            Assert.Equal(
+                services.stockItem,
+                result);
+
+            services.stockItemProvider.Verify(
+                mock => mock.ReadByIdAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>(),
+                    It.IsNotNull<ITransactionHandle?>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
@@ -399,7 +324,9 @@
                 int quantity = 10,
                 int minimumQuantity = 10,
                 bool isDeleted = true,
-                bool isUpdated = true
+                bool isUpdated = true,
+                int deltaQuantity = 10,
+                bool readByIdSucceeds = true
             )
         {
             var stockItem = new StockItem(
@@ -446,15 +373,17 @@
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>(),
                         It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult<IStockItem?>(stockItem));
+                .Returns(Task.FromResult<IStockItem?>(readByIdSucceeds ? stockItem : null));
             stockItemProvider.Setup(
-                    mock => mock.UpdateAsync(
+                    mock => mock.UpdateQuantityAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<int>(),
                         It.IsAny<CancellationToken>(),
                         It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(isUpdated));
+                .Returns(
+                    Task.FromResult<IStockItem?>(
+                        isUpdated ? new StockItem(stockItem) {Quantity = stockItem.Quantity + deltaQuantity} : null));
             stockItemProvider.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<IStockItem>(),

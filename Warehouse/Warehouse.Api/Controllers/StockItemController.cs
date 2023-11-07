@@ -3,7 +3,6 @@
     using System.ComponentModel.DataAnnotations;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.StockItems;
@@ -18,16 +17,6 @@
     [GuidValidation("stockItemId")]
     public class StockItemController : ControllerBase
     {
-        /// <summary>
-        ///     The decrease operation for <see cref="Put(string, string, int, System.Threading.CancellationToken)" />.
-        /// </summary>
-        private const string OperationDecrease = "decrease";
-
-        /// <summary>
-        ///     The increase operation for <see cref="Put(string, string, int, System.Threading.CancellationToken)" />.
-        /// </summary>
-        private const string OperationIncrease = "increase";
-
         /// <summary>
         ///     The business logic for handling stock items.
         /// </summary>
@@ -143,40 +132,25 @@
         ///     Increase or decrease the quantity of the specified stock item by the given amount.
         /// </summary>
         /// <param name="stockItemId">The stock item to be updated.</param>
-        /// <param name="amount">The quantity is increased or decreased by this amount.</param>
-        /// <param name="operation">Specifies if it is a increase or decrease update.</param>
+        /// <param name="quantityDelta">The quantity is increased or decreased by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>An <see cref="OkResult" /> if the update succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpPut("{operation}/{stockItemId}/{amount:int}")]
+        [HttpPut("{stockItemId}/{quantityDelta:int}")]
         public async Task<ActionResult> Put(
-            [FromRoute]
-            [BindRequired]
-            [RegularExpression($"^({StockItemController.OperationIncrease}|{StockItemController.OperationDecrease})$")]
-            string operation,
             [FromRoute] [BindRequired] string stockItemId,
             [FromRoute]
             [BindRequired]
             [Range(
-                1,
+                -CreateStockItem.MaxQuantity,
                 CreateStockItem.MaxQuantity)]
-            int amount,
+            int quantityDelta,
             CancellationToken cancellationToken
         )
         {
-            if (!Enum.TryParse(
-                    operation,
-                    true,
-                    out UpdateOperation updateOperation) ||
-                !Enum.IsDefined(updateOperation))
-            {
-                return this.BadRequest();
-            }
-
-            var success = await this.stockItemService.UpdateAsync(
+            var success = await this.stockItemService.UpdateQuantityAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
-                updateOperation,
-                amount,
+                quantityDelta,
                 cancellationToken);
 
             return success ? this.Ok() : this.NotFound();

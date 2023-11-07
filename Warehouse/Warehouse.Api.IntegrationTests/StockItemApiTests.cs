@@ -151,40 +151,19 @@ namespace Warehouse.Api.IntegrationTests
         }
 
         [Theory]
-        [InlineData("increase")]
-        [InlineData("decrease")]
-        [InlineData("foo")]
-        public async Task UpdateOperationAsync(string operation)
+        [InlineData(10)]
+        [InlineData(0)]
+        [InlineData(-10)]
+        public async Task UpdateOperationAsync(int quantityDelta)
         {
             var userId = Guid.NewGuid().ToString();
             var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
-            const int delta = 2;
 
             Assert.NotNull(stockItem);
 
-            if (operation is "increase" or "decrease")
-            {
-                await HttpClientService.PutAsync(
-                    userId,
-                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}");
-            }
-            else
-            {
-                var response = await Assert.ThrowsAsync<HttpRequestException>(
-                    () => HttpClientService.PutAsync(
-                        userId,
-                        $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
-                Assert.Equal(
-                    HttpStatusCode.BadRequest,
-                    response.StatusCode);
-            }
-
-            var update = operation switch
-            {
-                "increase" => delta,
-                "decrease" => -delta,
-                _ => 0
-            };
+            await HttpClientService.PutAsync(
+                userId,
+                $"{StockItemApiTests.Url}/{stockItem.Id}/{quantityDelta}");
 
             var updated = await StockItemApiTests.ReadStockItemByIdAsync(
                 userId,
@@ -199,7 +178,7 @@ namespace Warehouse.Api.IntegrationTests
                 stockItem.Name,
                 updated.Name);
             Assert.Equal(
-                stockItem.Quantity + update,
+                stockItem.Quantity + quantityDelta,
                 updated.Quantity);
             Assert.Equal(
                 stockItem.MinimumQuantity,
@@ -208,18 +187,12 @@ namespace Warehouse.Api.IntegrationTests
 
         [Theory]
         [InlineData(
-            "increase",
             HttpStatusCode.BadRequest,
-            -1)]
+            int.MinValue)]
         [InlineData(
-            "decrease",
             HttpStatusCode.BadRequest,
-            0)]
-        [InlineData(
-            "foo",
-            HttpStatusCode.BadRequest,
-            1)]
-        public async Task UpdateOperationAsyncFail(string operation, HttpStatusCode statusCode, int delta)
+            int.MaxValue)]
+        public async Task UpdateOperationAsyncFail(HttpStatusCode statusCode, int quantityDelta)
         {
             var userId = Guid.NewGuid().ToString();
             var stockItem = await StockItemApiTests.CreateStockItemAsync(userId);
@@ -229,7 +202,7 @@ namespace Warehouse.Api.IntegrationTests
             var response = await Assert.ThrowsAsync<HttpRequestException>(
                 () => HttpClientService.PutAsync(
                     userId,
-                    $"{StockItemApiTests.Url}/{operation}/{stockItem.Id}/{delta}"));
+                    $"{StockItemApiTests.Url}/{stockItem.Id}/{quantityDelta}"));
             Assert.Equal(
                 statusCode,
                 response.StatusCode);

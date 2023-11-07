@@ -208,8 +208,8 @@
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(
+        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item or null if no item is found.</returns>
+        public async Task<IStockItem?> UpdateQuantityAsync(
             string userId,
             string stockItemId,
             int quantityDelta,
@@ -217,28 +217,36 @@
             ITransactionHandle? transactionHandle = null
         )
         {
-            UpdateResult result;
+            var options =
+                new FindOneAndUpdateOptions<DatabaseStockItem, DatabaseStockItem>
+                {
+                    ReturnDocument = ReturnDocument.After
+                };
+
+            DatabaseStockItem? result;
             if (transactionHandle?.ClientSessionHandle is not null)
             {
-                result = await this.stockItemCollection.UpdateOneAsync(
+                result = await this.stockItemCollection.FindOneAndUpdateAsync<DatabaseStockItem>(
                     transactionHandle.ClientSessionHandle,
                     doc => doc.StockItemId == stockItemId && doc.UserId == userId,
                     Builders<DatabaseStockItem>.Update.Inc(
                         doc => doc.Quantity,
                         quantityDelta),
-                    cancellationToken: cancellationToken);
+                    options,
+                    cancellationToken);
             }
             else
             {
-                result = await this.stockItemCollection.UpdateOneAsync(
+                result = await this.stockItemCollection.FindOneAndUpdateAsync<DatabaseStockItem>(
                     doc => doc.StockItemId == stockItemId && doc.UserId == userId,
                     Builders<DatabaseStockItem>.Update.Inc(
                         doc => doc.Quantity,
                         quantityDelta),
-                    cancellationToken: cancellationToken);
+                    options,
+                    cancellationToken);
             }
 
-            return result.IsAcknowledged && result.MatchedCount == 1;
+            return StockItemProvider.ToStockItem(result);
         }
 
         /// <summary>

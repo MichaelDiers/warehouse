@@ -1,10 +1,16 @@
 ﻿namespace Warehouse.Api.Models.StockItems
 {
+    using System.Text.Json.Serialization;
     using Warehouse.Api.Contracts.StockItems;
 
     /// <inheritdoc cref="IStockItem" />
     public class StockItem : IStockItem
     {
+        [JsonConstructor]
+        public StockItem()
+        {
+        }
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="StockItem" /> class.
         /// </summary>
@@ -26,6 +32,20 @@
             this.Quantity = quantity;
             this.MinimumQuantity = minimumQuantity;
             this.UserId = userId;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="StockItem" /> class.
+        /// </summary>
+        /// <param name="stockItem">The stock item that is copied.</param>
+        public StockItem(IStockItem stockItem)
+            : this(
+                stockItem.Id,
+                stockItem.Name,
+                stockItem.Quantity,
+                stockItem.MinimumQuantity,
+                stockItem.UserId)
+        {
         }
 
         /// <summary>

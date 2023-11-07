@@ -124,40 +124,19 @@ namespace Warehouse.Api.IntegrationTests
         }
 
         [Theory]
-        [InlineData("increase")]
-        [InlineData("decrease")]
-        [InlineData("foo")]
-        public async Task UpdateOperationAsync(string operation)
+        [InlineData(10)]
+        [InlineData(0)]
+        [InlineData(-10)]
+        public async Task UpdateOperationAsync(int quanityDelta)
         {
             var userId = Guid.NewGuid().ToString();
             var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
-            const int delta = 2;
 
             Assert.NotNull(shoppingItem);
 
-            if (operation is "increase" or "decrease")
-            {
-                await HttpClientService.PutAsync(
-                    userId,
-                    $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}");
-            }
-            else
-            {
-                var response = await Assert.ThrowsAsync<HttpRequestException>(
-                    () => HttpClientService.PutAsync(
-                        userId,
-                        $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}"));
-                Assert.Equal(
-                    HttpStatusCode.BadRequest,
-                    response.StatusCode);
-            }
-
-            var update = operation switch
-            {
-                "increase" => delta,
-                "decrease" => -delta,
-                _ => 0
-            };
+            await HttpClientService.PutAsync(
+                userId,
+                $"{ShoppingItemApiTests.Url}/{shoppingItem.Id}/{quanityDelta}");
 
             var updated = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
@@ -172,24 +151,18 @@ namespace Warehouse.Api.IntegrationTests
                 shoppingItem.Name,
                 updated.Name);
             Assert.Equal(
-                shoppingItem.Quantity + update,
+                shoppingItem.Quantity + quanityDelta,
                 updated.Quantity);
         }
 
         [Theory]
         [InlineData(
-            "increase",
-            HttpStatusCode.BadRequest,
-            -1)]
+            int.MaxValue,
+            HttpStatusCode.BadRequest)]
         [InlineData(
-            "decrease",
-            HttpStatusCode.BadRequest,
-            0)]
-        [InlineData(
-            "foo",
-            HttpStatusCode.BadRequest,
-            1)]
-        public async Task UpdateOperationAsyncFail(string operation, HttpStatusCode statusCode, int delta)
+            int.MinValue,
+            HttpStatusCode.BadRequest)]
+        public async Task UpdateOperationAsyncFail(int quantityDelta, HttpStatusCode statusCode)
         {
             var userId = Guid.NewGuid().ToString();
             var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
@@ -199,7 +172,7 @@ namespace Warehouse.Api.IntegrationTests
             var response = await Assert.ThrowsAsync<HttpRequestException>(
                 () => HttpClientService.PutAsync(
                     userId,
-                    $"{ShoppingItemApiTests.Url}/{operation}/{shoppingItem.Id}/{delta}"));
+                    $"{ShoppingItemApiTests.Url}/{shoppingItem.Id}/{quantityDelta}"));
             Assert.Equal(
                 statusCode,
                 response.StatusCode);

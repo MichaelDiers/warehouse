@@ -1,6 +1,5 @@
 ﻿namespace Warehouse.Api.Services.Atomic
 {
-    using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Models.ShoppingItems;
@@ -150,51 +149,6 @@
         /// <summary>
         ///     Updates the specified shopping item.
         /// </summary>
-        /// <param name="userId">The id of the owner.</param>
-        /// <param name="shoppingItemId">The shopping item that is updated.</param>
-        /// <param name="operation">Specifies the type of the update.</param>
-        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(
-            string userId,
-            string shoppingItemId,
-            UpdateOperation operation,
-            int quantityDelta,
-            CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
-        )
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (quantityDelta == 0)
-            {
-                return true;
-            }
-
-            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            var delta = operation switch
-            {
-                UpdateOperation.Increase => quantityDelta,
-                UpdateOperation.Decrease => -quantityDelta,
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(operation),
-                    operation,
-                    null)
-            };
-
-            return await this.provider.UpdateAsync(
-                userId,
-                shoppingItemId,
-                delta,
-                cancellationToken,
-                transactionHandle);
-        }
-
-        /// <summary>
-        ///     Updates the specified shopping item.
-        /// </summary>
         /// <param name="updateShoppingItem">The shopping item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
@@ -218,6 +172,63 @@
 
             return this.provider.UpdateAsync(
                 shoppingItem,
+                cancellationToken,
+                transactionHandle);
+        }
+
+        /// <summary>
+        ///     Updates the specified shopping item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="shoppingItemId">The shopping item that is updated.</param>
+        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public async Task<bool> UpdateQuantityAsync(
+            string userId,
+            string shoppingItemId,
+            int quantityDelta,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (quantityDelta == 0)
+            {
+                return true;
+            }
+
+            return await this.provider.UpdateQuantityAsync(
+                userId,
+                shoppingItemId,
+                quantityDelta,
+                cancellationToken,
+                transactionHandle);
+        }
+
+        /// <summary>
+        ///     Updates the specified shopping item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The referenced stock item id of the shopping item.</param>
+        /// <param name="quantity">The quantity is updated to this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <param name="transactionHandle">The database transaction handle.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
+        public Task<bool> UpdateQuantityByStockItemIdAsync(
+            string userId,
+            string stockItemId,
+            int quantity,
+            CancellationToken cancellationToken,
+            ITransactionHandle? transactionHandle = null
+        )
+        {
+            return this.provider.UpdateQuantityByStockItemIdAsync(
+                userId,
+                stockItemId,
+                quantity,
                 cancellationToken,
                 transactionHandle);
         }
