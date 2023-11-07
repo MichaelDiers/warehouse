@@ -366,6 +366,35 @@
             AtomicShoppingItemServiceTests.NoOtherCalls(services);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task UpdateQuantityByStockItemIdAsync(bool isUpdated)
+        {
+            var services = AtomicShoppingItemServiceTests.Init(isUpdated: isUpdated);
+
+            var result = await services.atomicShoppingItemService.UpdateQuantityByStockItemIdAsync(
+                services.shoppingItem.UserId,
+                services.shoppingItem.StockItemId,
+                services.shoppingItem.Quantity,
+                new CancellationToken(),
+                services.transactionHandle.Object);
+
+            Assert.Equal(
+                isUpdated,
+                result);
+
+            services.shoppingItemProvider.Verify(
+                mock => mock.UpdateQuantityByStockItemIdAsync(
+                    services.shoppingItem.UserId,
+                    services.shoppingItem.StockItemId,
+                    services.shoppingItem.Quantity,
+                    It.IsAny<CancellationToken>(),
+                    It.IsNotNull<ITransactionHandle?>()));
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
+        }
+
         private static (IAtomicShoppingItemService atomicShoppingItemService, Mock<IShoppingItemProvider>
             shoppingItemProvider, Mock<ITransactionHandle> transactionHandle, IShoppingItem shoppingItem,
             ICreateShoppingItem createShoppingItem, IUpdateShoppingItem updateShoppingItem) Init(
@@ -439,6 +468,14 @@
                         It.IsAny<CancellationToken>(),
                         It.IsAny<ITransactionHandle?>()))
                 .Returns(Task.FromResult(isDeleted));
+            shoppingItemProvider.Setup(
+                    mock => mock.UpdateQuantityByStockItemIdAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<int>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<ITransactionHandle?>()))
+                .Returns(Task.FromResult(isUpdated));
 
             var atomicShoppingItemService =
                 TestHostApplicationBuilder

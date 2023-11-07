@@ -1,0 +1,5 @@
+dotnet test /p:AltCover=true --no-build --no-restore /p:AltCoverReport=".\coverage\altcover.xml"
+dotnet %userprofile%\.nuget\packages\reportgenerator\5.1.26\\tools\net6.0\ReportGenerator.dll -reports:coverage\altcover.xml -targetdir:coverage\report -reporttypes:Html_Dark -assemblyfilters:+Warehouse.Api -classfilters:"-Microsoft.*;-System.*;-*Program"
+
+
+dotnet test /p:AltCover=true --no-build --no-restore /p:AltCoverReport=".\coverage\altcover.xml" && dotnet %userprofile%\.nuget\packages\reportgenerator\5.1.26\\tools\net6.0\ReportGenerator.dll -reports:coverage\altcover.xml -targetdir:coverage\report -reporttypes:Html_Dark -assemblyfilters:+Warehouse.Api -classfilters:"-Microsoft.*;-System.*;-*Program"

@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Api.Tests", "Ware
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{75AC0DAB-E77F-4357-8156-0AF6EDCC0631}"
 	ProjectSection(SolutionItems) = preProject
+		coverage.txt = coverage.txt
 		docker.txt = docker.txt
 	EndProjectSection
 EndProject
