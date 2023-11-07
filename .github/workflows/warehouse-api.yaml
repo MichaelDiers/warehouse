@@ -4,6 +4,13 @@ on:
     paths:
       - Warehouse/**
   workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -32,3 +39,12 @@ jobs:
           reporttypes: Html_Dark
           assemblyfilters: +Warehouse.Api
           classfilters: -Microsoft.*;-System.*;-*Program
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ${{ env.REPORT_TARGET }}
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
