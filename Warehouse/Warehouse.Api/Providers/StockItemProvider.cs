@@ -22,7 +22,7 @@
         public StockItemProvider(IMongoClient mongoClient, IAppConfiguration configuration)
         {
             this.stockItemCollection = mongoClient.GetDatabase(configuration.Warehouse.DatabaseName)
-                .GetCollection<DatabaseStockItem>(configuration.Warehouse.StockItemCollectionName);
+                .GetCollection<DatabaseStockItem>(DatabaseStockItem.CollectionName);
         }
 
         /// <summary>

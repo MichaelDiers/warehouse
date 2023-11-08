@@ -10,6 +10,11 @@
     public class DatabaseStockItem
     {
         /// <summary>
+        ///     The database collection name for stock items.
+        /// </summary>
+        public static readonly string CollectionName = $"{nameof(DatabaseStockItem)}s";
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DatabaseStockItem" /> class.
         /// </summary>
         public DatabaseStockItem()

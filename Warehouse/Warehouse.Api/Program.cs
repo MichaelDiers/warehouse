@@ -1,6 +1,8 @@
 using Warehouse.Api.Extensions;
 using Warehouse.Api.Models.Config;
 
+var source = new CancellationTokenSource(10000);
+
 var builder = WebApplication.CreateBuilder(args);
 
 var appConfiguration = builder.Configuration.Get<AppConfiguration>();
@@ -14,9 +16,15 @@ builder.Services.AddJwtAuthorization();
 
 builder.Services.AddDependencies();
 builder.Services.AddAppConfiguration(appConfiguration);
-builder.Services.AddWarehouseDb(appConfiguration.Warehouse);
+await builder.Services.AddWarehouseDb(
+    appConfiguration.Warehouse,
+    source.Token);
 
 builder.Services.AddControllers();
+//    options =>
+//    {
+//        options.Filters.Add()
+//    })
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCustomSwaggerGen();

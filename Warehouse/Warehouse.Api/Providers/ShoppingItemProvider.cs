@@ -22,7 +22,7 @@
         public ShoppingItemProvider(IMongoClient mongoClient, IAppConfiguration configuration)
         {
             this.shoppingItemCollection = mongoClient.GetDatabase(configuration.Warehouse.DatabaseName)
-                .GetCollection<DatabaseShoppingItem>(configuration.Warehouse.ShoppingItemCollectionName);
+                .GetCollection<DatabaseShoppingItem>(DatabaseShoppingItem.CollectionName);
         }
 
         /// <summary>

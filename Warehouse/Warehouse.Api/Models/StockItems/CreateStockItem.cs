@@ -13,6 +13,21 @@
         public const int MaxQuantity = 9999;
 
         /// <summary>
+        ///     The minimum allowed quantity.
+        /// </summary>
+        public const int MinQuantity = 0;
+
+        /// <summary>
+        ///     The maximum length of the name.
+        /// </summary>
+        public const int NameMaxLength = 100;
+
+        /// <summary>
+        ///     The minimum length of the name.
+        /// </summary>
+        public const int NameMinLength = 2;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="CreateStockItem" /> class.
         /// </summary>
         /// <param name="name">The name.</param>
@@ -30,7 +45,7 @@
         /// </summary>
         [BindRequired]
         [Range(
-            0,
+            CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
         public int MinimumQuantity { get; set; }
 
@@ -38,7 +53,9 @@
         ///     Gets or sets the name of the item.
         /// </summary>
         [Required]
-        [StringLength(100)]
+        [StringLength(
+            CreateStockItem.NameMaxLength,
+            MinimumLength = CreateStockItem.NameMinLength)]
         public string Name { get; set; }
 
         /// <summary>
@@ -46,7 +63,7 @@
         /// </summary>
         [BindRequired]
         [Range(
-            0,
+            CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
         public int Quantity { get; set; }
     }

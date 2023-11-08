@@ -157,13 +157,19 @@
         /// </summary>
         /// <param name="services">The services.</param>
         /// <param name="configuration">The database configuration.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The given <paramref name="services" />.</returns>
-        public static IServiceCollection AddWarehouseDb(
+        public static async Task<IServiceCollection> AddWarehouseDb(
             this IServiceCollection services,
-            IDatabaseConfiguration configuration
+            IDatabaseConfiguration configuration,
+            CancellationToken cancellationToken
         )
         {
-            services.AddSingleton<IMongoClient>(_ => new MongoClient(configuration.ConnectionString));
+            var client = new MongoClient(configuration.ConnectionString);
+            await client.InitializeWarehouseAsync(
+                configuration,
+                cancellationToken);
+            services.AddSingleton<IMongoClient>(_ => client);
 
             return services;
         }
