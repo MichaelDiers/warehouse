@@ -261,8 +261,7 @@
             stockItemProvider.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {stockItem}));
             var readByIdAsync = stockItemProvider.Setup(
                 mock => mock.ReadByIdAsync(
