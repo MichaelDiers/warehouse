@@ -18,8 +18,6 @@
     {
         private const int Quantity = 100;
 
-        private readonly CreateShoppingItem createShoppingItem;
-
         private readonly string name = Guid.NewGuid().ToString();
 
         private readonly ShoppingItem shoppingItem;
@@ -28,98 +26,16 @@
 
         private readonly string stockItemId = Guid.NewGuid().ToString();
 
-        private readonly UpdateShoppingItem updateShoppingItem;
-
         private readonly string userId = Guid.NewGuid().ToString();
 
         public ShoppingItemControllerTests()
         {
-            this.createShoppingItem = new CreateShoppingItem(
-                this.name,
-                ShoppingItemControllerTests.Quantity,
-                this.stockItemId);
-
             this.shoppingItem = new ShoppingItem(
                 this.shoppingItemId,
                 this.name,
                 ShoppingItemControllerTests.Quantity,
                 this.userId,
                 this.stockItemId);
-
-            this.updateShoppingItem = new UpdateShoppingItem(
-                this.shoppingItemId,
-                $"{this.name}_update",
-                ShoppingItemControllerTests.Quantity + 1,
-                this.stockItemId);
-        }
-
-        [Fact]
-        public async Task CreateAsync()
-        {
-            var shoppingItemService = new Mock<IDomainShoppingItemService>();
-            shoppingItemService.Setup(
-                    mock => mock.CreateAsync(
-                        It.IsAny<ICreateShoppingItem>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IShoppingItem>(this.shoppingItem));
-
-            var controller = new ShoppingItemController(shoppingItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            var result = await controller.Post(
-                this.createShoppingItem,
-                new CancellationToken());
-
-            var actionResult = Assert.IsType<CreatedAtActionResult>(result);
-            var actual = Assert.IsAssignableFrom<IShoppingItem>(actionResult.Value);
-
-            Assert.Equal(
-                this.userId,
-                actual.UserId);
-            Assert.Equal(
-                this.shoppingItemId,
-                actual.Id);
-            Assert.Equal(
-                ShoppingItemControllerTests.Quantity,
-                actual.Quantity);
-            Assert.Equal(
-                this.name,
-                actual.Name);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task DeleteAsync(bool isDeleted)
-        {
-            var shoppingItemService = new Mock<IDomainShoppingItemService>();
-            shoppingItemService.Setup(
-                    mock => mock.DeleteAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(isDeleted));
-
-            var controller = new ShoppingItemController(shoppingItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            var result = await controller.Delete(
-                this.shoppingItemId,
-                new CancellationToken());
-
-            if (isDeleted)
-            {
-                Assert.IsType<OkResult>(result);
-            }
-            else
-            {
-                Assert.IsType<NotFoundResult>(result);
-            }
         }
 
         [Fact]
@@ -205,38 +121,6 @@
                 Assert.Equal(
                     this.name,
                     actual.Name);
-            }
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task UpdateAsync(bool isUpdated)
-        {
-            var shoppingItemService = new Mock<IDomainShoppingItemService>();
-            shoppingItemService.Setup(
-                    mock => mock.UpdateAsync(
-                        It.IsAny<UpdateShoppingItem>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
-            var controller = new ShoppingItemController(shoppingItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            var result = await controller.Put(
-                this.updateShoppingItem,
-                new CancellationToken());
-
-            if (isUpdated)
-            {
-                Assert.IsType<OkResult>(result);
-            }
-            else
-            {
-                Assert.IsType<NotFoundResult>(result);
             }
         }
     }

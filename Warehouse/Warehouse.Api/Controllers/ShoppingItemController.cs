@@ -1,11 +1,9 @@
 ﻿namespace Warehouse.Api.Controllers
 {
-    using System.ComponentModel.DataAnnotations;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Extensions;
-    using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Validation;
 
     /// <summary>
@@ -29,25 +27,6 @@
         public ShoppingItemController(IDomainShoppingItemService shoppingItemService)
         {
             this.shoppingItemService = shoppingItemService;
-        }
-
-        /// <summary>
-        ///     Deletes the specified shopping item identifier.
-        /// </summary>
-        /// <param name="shoppingItemId">The shopping item identifier.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>An <see cref="OkResult" /> if the delete succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpDelete("{shoppingItemId}")]
-        public async Task<ActionResult> Delete(
-            [BindRequired] [FromRoute] string shoppingItemId,
-            CancellationToken cancellationToken
-        )
-        {
-            await this.shoppingItemService.DeleteAsync(
-                this.User.Claims.RequiredId(),
-                shoppingItemId,
-                cancellationToken);
-            return this.Ok();
         }
 
         /// <summary>
@@ -81,75 +60,6 @@
                 cancellationToken);
 
             return this.Ok(result);
-        }
-
-        /// <summary>
-        ///     Posts the specified shopping item.
-        /// </summary>
-        /// <param name="createShoppingItem">The shopping item to be created.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>The created shopping item.</returns>
-        [HttpPost]
-        public async Task<ActionResult> Post(
-            [FromBody] CreateShoppingItem createShoppingItem,
-            CancellationToken cancellationToken
-        )
-        {
-            var shoppingItem = await this.shoppingItemService.CreateAsync(
-                createShoppingItem,
-                this.User.Claims.RequiredId(),
-                cancellationToken);
-            return this.CreatedAtAction(
-                nameof(this.Get),
-                new {shoppingItemId = shoppingItem.Id},
-                shoppingItem);
-        }
-
-        /// <summary>
-        ///     Update the specified shopping item.
-        /// </summary>
-        /// <param name="updateShoppingItem">The shopping item to be updated.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>An <see cref="OkResult" /> if the update succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpPut]
-        public async Task<ActionResult> Put(
-            [FromBody] UpdateShoppingItem updateShoppingItem,
-            CancellationToken cancellationToken
-        )
-        {
-            await this.shoppingItemService.UpdateAsync(
-                updateShoppingItem,
-                this.User.Claims.RequiredId(),
-                cancellationToken);
-            return this.Ok();
-        }
-
-        /// <summary>
-        ///     Increase or decrease the quantity of the specified shopping item by the given amount.
-        /// </summary>
-        /// <param name="shoppingItemId">The shopping item to be updated.</param>
-        /// <param name="quantityDelta">The quantity is increased or decreased by this amount.</param>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>An <see cref="OkResult" /> if the update succeeds and <see cref="NotFoundResult" /> otherwise.</returns>
-        [HttpPut("{shoppingItemId}/{quantityDelta:int}")]
-        public async Task<ActionResult> Put(
-            [FromRoute] [BindRequired] string shoppingItemId,
-            [FromRoute]
-            [BindRequired]
-            [Range(
-                -CreateShoppingItem.MaxQuantity,
-                CreateShoppingItem.MaxQuantity)]
-            int quantityDelta,
-            CancellationToken cancellationToken
-        )
-        {
-            await this.shoppingItemService.UpdateQuantityAsync(
-                this.User.Claims.RequiredId(),
-                shoppingItemId,
-                quantityDelta,
-                cancellationToken);
-
-            return this.Ok();
         }
     }
 }
