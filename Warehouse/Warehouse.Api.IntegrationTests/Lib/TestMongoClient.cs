@@ -2,7 +2,6 @@
 {
     using Microsoft.Extensions.DependencyInjection;
     using MongoDB.Driver;
-    using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Models.StockItems;
 
     internal static class TestMongoClient
@@ -19,12 +18,6 @@
             }
 
             return client.GetDatabase(configuration.Warehouse.DatabaseName);
-        }
-
-        public static IMongoCollection<DatabaseShoppingItem> ShoppingItemCollection(IServiceCollection? services = null)
-        {
-            return TestMongoClient.Connect(services)
-                .GetCollection<DatabaseShoppingItem>(DatabaseShoppingItem.CollectionName);
         }
 
         public static IMongoCollection<DatabaseStockItem> StockItemCollection(IServiceCollection? services = null)

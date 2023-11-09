@@ -4,6 +4,7 @@
     using Moq;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Controllers;
+    using Warehouse.Api.Exceptions;
     using Warehouse.Api.Models.StockItems;
     using Warehouse.Api.Tests.Utilities;
 
@@ -164,12 +165,19 @@
         public async Task ReadByIdAsync(bool hasResult)
         {
             var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
-                    mock => mock.ReadByIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IStockItem?>(hasResult ? this.stockItem : null));
+            var stockItemServiceSetup = stockItemService.Setup(
+                mock => mock.ReadByIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
+            if (hasResult)
+            {
+                stockItemServiceSetup.Returns(Task.FromResult<IStockItem>(this.stockItem));
+            }
+            else
+            {
+                stockItemServiceSetup.Throws<NotFoundException>();
+            }
 
             var controller = new StockItemController(stockItemService.Object)
             {

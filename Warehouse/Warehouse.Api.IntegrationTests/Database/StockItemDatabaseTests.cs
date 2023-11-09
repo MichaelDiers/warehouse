@@ -11,7 +11,7 @@
         [InlineData(10000)]
         public async Task CreateAsyncMinimumQuantityInvalid(int minimumQuantity)
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             stockItem.MinimumQuantity = minimumQuantity;
             var collection = TestMongoClient.StockItemCollection();
 
@@ -26,7 +26,7 @@
         [InlineData(101)]
         public async Task CreateAsyncNameInvalid(int nameLength)
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             stockItem.Name = new string(
                 'a',
                 nameLength);
@@ -41,12 +41,12 @@
         [Fact]
         public async Task CreateAsyncNameNotUnique()
         {
-            var stockItem1 = this.DatabaseStockItem();
+            var stockItem1 = StockItemDatabaseTests.DatabaseStockItem();
             var collection = TestMongoClient.StockItemCollection();
 
             await collection.InsertOneAsync(stockItem1);
 
-            var stockItem2 = this.DatabaseStockItem();
+            var stockItem2 = StockItemDatabaseTests.DatabaseStockItem();
             stockItem2.UserId = stockItem1.UserId;
             stockItem2.Name = stockItem1.Name;
 
@@ -59,7 +59,7 @@
         [Fact]
         public async Task CreateAsyncOk()
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             var collection = TestMongoClient.StockItemCollection();
 
             await collection.InsertOneAsync(stockItem);
@@ -69,7 +69,7 @@
 
             Assert.NotNull(actual);
 
-            await collection.InsertOneAsync(this.DatabaseStockItem());
+            await collection.InsertOneAsync(StockItemDatabaseTests.DatabaseStockItem());
         }
 
         [Theory]
@@ -77,7 +77,7 @@
         [InlineData(10000)]
         public async Task CreateAsyncQuantityInvalid(int quantity)
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             stockItem.Quantity = quantity;
             var collection = TestMongoClient.StockItemCollection();
 
@@ -92,7 +92,7 @@
         [InlineData("7c2c71da-72f0-4501-b949-3a97e4ed98041")]
         public async Task CreateAsyncStockItemIdInvalid(string stockItemId)
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             stockItem.StockItemId = stockItemId;
 
             var collection = TestMongoClient.StockItemCollection();
@@ -106,12 +106,12 @@
         [Fact]
         public async Task CreateAsyncStockItemIdNotUnique()
         {
-            var stockItem1 = this.DatabaseStockItem();
+            var stockItem1 = StockItemDatabaseTests.DatabaseStockItem();
             var collection = TestMongoClient.StockItemCollection();
 
             await collection.InsertOneAsync(stockItem1);
 
-            var stockItem2 = this.DatabaseStockItem();
+            var stockItem2 = StockItemDatabaseTests.DatabaseStockItem();
             stockItem2.UserId = stockItem1.UserId;
             stockItem2.StockItemId = stockItem1.StockItemId;
 
@@ -126,7 +126,7 @@
         [InlineData("7c2c71da-72f0-4501-b949-3a97e4ed98041")]
         public async Task CreateAsyncUserIdInvalid(string userId)
         {
-            var stockItem = this.DatabaseStockItem();
+            var stockItem = StockItemDatabaseTests.DatabaseStockItem();
             stockItem.UserId = userId;
 
             var collection = TestMongoClient.StockItemCollection();
@@ -137,7 +137,7 @@
                 exception.WriteError.Code);
         }
 
-        private DatabaseStockItem DatabaseStockItem()
+        private static DatabaseStockItem DatabaseStockItem()
         {
             return new DatabaseStockItem
             {

@@ -127,7 +127,7 @@ namespace Warehouse.Api.IntegrationTests
         [InlineData(10)]
         [InlineData(0)]
         [InlineData(-10)]
-        public async Task UpdateOperationAsync(int quanityDelta)
+        public async Task UpdateOperationAsync(int quantityDelta)
         {
             var userId = Guid.NewGuid().ToString();
             var shoppingItem = await ShoppingItemApiTests.CreateShoppingItemAsync(userId);
@@ -136,7 +136,7 @@ namespace Warehouse.Api.IntegrationTests
 
             await HttpClientService.PutAsync(
                 userId,
-                $"{ShoppingItemApiTests.Url}/{shoppingItem.Id}/{quanityDelta}");
+                $"{ShoppingItemApiTests.Url}/{shoppingItem.Id}/{quantityDelta}");
 
             var updated = await ShoppingItemApiTests.ReadShoppingItemByIdAsync(
                 userId,
@@ -151,7 +151,7 @@ namespace Warehouse.Api.IntegrationTests
                 shoppingItem.Name,
                 updated.Name);
             Assert.Equal(
-                shoppingItem.Quantity + quanityDelta,
+                shoppingItem.Quantity + quantityDelta,
                 updated.Quantity);
         }
 

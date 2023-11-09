@@ -316,7 +316,7 @@
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
-                    It.IsAny<ITransactionHandle?>()));
+                    It.IsAny<ITransactionHandle>()));
             if (atomicShoppingItemServiceThrows)
             {
                 atomicShoppingItemServiceCreateSetup.Throws<Exception>();
