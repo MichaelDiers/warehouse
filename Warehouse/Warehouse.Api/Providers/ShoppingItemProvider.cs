@@ -93,7 +93,7 @@
             await this.Execute(
                 () => this.shoppingItemCollection.DeleteOneAsync(
                     transactionHandle.ClientSessionHandle,
-                    doc => doc.UserId == userId && doc.ShoppingItemId == stockItemId,
+                    doc => doc.UserId == userId && doc.StockItemId == stockItemId,
                     cancellationToken: cancellationToken));
         }
 
