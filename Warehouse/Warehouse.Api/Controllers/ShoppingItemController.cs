@@ -20,15 +20,15 @@
         /// <summary>
         ///     The business logic for handling shopping items.
         /// </summary>
-        private readonly IAtomicShoppingItemService atomicShoppingItemService;
+        private readonly IDomainShoppingItemService shoppingItemService;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShoppingItemController" /> class.
         /// </summary>
-        /// <param name="atomicShoppingItemService">The business logic for handling shopping items.</param>
-        public ShoppingItemController(IAtomicShoppingItemService atomicShoppingItemService)
+        /// <param name="shoppingItemService">The business logic for handling shopping items.</param>
+        public ShoppingItemController(IDomainShoppingItemService shoppingItemService)
         {
-            this.atomicShoppingItemService = atomicShoppingItemService;
+            this.shoppingItemService = shoppingItemService;
         }
 
         /// <summary>
@@ -43,11 +43,11 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.atomicShoppingItemService.DeleteAsync(
+            await this.shoppingItemService.DeleteAsync(
                 this.User.Claims.RequiredId(),
                 shoppingItemId,
                 cancellationToken);
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@
         [HttpGet]
         public async Task<IEnumerable<IShoppingItem>> Get(CancellationToken cancellationToken)
         {
-            return await this.atomicShoppingItemService.ReadAsync(
+            return await this.shoppingItemService.ReadAsync(
                 this.User.Claims.RequiredId(),
                 cancellationToken);
         }
@@ -75,14 +75,10 @@
             CancellationToken cancellationToken
         )
         {
-            var result = await this.atomicShoppingItemService.ReadByIdAsync(
+            var result = await this.shoppingItemService.ReadByIdAsync(
                 this.User.Claims.RequiredId(),
                 shoppingItemId,
                 cancellationToken);
-            if (result is null)
-            {
-                return this.NotFound();
-            }
 
             return this.Ok(result);
         }
@@ -99,7 +95,7 @@
             CancellationToken cancellationToken
         )
         {
-            var shoppingItem = await this.atomicShoppingItemService.CreateAsync(
+            var shoppingItem = await this.shoppingItemService.CreateAsync(
                 createShoppingItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
@@ -121,11 +117,11 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.atomicShoppingItemService.UpdateAsync(
+            await this.shoppingItemService.UpdateAsync(
                 updateShoppingItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
 
         /// <summary>
@@ -147,13 +143,13 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.atomicShoppingItemService.UpdateQuantityAsync(
+            await this.shoppingItemService.UpdateQuantityAsync(
                 this.User.Claims.RequiredId(),
                 shoppingItemId,
                 quantityDelta,
                 cancellationToken);
 
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
     }
 }

@@ -97,6 +97,7 @@
             services.AddScoped<IAtomicShoppingItemService, AtomicShoppingItemService>();
 
             services.AddScoped<IStockItemService, DomainStockItemService>();
+            services.AddScoped<IDomainShoppingItemService, DomainShoppingItemService>();
 
             services.AddScoped<ITransactionHandler, TransactionHandler>();
 

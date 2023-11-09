@@ -17,7 +17,7 @@
         Task CreateAsync(
             IShoppingItem shoppingItem,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -27,12 +27,12 @@
         /// <param name="shoppingItemId">The shopping item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        Task<bool> DeleteAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        Task DeleteAsync(
             string userId,
             string shoppingItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -42,12 +42,12 @@
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        Task<bool> DeleteByStockItemIdAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        Task DeleteByStockItemIdAsync(
             string userId,
             string stockItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -55,13 +55,17 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>All shopping items with the specified user id.</returns>
-        Task<IEnumerable<IShoppingItem>> ReadAsync(
-            string userId,
-            CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
-        );
+        Task<IEnumerable<IShoppingItem>> ReadAsync(string userId, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Reads a shopping item by its identifier.
+        /// </summary>
+        /// <param name="userId">The user identifier of the owner.</param>
+        /// <param name="shoppingItemId">The shopping item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>The found shopping item.</returns>
+        Task<IShoppingItem> ReadByIdAsync(string userId, string shoppingItemId, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Reads a shopping item by its identifier.
@@ -71,11 +75,11 @@
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>The found shopping item.</returns>
-        Task<IShoppingItem?> ReadByIdAsync(
+        Task<IShoppingItem> ReadByIdAsync(
             string userId,
             string shoppingItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -84,11 +88,11 @@
         /// <param name="shoppingItem">The shopping item that is updated.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        Task UpdateAsync(
             IShoppingItem shoppingItem,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -99,13 +103,13 @@
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateQuantityAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        Task UpdateQuantityAsync(
             string userId,
             string shoppingItemId,
             int quantityDelta,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
 
         /// <summary>
@@ -116,13 +120,13 @@
         /// <param name="quantity">The quantity is updated to this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        Task<bool> UpdateQuantityByStockItemIdAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        Task UpdateQuantityByStockItemIdAsync(
             string userId,
             string stockItemId,
             int quantity,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         );
     }
 }

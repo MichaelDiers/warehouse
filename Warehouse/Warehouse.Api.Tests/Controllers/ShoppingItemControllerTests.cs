@@ -2,9 +2,9 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Moq;
-    using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Controllers;
+    using Warehouse.Api.Exceptions;
     using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Tests.Utilities;
 
@@ -56,13 +56,12 @@
         [Fact]
         public async Task CreateAsync()
         {
-            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
+            var shoppingItemService = new Mock<IDomainShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.CreateAsync(
                         It.IsAny<ICreateShoppingItem>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        null))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IShoppingItem>(this.shoppingItem));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -96,13 +95,12 @@
         [InlineData(false)]
         public async Task DeleteAsync(bool isDeleted)
         {
-            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
+            var shoppingItemService = new Mock<IDomainShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(isDeleted));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -127,12 +125,11 @@
         [Fact]
         public async Task ReadAsync()
         {
-            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
+            var shoppingItemService = new Mock<IDomainShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IEnumerable<IShoppingItem>>(new[] {this.shoppingItem}));
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
@@ -162,14 +159,20 @@
         [InlineData(false)]
         public async Task ReadByIdAsync(bool hasResult)
         {
-            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
-            shoppingItemService.Setup(
-                    mock => mock.ReadByIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult<IShoppingItem?>(hasResult ? this.shoppingItem : null));
+            var shoppingItemService = new Mock<IDomainShoppingItemService>();
+            var shoppingItemServiceSetup = shoppingItemService.Setup(
+                mock => mock.ReadByIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
+            if (hasResult)
+            {
+                shoppingItemServiceSetup.Returns(Task.FromResult<IShoppingItem>(this.shoppingItem));
+            }
+            else
+            {
+                shoppingItemServiceSetup.Throws<NotFoundException>();
+            }
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
             {
@@ -210,14 +213,13 @@
         [InlineData(false)]
         public async Task UpdateAsync(bool isUpdated)
         {
-            var shoppingItemService = new Mock<IAtomicShoppingItemService>();
+            var shoppingItemService = new Mock<IDomainShoppingItemService>();
             shoppingItemService.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<UpdateShoppingItem>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult(isUpdated));
+                        It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var controller = new ShoppingItemController(shoppingItemService.Object)
             {
