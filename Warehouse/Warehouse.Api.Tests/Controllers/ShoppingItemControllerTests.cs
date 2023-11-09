@@ -95,16 +95,19 @@
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
-            var result = await controller.Get(
-                this.shoppingItemId,
-                new CancellationToken());
-
             if (!hasResult)
             {
-                Assert.IsType<NotFoundResult>(result.Result);
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => controller.Get(
+                        this.shoppingItemId,
+                        new CancellationToken()));
             }
             else
             {
+                var result = await controller.Get(
+                    this.shoppingItemId,
+                    new CancellationToken());
+
                 var actionResult = Assert.IsType<OkObjectResult>(result.Result);
 
                 var actual = Assert.IsAssignableFrom<IShoppingItem>(actionResult.Value);

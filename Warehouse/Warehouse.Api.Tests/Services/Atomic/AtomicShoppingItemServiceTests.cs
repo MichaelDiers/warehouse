@@ -238,7 +238,7 @@
             }
             else
             {
-                await Assert.ThrowsAsync<BadRequestException>(
+                await Assert.ThrowsAsync<NotFoundException>(
                     () => services.atomicShoppingItemService.UpdateQuantityAsync(
                         services.shoppingItem.UserId,
                         services.shoppingItem.Id,
@@ -343,62 +343,94 @@
                         It.IsAny<CancellationToken>(),
                         It.IsAny<ITransactionHandle>()))
                 .Returns(Task.CompletedTask);
-            shoppingItemProvider.Setup(
-                    mock => mock.DeleteAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
-                .Returns(Task.FromResult(isDeleted));
+            var deleteAsyncSetup = shoppingItemProvider.Setup(
+                mock => mock.DeleteAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            if (isDeleted)
+            {
+                deleteAsyncSetup.Returns(Task.CompletedTask);
+            }
+            else
+            {
+                deleteAsyncSetup.Throws<NotFoundException>();
+            }
+
             shoppingItemProvider.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IEnumerable<IShoppingItem>>(new[] {shoppingItem}));
-            var shoppingItemProviderSetup = shoppingItemProvider.Setup(
+            var readByIdAsyncSetup = shoppingItemProvider.Setup(
                 mock => mock.ReadByIdAsync(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<ITransactionHandle>()));
+            var readByIdAsyncSetupNoSession = shoppingItemProvider.Setup(
+                mock => mock.ReadByIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
             if (readById)
             {
-                shoppingItemProviderSetup.Returns(Task.FromResult<IShoppingItem>(shoppingItem));
+                readByIdAsyncSetup.Returns(Task.FromResult<IShoppingItem>(shoppingItem));
+                readByIdAsyncSetupNoSession.Returns(Task.FromResult<IShoppingItem>(shoppingItem));
             }
             else
             {
-                shoppingItemProviderSetup.Throws<NotFoundException>();
+                readByIdAsyncSetup.Throws<NotFoundException>();
+                readByIdAsyncSetupNoSession.Throws<NotFoundException>();
             }
 
-            shoppingItemProvider.Setup(
-                    mock => mock.UpdateAsync(
-                        It.IsAny<IShoppingItem>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
-                .Returns(Task.FromResult(isUpdated));
-            shoppingItemProvider.Setup(
-                    mock => mock.UpdateQuantityAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<int>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
-                .Returns(Task.FromResult(isUpdated));
-            shoppingItemProvider.Setup(
-                    mock => mock.DeleteByStockItemIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
-                .Returns(Task.FromResult(isDeleted));
-            shoppingItemProvider.Setup(
-                    mock => mock.UpdateQuantityByStockItemIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<int>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle>()))
-                .Returns(Task.FromResult(isUpdated));
+            var updateAsyncSetup = shoppingItemProvider.Setup(
+                mock => mock.UpdateAsync(
+                    It.IsAny<IShoppingItem>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            var updateQuantityAsyncSetup = shoppingItemProvider.Setup(
+                mock => mock.UpdateQuantityAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            var updateQuantityByStockItemIdAsyncSetup = shoppingItemProvider.Setup(
+                mock => mock.UpdateQuantityByStockItemIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            if (isUpdated)
+            {
+                updateAsyncSetup.Returns(Task.CompletedTask);
+                updateQuantityAsyncSetup.Returns(Task.CompletedTask);
+                updateQuantityByStockItemIdAsyncSetup.Returns(Task.CompletedTask);
+            }
+            else
+            {
+                updateAsyncSetup.Throws<NotFoundException>();
+                updateQuantityAsyncSetup.Throws<NotFoundException>();
+                updateQuantityByStockItemIdAsyncSetup.Throws<NotFoundException>();
+            }
+
+            var deleteByStockItemIdAsyncSetup = shoppingItemProvider.Setup(
+                mock => mock.DeleteByStockItemIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            if (isDeleted)
+            {
+                deleteByStockItemIdAsyncSetup.Returns(Task.CompletedTask);
+            }
+            else
+            {
+                deleteByStockItemIdAsyncSetup.Throws<NotFoundException>();
+            }
 
             var atomicShoppingItemService =
                 TestHostApplicationBuilder

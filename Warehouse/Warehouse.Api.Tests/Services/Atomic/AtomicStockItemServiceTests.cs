@@ -72,7 +72,7 @@
         [Fact]
         public async Task ReadAsync()
         {
-            var services = AtomicStockItemServiceTests.Init();
+            var services = AtomicStockItemServiceTests.Init(readByIdSucceeds: true);
 
             var result = await services.atomicStockItemService.ReadAsync(
                 services.stockItem.UserId,
@@ -91,9 +91,21 @@
         }
 
         [Fact]
-        public async Task ReadByIdAsync()
+        public async Task ReadByIdAsyncFail()
         {
-            var services = AtomicStockItemServiceTests.Init();
+            var services = AtomicStockItemServiceTests.Init(readByIdSucceeds: false);
+
+            await Assert.ThrowsAsync<NotFoundException>(
+                () => services.atomicStockItemService.ReadByIdAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    new CancellationToken()));
+        }
+
+        [Fact]
+        public async Task ReadByIdAsyncOk()
+        {
+            var services = AtomicStockItemServiceTests.Init(readByIdSucceeds: true);
 
             var result = await services.atomicStockItemService.ReadByIdAsync(
                 services.stockItem.UserId,
@@ -158,23 +170,24 @@
                 isUpdated: isUpdated,
                 deltaQuantity: quantityDelta);
 
-            var result = await services.atomicStockItemService.UpdateQuantityAsync(
-                services.stockItem.UserId,
-                services.stockItem.Id,
-                quantityDelta,
-                new CancellationToken(),
-                services.transactionHandle.Object);
-
             if (isUpdated)
             {
-                Assert.NotNull(result);
-                Asserts.Assert(
-                    services.stockItem,
-                    new StockItem(result) {Quantity = result.Quantity - quantityDelta});
+                var result = await services.atomicStockItemService.UpdateQuantityAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    quantityDelta,
+                    new CancellationToken(),
+                    services.transactionHandle.Object);
             }
             else
             {
-                Assert.Null(result);
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => services.atomicStockItemService.UpdateQuantityAsync(
+                        services.stockItem.UserId,
+                        services.stockItem.Id,
+                        quantityDelta,
+                        new CancellationToken(),
+                        services.transactionHandle.Object));
             }
 
             services.stockItemProvider.Verify(
@@ -269,13 +282,20 @@
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<ITransactionHandle>()));
+            var readByIdAsyncNoSession = stockItemProvider.Setup(
+                mock => mock.ReadByIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
             if (readByIdSucceeds)
             {
                 readByIdAsync.Returns(Task.FromResult<IStockItem>(stockItem));
+                readByIdAsyncNoSession.Returns(Task.FromResult<IStockItem>(stockItem));
             }
             else
             {
                 readByIdAsync.Throws<NotFoundException>();
+                readByIdAsyncNoSession.Throws<NotFoundException>();
             }
 
             var updateQuantityAsync = stockItemProvider.Setup(

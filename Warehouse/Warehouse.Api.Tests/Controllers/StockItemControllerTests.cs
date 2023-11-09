@@ -98,29 +98,39 @@
         public async Task DeleteAsync(bool isDeleted)
         {
             var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
-                    mock => mock.DeleteAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(isDeleted));
+            var deleteAsyncSetup = stockItemService.Setup(
+                mock => mock.DeleteAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
+            if (isDeleted)
+            {
+                deleteAsyncSetup.Returns(Task.CompletedTask);
+            }
+            else
+            {
+                deleteAsyncSetup.Throws<NotFoundException>();
+            }
 
             var controller = new StockItemController(stockItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
-            var result = await controller.Delete(
-                this.stockItemId,
-                new CancellationToken());
-
             if (isDeleted)
+
             {
+                var result = await controller.Delete(
+                    this.stockItemId,
+                    new CancellationToken());
                 Assert.IsType<OkResult>(result);
             }
             else
             {
-                Assert.IsType<NotFoundResult>(result);
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => controller.Delete(
+                        this.stockItemId,
+                        new CancellationToken()));
             }
         }
 
@@ -184,16 +194,18 @@
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
-            var result = await controller.Get(
-                this.stockItemId,
-                new CancellationToken());
-
             if (!hasResult)
             {
-                Assert.IsType<NotFoundResult>(result.Result);
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => controller.Get(
+                        this.stockItemId,
+                        new CancellationToken()));
             }
             else
             {
+                var result = await controller.Get(
+                    this.stockItemId,
+                    new CancellationToken());
                 var actionResult = Assert.IsType<OkObjectResult>(result.Result);
 
                 var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
@@ -222,29 +234,40 @@
         public async Task UpdateAsync(bool isUpdated)
         {
             var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
-                    mock => mock.UpdateAsync(
-                        It.IsAny<UpdateStockItem>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(isUpdated));
+            var updateAsyncSetup = stockItemService.Setup(
+                mock => mock.UpdateAsync(
+                    It.IsAny<UpdateStockItem>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
+            if (isUpdated)
+            {
+                updateAsyncSetup.Returns(Task.CompletedTask);
+            }
+            else
+            {
+                updateAsyncSetup.Throws<NotFoundException>();
+            }
 
             var controller = new StockItemController(stockItemService.Object)
             {
                 ControllerContext = ControllerContextService.Create(this.userId)
             };
 
-            var result = await controller.Put(
-                this.updateStockItem,
-                new CancellationToken());
+            ;
 
             if (isUpdated)
             {
+                var result = await controller.Put(
+                    this.updateStockItem,
+                    new CancellationToken());
                 Assert.IsType<OkResult>(result);
             }
             else
             {
-                Assert.IsType<NotFoundResult>(result);
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => controller.Put(
+                        this.updateStockItem,
+                        new CancellationToken()));
             }
         }
     }
