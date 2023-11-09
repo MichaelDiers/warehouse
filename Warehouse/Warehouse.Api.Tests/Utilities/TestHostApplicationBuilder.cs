@@ -1,7 +1,11 @@
 ﻿namespace Warehouse.Api.Tests.Utilities
 {
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using MongoDB.Driver;
+    using Warehouse.Api.Extensions;
+    using Warehouse.Api.Models.Config;
 
     internal class TestHostApplicationBuilder
     {
@@ -123,10 +127,13 @@
         /// <summary>
         ///     Initialize the host and get a certain type of services.
         /// </summary>
-        /// <typeparam name="T">The type of the services to be requested from the host.</typeparam>
+        /// <typeparam name="TA">The type of the first service.</typeparam>
+        /// <typeparam name="TB">The type of the second service.</typeparam>
         /// <param name="addServices">The add services dependencies.</param>
         /// <returns>The requested services.</returns>
-        public static IEnumerable<T> GetServices<T>(params Func<IServiceCollection, IServiceCollection>[] addServices)
+        public static async Task<(TA, TB)> GetServices<TA, TB>(
+            params Func<IServiceCollection, IServiceCollection>[] addServices
+        )
         {
             var builder = Host.CreateApplicationBuilder();
             foreach (var addService in addServices)
@@ -134,12 +141,23 @@
                 addService(builder.Services);
             }
 
+            if (typeof(TA) == typeof(IMongoClient) || typeof(TB) == typeof(IMongoClient))
+            {
+                var appConfiguration = builder.Configuration.Get<AppConfiguration>();
+                Assert.NotNull(appConfiguration);
+                await builder.Services.AddWarehouseDb(
+                    appConfiguration.Warehouse,
+                    new CancellationToken());
+            }
+
             var host = builder.Build();
-            var services = host.Services.GetServices<T>();
+            var serviceA = host.Services.GetService<TA>();
+            var serviceB = host.Services.GetService<TB>();
 
-            Assert.NotNull(services);
+            Assert.NotNull(serviceA);
+            Assert.NotNull(serviceB);
 
-            return services;
+            return (serviceA, serviceB);
         }
 
         private static T Build<T>(HostApplicationBuilder builder)

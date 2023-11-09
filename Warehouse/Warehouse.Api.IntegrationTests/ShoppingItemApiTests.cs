@@ -202,7 +202,7 @@ namespace Warehouse.Api.IntegrationTests
         private static async Task<IShoppingItem> CreateShoppingItemAsync(string userId)
         {
             var createShoppingItem = new CreateShoppingItem(
-                "name",
+                Guid.NewGuid().ToString(),
                 10,
                 Guid.NewGuid().ToString());
 

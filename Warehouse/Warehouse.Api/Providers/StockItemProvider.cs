@@ -1,13 +1,12 @@
 ﻿namespace Warehouse.Api.Providers
 {
     using MongoDB.Driver;
-    using Warehouse.Api.Contracts.Config;
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Models.StockItems;
 
     /// <inheritdoc cref="IStockItemProvider" />
-    internal class StockItemProvider : IStockItemProvider
+    internal class StockItemProvider : BaseProvider, IStockItemProvider
     {
         /// <summary>
         ///     The collection that contains stock items.
@@ -17,12 +16,14 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="StockItemProvider" /> class.
         /// </summary>
-        /// <param name="mongoClient">The mongo client.</param>
-        /// <param name="configuration">The configuration.</param>
-        public StockItemProvider(IMongoClient mongoClient, IAppConfiguration configuration)
+        /// <param name="transactionHandler">A transaction handler.</param>
+        /// <param name="database">The mongo database.</param>
+        public StockItemProvider(ITransactionHandler transactionHandler, IMongoDatabase database)
+            : base(
+                nameof(StockItemProvider),
+                transactionHandler)
         {
-            this.stockItemCollection = mongoClient.GetDatabase(configuration.Warehouse.DatabaseName)
-                .GetCollection<DatabaseStockItem>(DatabaseStockItem.CollectionName);
+            this.stockItemCollection = database.GetCollection<DatabaseStockItem>(DatabaseStockItem.CollectionName);
         }
 
         /// <summary>
@@ -35,22 +36,48 @@
         public async Task CreateAsync(
             IStockItem stockItem,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
-            if (transactionHandle?.ClientSessionHandle is not null)
-            {
-                await this.stockItemCollection.InsertOneAsync(
+            await this.Execute(
+                () => this.stockItemCollection.InsertOneAsync(
                     transactionHandle.ClientSessionHandle,
                     new DatabaseStockItem(stockItem),
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                await this.stockItemCollection.InsertOneAsync(
-                    new DatabaseStockItem(stockItem),
-                    cancellationToken: cancellationToken);
-            }
+                    cancellationToken: cancellationToken));
+        }
+
+        /// <summary>
+        ///     Creates the specified stock item.
+        /// </summary>
+        /// <param name="stockItem">The stock item to be created.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task CreateAsync(IStockItem stockItem, CancellationToken cancellationToken)
+        {
+            await this.Execute(
+                session => this.CreateAsync(
+                    stockItem,
+                    cancellationToken,
+                    session),
+                cancellationToken);
+        }
+
+        /// <summary>
+        ///     Deletes the specified stock item.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
+        {
+            await this.Execute(
+                session => this.DeleteAsync(
+                    userId,
+                    stockItemId,
+                    cancellationToken,
+                    session),
+                cancellationToken);
         }
 
         /// <summary>
@@ -60,29 +87,19 @@
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public async Task<bool> DeleteAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task DeleteAsync(
             string userId,
             string stockItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle
+            ITransactionHandle transactionHandle
         )
         {
-            DeleteResult deleteResult;
-            if (transactionHandle is not null)
-            {
-                deleteResult = await this.stockItemCollection.DeleteOneAsync(
+            await this.Execute(
+                () => this.stockItemCollection.DeleteOneAsync(
+                    transactionHandle.ClientSessionHandle,
                     doc => doc.UserId == userId && doc.StockItemId == stockItemId,
-                    cancellationToken);
-            }
-            else
-            {
-                deleteResult = await this.stockItemCollection.DeleteOneAsync(
-                    doc => doc.UserId == userId && doc.StockItemId == stockItemId,
-                    cancellationToken);
-            }
-
-            return deleteResult.IsAcknowledged && deleteResult.DeletedCount == 1;
+                    cancellationToken: cancellationToken));
         }
 
         /// <summary>
@@ -95,26 +112,55 @@
         public async Task<IEnumerable<IStockItem>> ReadAsync(
             string userId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
-            IAsyncCursor<DatabaseStockItem> result;
-            if (transactionHandle?.ClientSessionHandle is not null)
-            {
-                result = await this.stockItemCollection.FindAsync(
+            var result = await this.Execute(
+                () => this.stockItemCollection.FindAsync(
                     transactionHandle.ClientSessionHandle,
                     doc => doc.UserId == userId,
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                result = await this.stockItemCollection.FindAsync(
-                    doc => doc.UserId == userId,
-                    cancellationToken: cancellationToken);
-            }
+                    cancellationToken: cancellationToken));
 
             return await StockItemProvider.ToStockItems(
                 result,
+                cancellationToken);
+        }
+
+        /// <summary>
+        ///     Reads all stock items of the given user.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>All stock items with the specified user id.</returns>
+        public async Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken)
+        {
+            return await this.Execute(
+                session => this.ReadAsync(
+                    userId,
+                    cancellationToken,
+                    session),
+                cancellationToken);
+        }
+
+        /// <summary>
+        ///     Reads a stock item by its identifier.
+        /// </summary>
+        /// <param name="userId">The user identifier of the owner.</param>
+        /// <param name="stockItemId">The stock item identifier.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>The found stock item.</returns>
+        public async Task<IStockItem> ReadByIdAsync(
+            string userId,
+            string stockItemId,
+            CancellationToken cancellationToken
+        )
+        {
+            return await this.Execute(
+                session => this.ReadByIdAsync(
+                    userId,
+                    stockItemId,
+                    cancellationToken,
+                    session),
                 cancellationToken);
         }
 
@@ -126,29 +172,36 @@
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>The found stock item.</returns>
-        public async Task<IStockItem?> ReadByIdAsync(
+        public async Task<IStockItem> ReadByIdAsync(
             string userId,
             string stockItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
-            IAsyncCursor<DatabaseStockItem> result;
-            if (transactionHandle?.ClientSessionHandle is not null)
-            {
-                result = await this.stockItemCollection.FindAsync(
+            return await this.Execute(
+                () => this.stockItemCollection.FindAsync(
                     transactionHandle.ClientSessionHandle,
                     doc => doc.UserId == userId && doc.StockItemId == stockItemId,
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                result = await this.stockItemCollection.FindAsync(
-                    doc => doc.UserId == userId && doc.StockItemId == stockItemId,
-                    cancellationToken: cancellationToken);
-            }
+                    cancellationToken: cancellationToken),
+                StockItemProvider.ToStockItem,
+                cancellationToken);
+        }
 
-            return StockItemProvider.ToStockItem(await result.FirstOrDefaultAsync(cancellationToken));
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="stockItem">The stock item that is updated.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task UpdateAsync(IStockItem stockItem, CancellationToken cancellationToken)
+        {
+            await this.Execute(
+                session => this.UpdateAsync(
+                    stockItem,
+                    cancellationToken,
+                    session),
+                cancellationToken);
         }
 
         /// <summary>
@@ -157,17 +210,15 @@
         /// <param name="stockItem">The stock item that is updated.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task UpdateAsync(
             IStockItem stockItem,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
-            UpdateResult result;
-            if (transactionHandle?.ClientSessionHandle is not null)
-            {
-                result = await this.stockItemCollection.UpdateOneAsync(
+            await this.Execute(
+                () => this.stockItemCollection.UpdateOneAsync(
                     transactionHandle.ClientSessionHandle,
                     doc => doc.StockItemId == stockItem.Id && doc.UserId == stockItem.UserId,
                     Builders<DatabaseStockItem>.Update.Set(
@@ -179,25 +230,32 @@
                         .Set(
                             doc => doc.MinimumQuantity,
                             stockItem.MinimumQuantity),
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                result = await this.stockItemCollection.UpdateOneAsync(
-                    doc => doc.StockItemId == stockItem.Id && doc.UserId == stockItem.UserId,
-                    Builders<DatabaseStockItem>.Update.Set(
-                            doc => doc.Name,
-                            stockItem.Name)
-                        .Set(
-                            doc => doc.Quantity,
-                            stockItem.Quantity)
-                        .Set(
-                            doc => doc.MinimumQuantity,
-                            stockItem.MinimumQuantity),
-                    cancellationToken: cancellationToken);
-            }
+                    cancellationToken: cancellationToken));
+        }
 
-            return result.IsAcknowledged && result.MatchedCount == 1;
+        /// <summary>
+        ///     Updates the specified stock item.
+        /// </summary>
+        /// <param name="userId">The id of the owner.</param>
+        /// <param name="stockItemId">The stock item that is updated.</param>
+        /// <param name="quantityDelta">The quantity is updated by this amount.</param>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item.</returns>
+        public async Task<IStockItem> UpdateQuantityAsync(
+            string userId,
+            string stockItemId,
+            int quantityDelta,
+            CancellationToken cancellationToken
+        )
+        {
+            return await this.Execute(
+                session => this.UpdateQuantityAsync(
+                    userId,
+                    stockItemId,
+                    quantityDelta,
+                    cancellationToken,
+                    session),
+                cancellationToken);
         }
 
         /// <summary>
@@ -208,13 +266,13 @@
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item or null if no item is found.</returns>
-        public async Task<IStockItem?> UpdateQuantityAsync(
+        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item.</returns>
+        public async Task<IStockItem> UpdateQuantityAsync(
             string userId,
             string stockItemId,
             int quantityDelta,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
             var options =
@@ -223,30 +281,16 @@
                     ReturnDocument = ReturnDocument.After
                 };
 
-            DatabaseStockItem? result;
-            if (transactionHandle?.ClientSessionHandle is not null)
-            {
-                result = await this.stockItemCollection.FindOneAndUpdateAsync<DatabaseStockItem>(
+            return await this.Execute(
+                () => this.stockItemCollection.FindOneAndUpdateAsync<DatabaseStockItem>(
                     transactionHandle.ClientSessionHandle,
                     doc => doc.StockItemId == stockItemId && doc.UserId == userId,
                     Builders<DatabaseStockItem>.Update.Inc(
                         doc => doc.Quantity,
                         quantityDelta),
                     options,
-                    cancellationToken);
-            }
-            else
-            {
-                result = await this.stockItemCollection.FindOneAndUpdateAsync<DatabaseStockItem>(
-                    doc => doc.StockItemId == stockItemId && doc.UserId == userId,
-                    Builders<DatabaseStockItem>.Update.Inc(
-                        doc => doc.Quantity,
-                        quantityDelta),
-                    options,
-                    cancellationToken);
-            }
-
-            return StockItemProvider.ToStockItem(result);
+                    cancellationToken),
+                StockItemProvider.ToStockItem);
         }
 
         /// <summary>
@@ -255,13 +299,8 @@
         /// <param name="databaseStockItem">The database stock item.</param>
         /// <returns>The converted stock item.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        private static IStockItem? ToStockItem(DatabaseStockItem? databaseStockItem)
+        private static IStockItem ToStockItem(DatabaseStockItem databaseStockItem)
         {
-            if (databaseStockItem is null)
-            {
-                return null;
-            }
-
             if (databaseStockItem.Name is null ||
                 databaseStockItem.Quantity is null ||
                 databaseStockItem.StockItemId is null ||

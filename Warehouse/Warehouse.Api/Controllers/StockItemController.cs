@@ -43,11 +43,11 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.stockItemService.DeleteAsync(
+            await this.stockItemService.DeleteAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 cancellationToken);
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
 
         /// <summary>
@@ -79,10 +79,6 @@
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 cancellationToken);
-            if (result is null)
-            {
-                return this.NotFound();
-            }
 
             return this.Ok(result);
         }
@@ -121,11 +117,11 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.stockItemService.UpdateAsync(
+            await this.stockItemService.UpdateAsync(
                 updateStockItem,
                 this.User.Claims.RequiredId(),
                 cancellationToken);
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
 
         /// <summary>
@@ -147,13 +143,13 @@
             CancellationToken cancellationToken
         )
         {
-            var success = await this.stockItemService.UpdateQuantityAsync(
+            await this.stockItemService.UpdateQuantityAsync(
                 this.User.Claims.RequiredId(),
                 stockItemId,
                 quantityDelta,
                 cancellationToken);
 
-            return success ? this.Ok() : this.NotFound();
+            return this.Ok();
         }
     }
 }

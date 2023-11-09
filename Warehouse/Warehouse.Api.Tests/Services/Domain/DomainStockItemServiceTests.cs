@@ -145,14 +145,10 @@
 
             if (!atomicShoppingItemServiceThrows && !atomicStockItemServiceThrows)
             {
-                var result = await services.domainStockItemService.DeleteAsync(
+                await services.domainStockItemService.DeleteAsync(
                     services.stockItem.UserId,
                     services.stockItem.Id,
                     new CancellationToken());
-
-                Assert.Equal(
-                    isDeleted,
-                    result);
             }
             else
             {
@@ -168,7 +164,7 @@
                     services.stockItem.UserId,
                     services.stockItem.Id,
                     It.IsAny<CancellationToken>(),
-                    It.IsNotNull<ITransactionHandle?>()),
+                    It.IsAny<ITransactionHandle>()),
                 Times.Once);
 
             if (!atomicStockItemServiceThrows)
@@ -284,19 +280,17 @@
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>(),
-                    It.IsAny<ITransactionHandle?>()));
+                    It.IsAny<ITransactionHandle>()));
             atomicStockItemService.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {stockItem}));
             atomicStockItemService.Setup(
                     mock => mock.ReadByIdAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(stockItem));
 
             if (atomicStockItemServiceThrows)

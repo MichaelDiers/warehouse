@@ -170,6 +170,7 @@
                 configuration,
                 cancellationToken);
             services.AddSingleton<IMongoClient>(_ => client);
+            services.AddTransient<IMongoDatabase>(_ => client.GetDatabase(configuration.DatabaseName));
 
             return services;
         }

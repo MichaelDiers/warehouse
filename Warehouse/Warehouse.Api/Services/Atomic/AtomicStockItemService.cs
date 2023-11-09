@@ -33,7 +33,7 @@
             ICreateStockItem createStockItem,
             string userId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -60,17 +60,17 @@
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public Task<bool> DeleteAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task DeleteAsync(
             string userId,
             string stockItemId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return this.provider.DeleteAsync(
+            await this.provider.DeleteAsync(
                 userId,
                 stockItemId,
                 cancellationToken,
@@ -82,20 +82,14 @@
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>All stock items with the specified user id.</returns>
-        public Task<IEnumerable<IStockItem>> ReadAsync(
-            string userId,
-            CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
-        )
+        public Task<IEnumerable<IStockItem>> ReadAsync(string userId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             return this.provider.ReadAsync(
                 userId,
-                cancellationToken,
-                transactionHandle);
+                cancellationToken);
         }
 
         /// <summary>
@@ -104,22 +98,15 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <param name="transactionHandle">The database transaction handle.</param>
         /// <returns>The found stock item.</returns>
-        public Task<IStockItem?> ReadByIdAsync(
-            string userId,
-            string stockItemId,
-            CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
-        )
+        public Task<IStockItem> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             return this.provider.ReadByIdAsync(
                 userId,
                 stockItemId,
-                cancellationToken,
-                transactionHandle);
+                cancellationToken);
         }
 
         /// <summary>
@@ -129,12 +116,12 @@
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public Task<bool> UpdateAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task UpdateAsync(
             IUpdateStockItem updateStockItem,
             string userId,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -146,7 +133,7 @@
                 updateStockItem.MinimumQuantity,
                 userId);
 
-            return this.provider.UpdateAsync(
+            await this.provider.UpdateAsync(
                 stockItem,
                 cancellationToken,
                 transactionHandle);
@@ -160,20 +147,20 @@
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <param name="transactionHandle">The database transaction handle.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item or null if no item is found.</returns>
-        public async Task<IStockItem?> UpdateQuantityAsync(
+        /// <returns>A <see cref="Task{T}" /> whose result is the updated stock item.</returns>
+        public async Task<IStockItem> UpdateQuantityAsync(
             string userId,
             string stockItemId,
             int quantityDelta,
             CancellationToken cancellationToken,
-            ITransactionHandle? transactionHandle = null
+            ITransactionHandle transactionHandle
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (quantityDelta == 0)
             {
-                return await this.ReadByIdAsync(
+                return await this.provider.ReadByIdAsync(
                     userId,
                     stockItemId,
                     cancellationToken,

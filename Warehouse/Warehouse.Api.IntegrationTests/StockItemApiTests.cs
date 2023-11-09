@@ -243,7 +243,7 @@ namespace Warehouse.Api.IntegrationTests
         )
         {
             var createStockItem = new CreateStockItem(
-                "name",
+                Guid.NewGuid().ToString(),
                 quantity,
                 minimumQuantity);
 

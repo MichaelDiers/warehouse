@@ -3,6 +3,7 @@
     using Moq;
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Exceptions;
     using Warehouse.Api.Extensions;
     using Warehouse.Api.Models.StockItems;
     using Warehouse.Api.Tests.Utilities;
@@ -15,10 +16,8 @@
         Constants.TraitValueUnitTest)]
     public class AtomicStockItemServiceTests
     {
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task CreateAsync(bool hasTransactionHandle)
+        [Fact]
+        public async Task CreateAsync()
         {
             var services = AtomicStockItemServiceTests.Init();
 
@@ -26,89 +25,22 @@
                 services.createStockItem,
                 services.stockItem.UserId,
                 new CancellationToken(),
-                hasTransactionHandle ? services.transactionHandle.Object : null);
+                services.transactionHandle.Object);
 
             Asserts.Assert(
                 services.createStockItem,
                 services.stockItem.UserId,
                 result);
 
-            if (hasTransactionHandle)
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.CreateAsync(
-                        It.Is<IStockItem>(
-                            value => Asserts.Assert(
-                                services.createStockItem,
-                                services.stockItem.UserId,
-                                value)),
-                        It.IsAny<CancellationToken>(),
-                        It.IsNotNull<ITransactionHandle?>()));
-            }
-            else
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.CreateAsync(
-                        It.Is<IStockItem>(
-                            value => Asserts.Assert(
-                                services.createStockItem,
-                                services.stockItem.UserId,
-                                value)),
-                        It.IsAny<CancellationToken>(),
-                        null),
-                    Times.Once);
-            }
-
-            AtomicStockItemServiceTests.NoOtherCalls(services);
-        }
-
-        [Theory]
-        [InlineData(
-            true,
-            true)]
-        [InlineData(
-            true,
-            false)]
-        [InlineData(
-            false,
-            true)]
-        [InlineData(
-            false,
-            false)]
-        public async Task DeleteAsync(bool isDeleted, bool hasTransactionHandle)
-        {
-            var services = AtomicStockItemServiceTests.Init(isDeleted: isDeleted);
-
-            var result = await services.atomicStockItemService.DeleteAsync(
-                services.stockItem.UserId,
-                services.stockItem.Id,
-                new CancellationToken(),
-                hasTransactionHandle ? services.transactionHandle.Object : null);
-
-            Assert.Equal(
-                isDeleted,
-                result);
-
-            if (hasTransactionHandle)
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.DeleteAsync(
-                        services.stockItem.UserId,
-                        services.stockItem.Id,
-                        new CancellationToken(),
-                        It.IsNotNull<ITransactionHandle?>()),
-                    Times.Once);
-            }
-            else
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.DeleteAsync(
-                        services.stockItem.UserId,
-                        services.stockItem.Id,
-                        new CancellationToken(),
-                        null),
-                    Times.Once);
-            }
+            services.stockItemProvider.Verify(
+                mock => mock.CreateAsync(
+                    It.Is<IStockItem>(
+                        value => Asserts.Assert(
+                            services.createStockItem,
+                            services.stockItem.UserId,
+                            value)),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
@@ -116,128 +48,93 @@
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task ReadAsync(bool hasTransactionHandle)
+        public async Task DeleteAsync(bool isDeleted)
+        {
+            var services = AtomicStockItemServiceTests.Init(isDeleted: isDeleted);
+
+            await services.atomicStockItemService.DeleteAsync(
+                services.stockItem.UserId,
+                services.stockItem.Id,
+                new CancellationToken(),
+                services.transactionHandle.Object);
+
+            services.stockItemProvider.Verify(
+                mock => mock.DeleteAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    new CancellationToken(),
+                    It.IsNotNull<ITransactionHandle>()),
+                Times.Once);
+
+            AtomicStockItemServiceTests.NoOtherCalls(services);
+        }
+
+        [Fact]
+        public async Task ReadAsync()
         {
             var services = AtomicStockItemServiceTests.Init();
 
             var result = await services.atomicStockItemService.ReadAsync(
                 services.stockItem.UserId,
-                new CancellationToken(),
-                hasTransactionHandle ? services.transactionHandle.Object : null);
+                new CancellationToken());
 
             Asserts.Assert(
                 services.stockItem,
                 result.Single());
 
-            if (hasTransactionHandle)
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.ReadAsync(
-                        services.stockItem.UserId,
-                        It.IsAny<CancellationToken>(),
-                        It.IsNotNull<ITransactionHandle?>()));
-            }
-            else
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.ReadAsync(
-                        services.stockItem.UserId,
-                        It.IsAny<CancellationToken>(),
-                        null));
-            }
+            services.stockItemProvider.Verify(
+                mock => mock.ReadAsync(
+                    services.stockItem.UserId,
+                    It.IsAny<CancellationToken>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task ReadByIdAsync(bool hasTransactionHandle)
+        [Fact]
+        public async Task ReadByIdAsync()
         {
             var services = AtomicStockItemServiceTests.Init();
 
             var result = await services.atomicStockItemService.ReadByIdAsync(
                 services.stockItem.UserId,
                 services.stockItem.Id,
-                new CancellationToken(),
-                hasTransactionHandle ? services.transactionHandle.Object : null);
+                new CancellationToken());
 
             Assert.NotNull(result);
             Asserts.Assert(
                 services.stockItem,
                 result);
 
-            if (hasTransactionHandle)
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.ReadByIdAsync(
-                        services.stockItem.UserId,
-                        services.stockItem.Id,
-                        It.IsAny<CancellationToken>(),
-                        It.IsNotNull<ITransactionHandle?>()));
-            }
-            else
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.ReadByIdAsync(
-                        services.stockItem.UserId,
-                        services.stockItem.Id,
-                        It.IsAny<CancellationToken>(),
-                        null));
-            }
+            services.stockItemProvider.Verify(
+                mock => mock.ReadByIdAsync(
+                    services.stockItem.UserId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
 
         [Theory]
-        [InlineData(
-            true,
-            true)]
-        [InlineData(
-            true,
-            false)]
-        [InlineData(
-            false,
-            false)]
-        [InlineData(
-            false,
-            true)]
-        public async Task UpdateAsync(bool isUpdated, bool hasTransactionHandle)
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task UpdateAsync(bool isUpdated)
         {
             var services = AtomicStockItemServiceTests.Init(isUpdated: isUpdated);
 
-            var result = await services.atomicStockItemService.UpdateAsync(
+            await services.atomicStockItemService.UpdateAsync(
                 services.updateStockItem,
                 services.stockItem.UserId,
                 new CancellationToken(),
-                hasTransactionHandle ? services.transactionHandle.Object : null);
+                services.transactionHandle.Object);
 
-            Assert.Equal(
-                isUpdated,
-                result);
-
-            if (hasTransactionHandle)
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.UpdateAsync(
-                        It.Is<IStockItem>(
-                            value => Asserts.Assert(
-                                services.stockItem,
-                                value)),
-                        It.IsAny<CancellationToken>(),
-                        It.IsNotNull<ITransactionHandle?>()));
-            }
-            else
-            {
-                services.stockItemProvider.Verify(
-                    mock => mock.UpdateAsync(
-                        It.Is<IStockItem>(
-                            value => Asserts.Assert(
-                                services.stockItem,
-                                value)),
-                        It.IsAny<CancellationToken>(),
-                        null));
-            }
+            services.stockItemProvider.Verify(
+                mock => mock.UpdateAsync(
+                    It.Is<IStockItem>(
+                        value => Asserts.Assert(
+                            services.stockItem,
+                            value)),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
@@ -286,7 +183,7 @@
                     services.stockItem.Id,
                     quantityDelta,
                     It.IsAny<CancellationToken>(),
-                    It.IsNotNull<ITransactionHandle?>()));
+                    It.IsAny<ITransactionHandle>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
@@ -313,7 +210,7 @@
                     services.stockItem.UserId,
                     services.stockItem.Id,
                     It.IsAny<CancellationToken>(),
-                    It.IsNotNull<ITransactionHandle?>()));
+                    It.IsAny<ITransactionHandle>()));
 
             AtomicStockItemServiceTests.NoOtherCalls(services);
         }
@@ -352,43 +249,59 @@
                     mock => mock.CreateAsync(
                         It.IsAny<IStockItem>(),
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<ITransactionHandle>()))
                 .Returns(Task.CompletedTask);
             stockItemProvider.Setup(
                     mock => mock.DeleteAsync(
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<ITransactionHandle>()))
                 .Returns(Task.FromResult(isDeleted));
             stockItemProvider.Setup(
                     mock => mock.ReadAsync(
                         It.IsAny<string>(),
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<ITransactionHandle>()))
                 .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {stockItem}));
-            stockItemProvider.Setup(
-                    mock => mock.ReadByIdAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(Task.FromResult<IStockItem?>(readByIdSucceeds ? stockItem : null));
-            stockItemProvider.Setup(
-                    mock => mock.UpdateQuantityAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<int>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
-                .Returns(
-                    Task.FromResult<IStockItem?>(
-                        isUpdated ? new StockItem(stockItem) {Quantity = stockItem.Quantity + deltaQuantity} : null));
+            var readByIdAsync = stockItemProvider.Setup(
+                mock => mock.ReadByIdAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            if (readByIdSucceeds)
+            {
+                readByIdAsync.Returns(Task.FromResult<IStockItem>(stockItem));
+            }
+            else
+            {
+                readByIdAsync.Throws<NotFoundException>();
+            }
+
+            var updateQuantityAsync = stockItemProvider.Setup(
+                mock => mock.UpdateQuantityAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()));
+            if (isUpdated)
+            {
+                updateQuantityAsync.Returns(
+                    Task.FromResult<IStockItem>(
+                        new StockItem(stockItem) {Quantity = stockItem.Quantity + deltaQuantity}));
+            }
+            else
+            {
+                updateQuantityAsync.Throws<NotFoundException>();
+            }
+
             stockItemProvider.Setup(
                     mock => mock.UpdateAsync(
                         It.IsAny<IStockItem>(),
                         It.IsAny<CancellationToken>(),
-                        It.IsAny<ITransactionHandle?>()))
+                        It.IsAny<ITransactionHandle>()))
                 .Returns(Task.FromResult(isUpdated));
 
             var atomicStockItemService =

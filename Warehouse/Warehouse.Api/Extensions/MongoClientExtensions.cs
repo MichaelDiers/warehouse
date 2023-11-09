@@ -141,10 +141,11 @@
             {
                 new CreateIndexModel<DatabaseShoppingItem>(
                     new JsonIndexKeysDefinition<DatabaseShoppingItem>(
-                        $"{{\"{nameof(DatabaseShoppingItem.Name)}\": 1}}"),
+                        $"{{\"{nameof(DatabaseShoppingItem.UserId)}\": 1, \"{nameof(DatabaseShoppingItem.Name)}\": 1}}"),
                     new CreateIndexOptions
                     {
-                        Name = $"{nameof(DatabaseShoppingItem.Name)}_unique_index",
+                        Name =
+                            $"{nameof(DatabaseShoppingItem.UserId)}_{nameof(DatabaseShoppingItem.Name)}_unique_index",
                         Unique = true,
                         Collation = new Collation(
                             "de",
@@ -152,33 +153,23 @@
                     }),
                 new CreateIndexModel<DatabaseShoppingItem>(
                     new JsonIndexKeysDefinition<DatabaseShoppingItem>(
-                        $"{{\"{nameof(DatabaseShoppingItem.StockItemId)}\": 1}}"),
-                    new CreateIndexOptions
-                    {
-                        Name = $"{nameof(DatabaseShoppingItem.StockItemId)}_unique_index",
-                        Unique = true,
-                        Collation = new Collation(
-                            "simple",
-                            strength: new Optional<CollationStrength?>(CollationStrength.Primary))
-                    }),
-                new CreateIndexModel<DatabaseShoppingItem>(
-                    new JsonIndexKeysDefinition<DatabaseShoppingItem>(
-                        $"{{\"{nameof(DatabaseShoppingItem.ShoppingItemId)}\": 1}}"),
-                    new CreateIndexOptions
-                    {
-                        Name = $"{nameof(DatabaseShoppingItem.ShoppingItemId)}_unique_index",
-                        Unique = true,
-                        Collation = new Collation(
-                            "simple",
-                            strength: new Optional<CollationStrength?>(CollationStrength.Primary))
-                    }),
-                new CreateIndexModel<DatabaseShoppingItem>(
-                    new JsonIndexKeysDefinition<DatabaseShoppingItem>(
-                        $"{{\"{nameof(DatabaseShoppingItem.ShoppingItemId)}\": 1, \"{nameof(DatabaseShoppingItem.UserId)}\": 1}}"),
+                        $"{{\"{nameof(DatabaseShoppingItem.UserId)}\": 1, \"{nameof(DatabaseShoppingItem.StockItemId)}\": 1}}"),
                     new CreateIndexOptions
                     {
                         Name =
-                            $"{nameof(DatabaseShoppingItem.ShoppingItemId)}_{nameof(DatabaseShoppingItem.UserId)}_unique_index",
+                            $"{nameof(DatabaseShoppingItem.UserId)}_{nameof(DatabaseShoppingItem.StockItemId)}_unique_index",
+                        Unique = true,
+                        Collation = new Collation(
+                            "simple",
+                            strength: new Optional<CollationStrength?>(CollationStrength.Primary))
+                    }),
+                new CreateIndexModel<DatabaseShoppingItem>(
+                    new JsonIndexKeysDefinition<DatabaseShoppingItem>(
+                        $"{{\"{nameof(DatabaseShoppingItem.UserId)}\": 1, \"{nameof(DatabaseShoppingItem.ShoppingItemId)}\": 1}}"),
+                    new CreateIndexOptions
+                    {
+                        Name =
+                            $"{nameof(DatabaseShoppingItem.UserId)}_{nameof(DatabaseShoppingItem.ShoppingItemId)}_unique_index",
                         Unique = true,
                         Collation = new Collation(
                             "simple",
@@ -252,10 +243,12 @@
             var indices = new[]
             {
                 new CreateIndexModel<DatabaseStockItem>(
-                    new JsonIndexKeysDefinition<DatabaseStockItem>($"{{\"{nameof(DatabaseStockItem.Name)}\": 1}}"),
+                    new JsonIndexKeysDefinition<DatabaseStockItem>(
+                        $"{{\"{nameof(DatabaseStockItem.UserId)}\": 1, \"{nameof(DatabaseStockItem.Name)}\": 1}}"),
                     new CreateIndexOptions
                     {
-                        Name = $"{nameof(DatabaseStockItem.Name)}_unique_index",
+                        Name =
+                            $"{nameof(DatabaseStockItem.UserId)}_{nameof(DatabaseStockItem.Name)}_unique_index",
                         Unique = true,
                         Collation = new Collation(
                             "de",
@@ -263,22 +256,11 @@
                     }),
                 new CreateIndexModel<DatabaseStockItem>(
                     new JsonIndexKeysDefinition<DatabaseStockItem>(
-                        $"{{\"{nameof(DatabaseStockItem.StockItemId)}\": 1}}"),
-                    new CreateIndexOptions
-                    {
-                        Name = $"{nameof(DatabaseStockItem.StockItemId)}_unique_index",
-                        Unique = true,
-                        Collation = new Collation(
-                            "simple",
-                            strength: new Optional<CollationStrength?>(CollationStrength.Primary))
-                    }),
-                new CreateIndexModel<DatabaseStockItem>(
-                    new JsonIndexKeysDefinition<DatabaseStockItem>(
-                        $"{{\"{nameof(DatabaseStockItem.StockItemId)}\": 1, \"{nameof(DatabaseStockItem.UserId)}\": 1}}"),
+                        $"{{\"{nameof(DatabaseStockItem.UserId)}\": 1, \"{nameof(DatabaseStockItem.StockItemId)}\": 1}}"),
                     new CreateIndexOptions
                     {
                         Name =
-                            $"{nameof(DatabaseStockItem.StockItemId)}_{nameof(DatabaseStockItem.UserId)}_unique_index",
+                            $"{nameof(DatabaseStockItem.UserId)}_{nameof(DatabaseStockItem.StockItemId)}_unique_index",
                         Unique = true,
                         Collation = new Collation(
                             "simple",

@@ -90,15 +90,15 @@
         /// <param name="userId">The user identifier.</param>
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task{TResult}" /> whose result is true if the item is deleted and false otherwise.</returns>
-        public async Task<bool> DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task DeleteAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
             try
             {
-                var result = await this.atomicStockItemService.DeleteAsync(
+                await this.atomicStockItemService.DeleteAsync(
                     userId,
                     stockItemId,
                     cancellationToken,
@@ -109,7 +109,6 @@
                     cancellationToken,
                     session);
                 await session.CommitTransactionAsync(cancellationToken);
-                return result;
             }
             catch
             {
@@ -138,7 +137,7 @@
         /// <param name="stockItemId">The stock item identifier.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>The found stock item.</returns>
-        public Task<IStockItem?> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken)
+        public Task<IStockItem> ReadByIdAsync(string userId, string stockItemId, CancellationToken cancellationToken)
         {
             return this.atomicStockItemService.ReadByIdAsync(
                 userId,
@@ -152,17 +151,28 @@
         /// <param name="updateStockItem">The stock item that is updated.</param>
         /// <param name="userId">The user identifier of the owner.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public Task<bool> UpdateAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task UpdateAsync(
             IUpdateStockItem updateStockItem,
             string userId,
             CancellationToken cancellationToken
         )
         {
-            return this.atomicStockItemService.UpdateAsync(
-                updateStockItem,
-                userId,
-                cancellationToken);
+            using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
+            try
+            {
+                await this.atomicStockItemService.UpdateAsync(
+                    updateStockItem,
+                    userId,
+                    cancellationToken,
+                    session);
+                await session.CommitTransactionAsync(cancellationToken);
+            }
+            catch
+            {
+                await session.AbortTransactionAsync(cancellationToken);
+                throw;
+            }
         }
 
         /// <summary>
@@ -172,8 +182,8 @@
         /// <param name="stockItemId">The stock item that is updated.</param>
         /// <param name="quantityDelta">The quantity is updated by this amount.</param>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task{T}" /> whose result is true if the update is executed and false otherwise.</returns>
-        public async Task<bool> UpdateQuantityAsync(
+        /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
+        public async Task UpdateQuantityAsync(
             string userId,
             string stockItemId,
             int quantityDelta,
@@ -191,10 +201,6 @@
                     quantityDelta,
                     cancellationToken,
                     session);
-                if (stockItem is null)
-                {
-                    return false;
-                }
 
                 await this.atomicShoppingItemService.UpdateQuantityByStockItemIdAsync(
                     userId,
@@ -205,7 +211,6 @@
                     cancellationToken,
                     session);
                 await session.CommitTransactionAsync(cancellationToken);
-                return true;
             }
             catch
             {
