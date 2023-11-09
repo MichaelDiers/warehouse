@@ -51,6 +51,39 @@ namespace Warehouse.Api.IntegrationTests
                 shoppingItem.Quantity);
         }
 
+        public static async Task<IStockItem> CreateStockItemAsync(
+            string userId,
+            int quantity = 10,
+            int minimumQuantity = 20
+        )
+        {
+            var createStockItem = new CreateStockItem(
+                Guid.NewGuid().ToString(),
+                quantity,
+                minimumQuantity);
+
+            var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
+                userId,
+                StockItemApiTests.Url,
+                createStockItem);
+
+            Assert.NotNull(stockItem);
+            Assert.Equal(
+                createStockItem.Name,
+                stockItem.Name);
+            Assert.Equal(
+                createStockItem.Quantity,
+                stockItem.Quantity);
+            Assert.Equal(
+                createStockItem.MinimumQuantity,
+                stockItem.MinimumQuantity);
+            Assert.Equal(
+                userId,
+                stockItem.UserId);
+
+            return stockItem;
+        }
+
         [Fact]
         public async Task DeleteAsync()
         {
@@ -234,39 +267,6 @@ namespace Warehouse.Api.IntegrationTests
                    a.Quantity == b.Quantity &&
                    a.UserId == b.UserId &&
                    a.MinimumQuantity == b.MinimumQuantity;
-        }
-
-        private static async Task<IStockItem> CreateStockItemAsync(
-            string userId,
-            int quantity = 10,
-            int minimumQuantity = 20
-        )
-        {
-            var createStockItem = new CreateStockItem(
-                Guid.NewGuid().ToString(),
-                quantity,
-                minimumQuantity);
-
-            var stockItem = await HttpClientService.PostAsync<CreateStockItem, StockItem>(
-                userId,
-                StockItemApiTests.Url,
-                createStockItem);
-
-            Assert.NotNull(stockItem);
-            Assert.Equal(
-                createStockItem.Name,
-                stockItem.Name);
-            Assert.Equal(
-                createStockItem.Quantity,
-                stockItem.Quantity);
-            Assert.Equal(
-                createStockItem.MinimumQuantity,
-                stockItem.MinimumQuantity);
-            Assert.Equal(
-                userId,
-                stockItem.UserId);
-
-            return stockItem;
         }
 
         private static async Task<IStockItem> ReadStockItemByIdAsync(string userId, string stockItemId)
