@@ -61,6 +61,33 @@ namespace Warehouse.Api.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Shopping item validation failed..
+        /// </summary>
+        internal static string ShoppingItemProvider_BadRequestException {
+            get {
+                return ResourceManager.GetString("ShoppingItemProvider_BadRequestException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shopping item already exists..
+        /// </summary>
+        internal static string ShoppingItemProvider_ConflictException {
+            get {
+                return ResourceManager.GetString("ShoppingItemProvider_ConflictException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shopping item not found..
+        /// </summary>
+        internal static string ShoppingItemProvider_NotFoundException {
+            get {
+                return ResourceManager.GetString("ShoppingItemProvider_NotFoundException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stock item validation failed..
         /// </summary>
         internal static string StockItemProvider_BadRequestException {
@@ -75,6 +102,15 @@ namespace Warehouse.Api.Properties {
         internal static string StockItemProvider_ConflictException {
             get {
                 return ResourceManager.GetString("StockItemProvider_ConflictException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stock item not found..
+        /// </summary>
+        internal static string StockItemProvider_NotFoundException {
+            get {
+                return ResourceManager.GetString("StockItemProvider_NotFoundException", resourceCulture);
             }
         }
     }
