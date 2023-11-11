@@ -174,6 +174,46 @@
         }
 
         [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task ReadByIdAsyncWithSession(bool found)
+        {
+            var services = AtomicShoppingItemServiceTests.Init(readById: found);
+
+            if (found)
+            {
+                var result = await services.atomicShoppingItemService.ReadByIdAsync(
+                    services.shoppingItem.UserId,
+                    services.shoppingItem.Id,
+                    new CancellationToken(),
+                    services.transactionHandle.Object);
+                Assert.NotNull(result);
+                Asserts.Assert(
+                    services.shoppingItem,
+                    result);
+            }
+            else
+            {
+                await Assert.ThrowsAsync<NotFoundException>(
+                    () => services.atomicShoppingItemService.ReadByIdAsync(
+                        services.shoppingItem.UserId,
+                        services.shoppingItem.Id,
+                        new CancellationToken(),
+                        services.transactionHandle.Object));
+            }
+
+            services.shoppingItemProvider.Verify(
+                mock => mock.ReadByIdAsync(
+                    services.shoppingItem.UserId,
+                    services.shoppingItem.Id,
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<ITransactionHandle>()),
+                Times.Once);
+
+            AtomicShoppingItemServiceTests.NoOtherCalls(services);
+        }
+
+        [Theory]
         [InlineData(true)]
         [InlineData(false)]
         public async Task UpdateAsync(bool isUpdated)
