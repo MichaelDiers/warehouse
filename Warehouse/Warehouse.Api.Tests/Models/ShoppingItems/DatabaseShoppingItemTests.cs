@@ -8,6 +8,14 @@
         Constants.TraitValueUnitTest)]
     public class DatabaseShoppingItemTests
     {
+        [Fact]
+        public void CheckCollectionName()
+        {
+            Assert.Equal(
+                "DatabaseShoppingItems",
+                DatabaseShoppingItem.CollectionName);
+        }
+
         [Theory]
         [InlineData(
             "id",

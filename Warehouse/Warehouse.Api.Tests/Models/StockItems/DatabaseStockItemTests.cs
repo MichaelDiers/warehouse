@@ -8,6 +8,14 @@
         Constants.TraitValueUnitTest)]
     public class DatabaseStockItemTests
     {
+        [Fact]
+        public void CheckCollectionName()
+        {
+            Assert.Equal(
+                "DatabaseStockItems",
+                DatabaseStockItem.CollectionName);
+        }
+
         [Theory]
         [InlineData(
             "id",
