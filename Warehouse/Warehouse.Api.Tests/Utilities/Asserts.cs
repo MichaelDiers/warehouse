@@ -90,5 +90,38 @@
 
             return true;
         }
+
+        public static bool Assert(IUpdateStockItem a, IUpdateStockItem b)
+        {
+            Xunit.Assert.Equal(
+                a.Id,
+                b.Id);
+            Xunit.Assert.Equal(
+                a.Quantity,
+                b.Quantity);
+            Xunit.Assert.Equal(
+                a.MinimumQuantity,
+                b.MinimumQuantity);
+            Xunit.Assert.Equal(
+                a.Name,
+                b.Name);
+
+            return true;
+        }
+
+        public static bool Assert(ICreateStockItem a, ICreateStockItem b)
+        {
+            Xunit.Assert.Equal(
+                a.Quantity,
+                b.Quantity);
+            Xunit.Assert.Equal(
+                a.MinimumQuantity,
+                b.MinimumQuantity);
+            Xunit.Assert.Equal(
+                a.Name,
+                b.Name);
+
+            return true;
+        }
     }
 }

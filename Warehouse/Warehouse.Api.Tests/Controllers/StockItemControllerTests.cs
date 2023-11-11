@@ -16,259 +16,341 @@
         Constants.TraitValueUnitTest)]
     public class StockItemControllerTests
     {
-        private const int MinimumQuantity = StockItemControllerTests.Quantity / 2;
-        private const int Quantity = 100;
-
-        private readonly CreateStockItem createStockItem;
-
-        private readonly string name = Guid.NewGuid().ToString();
-
-        private readonly StockItem stockItem;
-
-        private readonly string stockItemId = Guid.NewGuid().ToString();
-
-        private readonly UpdateStockItem updateStockItem;
-
-        private readonly string userId = Guid.NewGuid().ToString();
-
-        public StockItemControllerTests()
+        [Fact]
+        public async Task CreateAsyncFail()
         {
-            this.createStockItem = new CreateStockItem(
-                this.name,
-                StockItemControllerTests.Quantity,
-                StockItemControllerTests.MinimumQuantity);
+            var services = StockItemControllerTests.Init(false);
 
-            this.stockItem = new StockItem(
-                this.stockItemId,
-                this.name,
-                StockItemControllerTests.Quantity,
-                StockItemControllerTests.MinimumQuantity,
-                this.userId);
+            await Assert.ThrowsAsync<ConflictException>(
+                () => services.controller.Post(
+                    services.createStockItem,
+                    new CancellationToken()));
 
-            this.updateStockItem = new UpdateStockItem(
-                this.stockItemId,
-                $"{this.name}_update",
-                StockItemControllerTests.Quantity + 1,
-                StockItemControllerTests.MinimumQuantity + 1);
+            services.stockItemService.Verify(
+                mock => mock.CreateAsync(
+                    It.Is<CreateStockItem>(
+                        value => Asserts.Assert(
+                            services.createStockItem,
+                            value)),
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+            services.stockItemService.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task CreateAsync()
+        public async Task CreateAsyncOk()
         {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
-                    mock => mock.CreateAsync(
-                        It.IsAny<ICreateStockItem>(),
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IStockItem>(this.stockItem));
+            var services = StockItemControllerTests.Init(true);
 
-            var controller = new StockItemController(stockItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            var result = await controller.Post(
-                this.createStockItem,
+            var result = await services.controller.Post(
+                services.createStockItem,
                 new CancellationToken());
 
             var actionResult = Assert.IsType<CreatedAtActionResult>(result);
             var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
 
-            Assert.Equal(
-                this.userId,
-                actual.UserId);
-            Assert.Equal(
-                this.stockItemId,
-                actual.Id);
-            Assert.Equal(
-                StockItemControllerTests.Quantity,
-                actual.Quantity);
-            Assert.Equal(
-                StockItemControllerTests.MinimumQuantity,
-                actual.MinimumQuantity);
-            Assert.Equal(
-                this.name,
-                actual.Name);
+            Asserts.Assert(
+                services.stockItem,
+                actual);
+
+            services.stockItemService.Verify(
+                mock => mock.CreateAsync(
+                    It.Is<CreateStockItem>(
+                        value => Asserts.Assert(
+                            services.createStockItem,
+                            value)),
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+            services.stockItemService.VerifyNoOtherCalls();
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task DeleteAsync(bool isDeleted)
+        [Fact]
+        public async Task DeleteAsyncFail()
         {
+            var services = StockItemControllerTests.Init(false);
+
+            await Assert.ThrowsAsync<NotFoundException>(
+                () => services.controller.Delete(
+                    services.stockItem.Id,
+                    new CancellationToken()));
+
+            services.stockItemService.Verify(
+                mock => mock.DeleteAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>()));
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task DeleteAsyncOk()
+        {
+            var services = StockItemControllerTests.Init(true);
+
+            var result = await services.controller.Delete(
+                services.stockItem.Id,
+                new CancellationToken());
+
+            Assert.IsType<OkResult>(result);
+
+            services.stockItemService.Verify(
+                mock => mock.DeleteAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>()));
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ReadAsyncFail()
+        {
+            var services = StockItemControllerTests.Init(false);
+
+            var result = (await services.controller.Get(new CancellationToken())).ToArray();
+
+            Assert.Empty(result);
+
+            services.stockItemService.Verify(
+                mock => mock.ReadAsync(
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ReadAsyncOk()
+        {
+            var services = StockItemControllerTests.Init(true);
+
+            var result = (await services.controller.Get(new CancellationToken())).ToArray();
+
+            Assert.Equal(
+                services.stockItem,
+                result.Single());
+
+            services.stockItemService.Verify(
+                mock => mock.ReadAsync(
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ReadByIdAsyncFail()
+        {
+            var services = StockItemControllerTests.Init(false);
+
+            await Assert.ThrowsAsync<NotFoundException>(
+                () => services.controller.Get(
+                    services.stockItem.Id,
+                    new CancellationToken()));
+
+            services.stockItemService.Verify(
+                mock => mock.ReadByIdAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>()));
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ReadByIdAsyncOk()
+        {
+            var services = StockItemControllerTests.Init(true);
+
+            var result = await services.controller.Get(
+                services.stockItem.Id,
+                new CancellationToken());
+
+            var actionResult = Assert.IsType<OkObjectResult>(result.Result);
+
+            var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
+
+            Asserts.Assert(
+                services.stockItem,
+                actual);
+
+            services.stockItemService.Verify(
+                mock => mock.ReadByIdAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    It.IsAny<CancellationToken>()));
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateAsyncFail()
+        {
+            var services = StockItemControllerTests.Init(false);
+
+            await Assert.ThrowsAsync<NotFoundException>(
+                () => services.controller.Put(
+                    services.updateStockItem,
+                    new CancellationToken()));
+
+            services.stockItemService.Verify(
+                mock => mock.UpdateAsync(
+                    It.Is<IUpdateStockItem>(
+                        value => Asserts.Assert(
+                            services.updateStockItem,
+                            value)),
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateAsyncOk()
+        {
+            var services = StockItemControllerTests.Init(true);
+
+            var result = await services.controller.Put(
+                services.updateStockItem,
+                new CancellationToken());
+            Assert.IsType<OkResult>(result);
+
+            services.stockItemService.Verify(
+                mock => mock.UpdateAsync(
+                    It.Is<IUpdateStockItem>(
+                        value => Asserts.Assert(
+                            services.updateStockItem,
+                            value)),
+                    services.userId,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+            services.stockItemService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateQuantityAsyncFail()
+        {
+            var services = StockItemControllerTests.Init(false);
+
+            const int delta = 20;
+
+            await Assert.ThrowsAsync<NotFoundException>(
+                () => services.controller.Put(
+                    services.stockItem.Id,
+                    delta,
+                    new CancellationToken()));
+
+            services.stockItemService.Verify(
+                mock => mock.UpdateQuantityAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    delta,
+                    It.IsAny<CancellationToken>()));
+        }
+
+        [Fact]
+        public async Task UpdateQuantityAsyncOk()
+        {
+            var services = StockItemControllerTests.Init(true);
+
+            const int delta = 20;
+            var result = await services.controller.Put(
+                services.stockItem.Id,
+                delta,
+                new CancellationToken());
+
+            Assert.IsType<OkResult>(result);
+
+            services.stockItemService.Verify(
+                mock => mock.UpdateQuantityAsync(
+                    services.userId,
+                    services.stockItem.Id,
+                    delta,
+                    It.IsAny<CancellationToken>()));
+        }
+
+        private static (Mock<IStockItemService> stockItemService, StockItemController controller, string userId,
+            IStockItem stockItem, CreateStockItem createStockItem, UpdateStockItem updateStockItem) Init(bool succeed)
+        {
+            var userId = Guid.NewGuid().ToString();
+
+            var stockItem = new StockItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                MinimumQuantity = 10,
+                Name = Guid.NewGuid().ToString(),
+                UserId = userId,
+                Quantity = 10
+            };
+
+            var createStockItem = new CreateStockItem(
+                stockItem.Name,
+                stockItem.Quantity,
+                stockItem.MinimumQuantity);
+
+            var updateStockItem = new UpdateStockItem(
+                stockItem.Id,
+                stockItem.Name,
+                stockItem.Quantity,
+                stockItem.MinimumQuantity);
+
             var stockItemService = new Mock<IStockItemService>();
+            var createAsyncSetup = stockItemService.Setup(
+                mock => mock.CreateAsync(
+                    It.IsAny<ICreateStockItem>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
             var deleteAsyncSetup = stockItemService.Setup(
                 mock => mock.DeleteAsync(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
-            if (isDeleted)
-            {
-                deleteAsyncSetup.Returns(Task.CompletedTask);
-            }
-            else
-            {
-                deleteAsyncSetup.Throws<NotFoundException>();
-            }
-
-            var controller = new StockItemController(stockItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            if (isDeleted)
-
-            {
-                var result = await controller.Delete(
-                    this.stockItemId,
-                    new CancellationToken());
-                Assert.IsType<OkResult>(result);
-            }
-            else
-            {
-                await Assert.ThrowsAsync<NotFoundException>(
-                    () => controller.Delete(
-                        this.stockItemId,
-                        new CancellationToken()));
-            }
-        }
-
-        [Fact]
-        public async Task ReadAsync()
-        {
-            var stockItemService = new Mock<IStockItemService>();
-            stockItemService.Setup(
-                    mock => mock.ReadAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {this.stockItem}));
-
-            var controller = new StockItemController(stockItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            var result = (await controller.Get(new CancellationToken())).ToArray();
-
-            var actual = result.First();
-            Assert.Equal(
-                this.userId,
-                actual.UserId);
-            Assert.Equal(
-                this.stockItemId,
-                actual.Id);
-            Assert.Equal(
-                StockItemControllerTests.Quantity,
-                actual.Quantity);
-            Assert.Equal(
-                StockItemControllerTests.MinimumQuantity,
-                actual.MinimumQuantity);
-            Assert.Equal(
-                this.name,
-                actual.Name);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task ReadByIdAsync(bool hasResult)
-        {
-            var stockItemService = new Mock<IStockItemService>();
-            var stockItemServiceSetup = stockItemService.Setup(
+            var readAsyncSetup = stockItemService.Setup(
+                mock => mock.ReadAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
+            var readByIdAsyncSetup = stockItemService.Setup(
                 mock => mock.ReadByIdAsync(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
-            if (hasResult)
-            {
-                stockItemServiceSetup.Returns(Task.FromResult<IStockItem>(this.stockItem));
-            }
-            else
-            {
-                stockItemServiceSetup.Throws<NotFoundException>();
-            }
-
-            var controller = new StockItemController(stockItemService.Object)
-            {
-                ControllerContext = ControllerContextService.Create(this.userId)
-            };
-
-            if (!hasResult)
-            {
-                await Assert.ThrowsAsync<NotFoundException>(
-                    () => controller.Get(
-                        this.stockItemId,
-                        new CancellationToken()));
-            }
-            else
-            {
-                var result = await controller.Get(
-                    this.stockItemId,
-                    new CancellationToken());
-                var actionResult = Assert.IsType<OkObjectResult>(result.Result);
-
-                var actual = Assert.IsAssignableFrom<IStockItem>(actionResult.Value);
-
-                Assert.Equal(
-                    this.userId,
-                    actual.UserId);
-                Assert.Equal(
-                    this.stockItemId,
-                    actual.Id);
-                Assert.Equal(
-                    StockItemControllerTests.Quantity,
-                    actual.Quantity);
-                Assert.Equal(
-                    StockItemControllerTests.MinimumQuantity,
-                    actual.MinimumQuantity);
-                Assert.Equal(
-                    this.name,
-                    actual.Name);
-            }
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task UpdateAsync(bool isUpdated)
-        {
-            var stockItemService = new Mock<IStockItemService>();
             var updateAsyncSetup = stockItemService.Setup(
                 mock => mock.UpdateAsync(
-                    It.IsAny<UpdateStockItem>(),
+                    It.IsAny<IUpdateStockItem>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
-            if (isUpdated)
+            var updateQuantityAsyncSetup = stockItemService.Setup(
+                mock => mock.UpdateQuantityAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()));
+            if (succeed)
             {
+                createAsyncSetup.Returns(Task.FromResult<IStockItem>(stockItem));
+                deleteAsyncSetup.Returns(Task.CompletedTask);
+                readAsyncSetup.Returns(Task.FromResult<IEnumerable<IStockItem>>(new[] {stockItem}));
+                readByIdAsyncSetup.Returns(Task.FromResult<IStockItem>(stockItem));
                 updateAsyncSetup.Returns(Task.CompletedTask);
+                updateQuantityAsyncSetup.Returns(Task.CompletedTask);
             }
             else
             {
+                createAsyncSetup.Throws<ConflictException>();
+                deleteAsyncSetup.Throws<NotFoundException>();
+                readAsyncSetup.Returns(Task.FromResult(Enumerable.Empty<IStockItem>()));
+                readByIdAsyncSetup.Throws<NotFoundException>();
                 updateAsyncSetup.Throws<NotFoundException>();
+                updateQuantityAsyncSetup.Throws<NotFoundException>();
             }
 
             var controller = new StockItemController(stockItemService.Object)
             {
-                ControllerContext = ControllerContextService.Create(this.userId)
+                ControllerContext = ControllerContextService.Create(userId)
             };
 
-            ;
-
-            if (isUpdated)
-            {
-                var result = await controller.Put(
-                    this.updateStockItem,
-                    new CancellationToken());
-                Assert.IsType<OkResult>(result);
-            }
-            else
-            {
-                await Assert.ThrowsAsync<NotFoundException>(
-                    () => controller.Put(
-                        this.updateStockItem,
-                        new CancellationToken()));
-            }
+            return (stockItemService, controller, userId, stockItem, createStockItem, updateStockItem);
         }
     }
 }
