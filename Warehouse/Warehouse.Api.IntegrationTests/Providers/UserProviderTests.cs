@@ -90,7 +90,7 @@
             var services = await UserProviderTests.Init(true);
 
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.Delete(
+                () => services.provider.DeleteAsync(
                     Guid.NewGuid().ToString(),
                     new CancellationToken()));
         }
@@ -100,7 +100,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id,
                 new CancellationToken());
         }
@@ -110,7 +110,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id.ToLower(),
                 new CancellationToken());
         }
@@ -120,7 +120,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id.ToUpper(),
                 new CancellationToken());
         }
@@ -132,7 +132,7 @@
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.Delete(
+                () => services.provider.DeleteAsync(
                     Guid.NewGuid().ToString(),
                     new CancellationToken(),
                     session));
@@ -146,7 +146,7 @@
             var services = await UserProviderTests.Init(true);
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id,
                 new CancellationToken(),
                 session);
@@ -159,7 +159,7 @@
             var services = await UserProviderTests.Init(true);
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id.ToLower(),
                 new CancellationToken(),
                 session);
@@ -172,7 +172,7 @@
             var services = await UserProviderTests.Init(true);
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
-            await services.provider.Delete(
+            await services.provider.DeleteAsync(
                 services.user.Id.ToUpper(),
                 new CancellationToken(),
                 session);
@@ -184,7 +184,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            var result = await services.provider.Read(new CancellationToken());
+            var result = await services.provider.ReadAsync(new CancellationToken());
 
             Assert.Contains(
                 result,
@@ -197,7 +197,7 @@
             var services = await UserProviderTests.Init(true);
 
             var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
-            var result = await services.provider.Read(
+            var result = await services.provider.ReadAsync(
                 new CancellationToken(),
                 session);
             await session.CommitTransactionAsync(new CancellationToken());
@@ -212,7 +212,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            var result = await services.provider.ReadById(
+            var result = await services.provider.ReadByIdAsync(
                 services.user.Id.ToLower(),
                 new CancellationToken());
 
@@ -236,7 +236,7 @@
             var services = await UserProviderTests.Init(true);
 
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.ReadById(
+                () => services.provider.ReadByIdAsync(
                     Guid.NewGuid().ToString(),
                     new CancellationToken()));
         }
@@ -246,7 +246,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            var result = await services.provider.ReadById(
+            var result = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken());
 
@@ -269,7 +269,7 @@
         {
             var services = await UserProviderTests.Init(true);
 
-            var result = await services.provider.ReadById(
+            var result = await services.provider.ReadByIdAsync(
                 services.user.Id.ToUpper(),
                 new CancellationToken());
 
@@ -294,7 +294,7 @@
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.ReadById(
+                () => services.provider.ReadByIdAsync(
                     Guid.NewGuid().ToString(),
                     new CancellationToken(),
                     session));
@@ -308,7 +308,7 @@
             var services = await UserProviderTests.Init(true);
 
             using var session = await services.transactionHandler.StartTransactionAsync(new CancellationToken());
-            var result = await services.provider.ReadById(
+            var result = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken(),
                 session);
@@ -341,7 +341,7 @@
                 new[] {Role.None});
 
             await Assert.ThrowsAsync<BadRequestException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken()));
         }
@@ -357,7 +357,7 @@
                 new[] {(Role) int.MaxValue});
 
             await Assert.ThrowsAsync<BadRequestException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken()));
         }
@@ -373,7 +373,7 @@
                 new[] {Role.None});
 
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken()));
         }
@@ -388,11 +388,11 @@
                 Guid.NewGuid().ToString(),
                 new[] {Role.None});
 
-            await services.provider.Update(
+            await services.provider.UpdateAsync(
                 update,
                 new CancellationToken());
 
-            var updated = await services.provider.ReadById(
+            var updated = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken());
 
@@ -420,11 +420,11 @@
                 Guid.NewGuid().ToString(),
                 new[] {Role.None});
 
-            await services.provider.Update(
+            await services.provider.UpdateAsync(
                 update,
                 new CancellationToken());
 
-            var updated = await services.provider.ReadById(
+            var updated = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken());
 
@@ -452,11 +452,11 @@
                 Guid.NewGuid().ToString(),
                 new[] {Role.None});
 
-            await services.provider.Update(
+            await services.provider.UpdateAsync(
                 update,
                 new CancellationToken());
 
-            var updated = await services.provider.ReadById(
+            var updated = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken());
 
@@ -488,7 +488,7 @@
                 new[] {Role.User});
 
             await Assert.ThrowsAsync<BadRequestException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken(),
                     session));
@@ -508,7 +508,7 @@
                 new[] {(Role) int.MaxValue});
 
             await Assert.ThrowsAsync<BadRequestException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken(),
                     session));
@@ -528,7 +528,7 @@
                 new[] {Role.None});
 
             await Assert.ThrowsAsync<NotFoundException>(
-                () => services.provider.Update(
+                () => services.provider.UpdateAsync(
                     update,
                     new CancellationToken(),
                     session));
@@ -547,13 +547,13 @@
                 Guid.NewGuid().ToString(),
                 new[] {Role.None});
 
-            await services.provider.Update(
+            await services.provider.UpdateAsync(
                 update,
                 new CancellationToken(),
                 session);
             await session.CommitTransactionAsync(new CancellationToken());
 
-            var updated = await services.provider.ReadById(
+            var updated = await services.provider.ReadByIdAsync(
                 services.user.Id,
                 new CancellationToken());
 

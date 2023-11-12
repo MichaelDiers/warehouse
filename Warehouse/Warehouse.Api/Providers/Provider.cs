@@ -98,13 +98,13 @@
         }
 
         /// <summary>
-        ///     Delete an entry by its id used in the application.
+        ///     DeleteAsync an entry by its id used in the application.
         /// </summary>
         /// <param name="applicationId">The id of the entry used in the application.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task Delete(
+        public async Task DeleteAsync(
             string applicationId,
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
@@ -124,17 +124,17 @@
         }
 
         /// <summary>
-        ///     Delete an entry by its id used in the application.
+        ///     DeleteAsync an entry by its id used in the application.
         /// </summary>
         /// <param name="applicationId">The id of the entry used in the application.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task Delete(string applicationId, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string applicationId, CancellationToken cancellationToken)
         {
             using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
             try
             {
-                await this.Delete(
+                await this.DeleteAsync(
                     applicationId,
                     cancellationToken,
                     session);
@@ -152,12 +152,12 @@
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is a list of all entries.</returns>
-        public async Task<IEnumerable<TEntry>> Read(CancellationToken cancellationToken)
+        public async Task<IEnumerable<TEntry>> ReadAsync(CancellationToken cancellationToken)
         {
             using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
             try
             {
-                var result = await this.Read(
+                var result = await this.ReadAsync(
                     cancellationToken,
                     session);
                 await session.CommitTransactionAsync(cancellationToken);
@@ -176,7 +176,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is a list of all entries.</returns>
-        public async Task<IEnumerable<TEntry>> Read(
+        public async Task<IEnumerable<TEntry>> ReadAsync(
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
         )
@@ -195,12 +195,12 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="applicationId">The id of the entry used in the application.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is the found entry.</returns>
-        public async Task<TEntry> ReadById(string applicationId, CancellationToken cancellationToken)
+        public async Task<TEntry> ReadByIdAsync(string applicationId, CancellationToken cancellationToken)
         {
             using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
             try
             {
-                var result = await this.ReadById(
+                var result = await this.ReadByIdAsync(
                     applicationId,
                     cancellationToken,
                     session);
@@ -221,7 +221,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is the found entry.</returns>
-        public async Task<TEntry> ReadById(
+        public async Task<TEntry> ReadByIdAsync(
             string applicationId,
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
@@ -250,7 +250,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public abstract Task Update(
+        public abstract Task UpdateAsync(
             TEntry entry,
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
@@ -262,12 +262,12 @@
         /// <param name="entry">The entry to be replaced.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public async Task Update(TEntry entry, CancellationToken cancellationToken)
+        public async Task UpdateAsync(TEntry entry, CancellationToken cancellationToken)
         {
             using var session = await this.transactionHandler.StartTransactionAsync(cancellationToken);
             try
             {
-                await this.Update(
+                await this.UpdateAsync(
                     entry,
                     cancellationToken,
                     session);
@@ -288,7 +288,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        protected async Task Update(
+        protected async Task UpdateAsync(
             Expression<Func<TDatabase, bool>> filter,
             UpdateDefinition<TDatabase> update,
             CancellationToken cancellationToken,

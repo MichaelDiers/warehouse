@@ -22,7 +22,11 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task Delete(string applicationId, CancellationToken cancellationToken, ITransactionHandle transactionHandle);
+        Task DeleteAsync(
+            string applicationId,
+            CancellationToken cancellationToken,
+            ITransactionHandle transactionHandle
+        );
 
         /// <summary>
         ///     Delete an entry by its id used in the application.
@@ -30,14 +34,14 @@
         /// <param name="applicationId">The id of the entry used in the application.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task Delete(string applicationId, CancellationToken cancellationToken);
+        Task DeleteAsync(string applicationId, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Read all entries from the database.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is a list of all entries.</returns>
-        Task<IEnumerable<TEntry>> Read(CancellationToken cancellationToken);
+        Task<IEnumerable<TEntry>> ReadAsync(CancellationToken cancellationToken);
 
         /// <summary>
         ///     Read all entries from the database.
@@ -45,7 +49,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is a list of all entries.</returns>
-        Task<IEnumerable<TEntry>> Read(CancellationToken cancellationToken, ITransactionHandle transactionHandle);
+        Task<IEnumerable<TEntry>> ReadAsync(CancellationToken cancellationToken, ITransactionHandle transactionHandle);
 
         /// <summary>
         ///     Read an entry by its id used in the application.
@@ -53,7 +57,7 @@
         /// <param name="applicationId">The id of the entry used in the application.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is the found entry.</returns>
-        Task<TEntry> ReadById(string applicationId, CancellationToken cancellationToken);
+        Task<TEntry> ReadByIdAsync(string applicationId, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Read an entry by its id used in the application.
@@ -62,7 +66,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task{T}" /> whose result is the found entry.</returns>
-        Task<TEntry> ReadById(
+        Task<TEntry> ReadByIdAsync(
             string applicationId,
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
@@ -75,7 +79,7 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task Update(TEntry entry, CancellationToken cancellationToken, ITransactionHandle transactionHandle);
+        Task UpdateAsync(TEntry entry, CancellationToken cancellationToken, ITransactionHandle transactionHandle);
 
         /// <summary>
         ///     Updates the specified entry.
@@ -83,6 +87,6 @@
         /// <param name="entry">The entry to be replaced.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        Task Update(TEntry entry, CancellationToken cancellationToken);
+        Task UpdateAsync(TEntry entry, CancellationToken cancellationToken);
     }
 }

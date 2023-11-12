@@ -39,13 +39,13 @@
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="transactionHandle">The transaction handle.</param>
         /// <returns>A <see cref="Task" /> whose result indicates success.</returns>
-        public override async Task Update(
+        public override async Task UpdateAsync(
             IUser entry,
             CancellationToken cancellationToken,
             ITransactionHandle transactionHandle
         )
         {
-            await this.Update(
+            await this.UpdateAsync(
                 doc => string.Equals(
                     doc.ApplicationId,
                     entry.Id,

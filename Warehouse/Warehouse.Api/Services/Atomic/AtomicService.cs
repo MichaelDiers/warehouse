@@ -61,7 +61,7 @@
             ITransactionHandle transactionHandle
         )
         {
-            await this.provider.Delete(
+            await this.provider.DeleteAsync(
                 id,
                 cancellationToken,
                 transactionHandle);
@@ -78,7 +78,7 @@
             ITransactionHandle transactionHandle
         )
         {
-            return await this.provider.Read(
+            return await this.provider.ReadAsync(
                 cancellationToken,
                 transactionHandle);
         }
@@ -96,7 +96,7 @@
             ITransactionHandle transactionHandle
         )
         {
-            return await this.provider.ReadById(
+            return await this.provider.ReadByIdAsync(
                 id,
                 cancellationToken,
                 transactionHandle);
@@ -115,7 +115,7 @@
             ITransactionHandle transactionHandle
         )
         {
-            await this.provider.Update(
+            await this.provider.UpdateAsync(
                 entry,
                 cancellationToken,
                 transactionHandle);
