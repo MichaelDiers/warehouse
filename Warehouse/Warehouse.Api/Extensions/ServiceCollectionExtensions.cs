@@ -9,6 +9,8 @@
     using Warehouse.Api.Contracts;
     using Warehouse.Api.Contracts.Config;
     using Warehouse.Api.Contracts.Database;
+    using Warehouse.Api.Contracts.Services.Atomic;
+    using Warehouse.Api.Contracts.Services.Domain;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
     using Warehouse.Api.Contracts.Users;
@@ -91,13 +93,15 @@
         /// <returns>The given <paramref name="services" />.</returns>
         public static IServiceCollection AddDependencies(this IServiceCollection services)
         {
+            services.AddScoped<IUserProvider, UserProvider>();
+            services.AddScoped<IAtomicUserService, AtomicUserService>();
+            services.AddScoped<IDomainUserService, DomainUserService>();
+
             services.AddScoped<IStockItemProvider, StockItemProvider>();
             services.AddScoped<IAtomicStockItemService, AtomicStockItemService>();
 
             services.AddScoped<IShoppingItemProvider, ShoppingItemProvider>();
             services.AddScoped<IAtomicShoppingItemService, AtomicShoppingItemService>();
-
-            services.AddScoped<IUserProvider, UserProvider>();
 
             services.AddScoped<IStockItemService, DomainStockItemService>();
             services.AddScoped<IDomainShoppingItemService, DomainShoppingItemService>();
