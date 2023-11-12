@@ -11,6 +11,7 @@
     using Warehouse.Api.Contracts.Database;
     using Warehouse.Api.Contracts.ShoppingItems;
     using Warehouse.Api.Contracts.StockItems;
+    using Warehouse.Api.Contracts.Users;
     using Warehouse.Api.Database;
     using Warehouse.Api.Providers;
     using Warehouse.Api.Services.Atomic;
@@ -95,6 +96,8 @@
 
             services.AddScoped<IShoppingItemProvider, ShoppingItemProvider>();
             services.AddScoped<IAtomicShoppingItemService, AtomicShoppingItemService>();
+
+            services.AddScoped<IUserProvider, UserProvider>();
 
             services.AddScoped<IStockItemService, DomainStockItemService>();
             services.AddScoped<IDomainShoppingItemService, DomainShoppingItemService>();

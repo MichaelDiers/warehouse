@@ -13,6 +13,7 @@
             var client = new MongoClient(configuration.Warehouse.ConnectionString);
             if (services is not null)
             {
+                services.AddSingleton(configuration);
                 services.AddSingleton<IMongoClient>(client);
                 services.AddTransient<IMongoDatabase>(_ => client.GetDatabase(configuration.Warehouse.DatabaseName));
             }

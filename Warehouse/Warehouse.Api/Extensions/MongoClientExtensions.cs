@@ -3,8 +3,11 @@
     using MongoDB.Bson;
     using MongoDB.Driver;
     using Warehouse.Api.Contracts.Config;
+    using Warehouse.Api.Contracts.Users;
+    using Warehouse.Api.Models;
     using Warehouse.Api.Models.ShoppingItems;
     using Warehouse.Api.Models.StockItems;
+    using Warehouse.Api.Models.Users;
 
     /// <summary>
     ///     Extensions for <see cref="IMongoClient" />.
@@ -30,6 +33,9 @@
                 database,
                 cancellationToken);
             await MongoClientExtensions.InitializeShoppingItemCollection(
+                database,
+                cancellationToken);
+            await MongoClientExtensions.InitializeUserCollection(
                 database,
                 cancellationToken);
 
@@ -274,6 +280,68 @@
                 schema,
                 indices,
                 Enumerable.Empty<DatabaseStockItem>(),
+                cancellationToken);
+        }
+
+        private static async Task InitializeUserCollection(IMongoDatabase database, CancellationToken cancellationToken)
+        {
+            var schema = $@"
+            {{
+                ""collMod"": ""{DatabaseUser.CollectionName}"",
+                ""validator"": {{
+                    $jsonSchema: {{
+                        ""bsonType"": ""object"",
+                        ""required"": [
+                            ""{nameof(DatabaseEntry.ApplicationId)}"",
+                            ""{nameof(DatabaseUser.Password)}"",
+                            ""{nameof(DatabaseUser.Roles)}""
+                        ],
+                        ""properties"": {{
+                            ""{nameof(DatabaseEntry.ApplicationId)}"": {{
+                                ""bsonType"": ""string"",
+                                ""minLength"": 2,
+                                ""maxLength"": 36,
+                                ""description"": ""The id of the entry for the application is a string and required.""
+                            }},
+                            ""{nameof(DatabaseUser.Password)}"": {{
+                                ""bsonType"": ""string"",
+                                ""minLength"": 8,
+                                ""maxLength"": 100,
+                                ""description"": ""The password is a string and required.""
+                            }},
+                            ""{nameof(DatabaseUser.Roles)}"": {{
+                                ""bsonType"": ""array"",
+                                ""minItems"": 1,
+                                ""items"": {{
+                                    ""enum"": [{string.Join(",", Enum.GetNames<Role>().Select(value => $"\"{value}\""))}],
+                                }},
+                                ""description"": ""Roles is an enum and required""
+                            }},
+                        }},
+                    }}
+                }}
+            }}";
+
+            var indices = new[]
+            {
+                new CreateIndexModel<DatabaseUser>(
+                    new JsonIndexKeysDefinition<DatabaseUser>($"{{\"{nameof(DatabaseEntry.ApplicationId)}\": 1}}"),
+                    new CreateIndexOptions
+                    {
+                        Name = $"{nameof(DatabaseEntry.ApplicationId)}_unique_index",
+                        Unique = true,
+                        Collation = new Collation(
+                            "en",
+                            strength: new Optional<CollationStrength?>(CollationStrength.Primary))
+                    })
+            };
+
+            await MongoClientExtensions.InitializeCollection(
+                database,
+                DatabaseUser.CollectionName,
+                schema,
+                indices,
+                Enumerable.Empty<DatabaseUser>(),
                 cancellationToken);
         }
     }
