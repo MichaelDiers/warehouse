@@ -22,9 +22,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Warehouse.Api.Tests\Warehouse.Api.Tests.csproj" />
-    <ProjectReference Include="..\Warehouse.Api\Warehouse.Api.csproj" />
-  </ItemGroup>
-
 </Project>
