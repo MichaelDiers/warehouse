@@ -8,6 +8,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -19,6 +20,9 @@ jobs:
       SOLUTION_PATH: Warehouse/Warehouse.sln
     steps:
       - uses: actions/checkout@v3
+      - name: update package source
+        run: dotnet nuget update source github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+        working-directory: Warehouse/Warehouse.Api
       - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
       - run: 'dotnet test ${{ env.SOLUTION_PATH }} --filter Type=Unit -c ${{ env.CONFIGURATION }} --no-build --no-restore'
   doc:
@@ -33,6 +37,9 @@ jobs:
       REPORT_TARGET: doc/coverage
     steps:
       - uses: actions/checkout@v3
+      - name: update package source
+        run: dotnet nuget update source github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+        working-directory: Warehouse/Warehouse.Api
       - run: 'dotnet build ${{ env.SOLUTION_PATH }} -c ${{ env.CONFIGURATION }}'
       - run: 'dotnet test ${{ env.TEST_PROJ_PATH }} /p:AltCover=true --no-build --no-restore /p:AltCoverReport="${{ env.ALTCOVER_XML }}"'
       - name: Setup .NET Core
