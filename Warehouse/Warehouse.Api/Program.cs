@@ -8,8 +8,6 @@ using Microsoft.OpenApi.Models;
 using Warehouse.Api.ShoppingItems;
 using Warehouse.Api.StockItems;
 
-var source = new CancellationTokenSource(10000);
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAuthorization();

@@ -11,6 +11,7 @@
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
         /// <param name="userId">The user identifier.</param>
+        /// <param name="links">The links to valid operations.</param>
         public ResultShoppingItem(
             string id,
             string name,

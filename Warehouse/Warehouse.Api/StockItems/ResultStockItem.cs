@@ -10,6 +10,7 @@
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
         /// <param name="minimumQuantity">The minimal required quantity.</param>
+        /// <param name="links">The links to valid operations.</param>
         public ResultStockItem(
             string name,
             int quantity,
