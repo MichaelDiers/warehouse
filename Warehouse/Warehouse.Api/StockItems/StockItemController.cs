@@ -1,5 +1,6 @@
 ﻿namespace Warehouse.Api.StockItems
 {
+    using System.Security.Claims;
     using Generic.Base.Api.AuthServices.UserService;
     using Generic.Base.Api.Controllers;
     using Generic.Base.Api.Services;
@@ -14,7 +15,7 @@
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = nameof(Role.Accessor))]
-    [Authorize(Roles = nameof(Role.Admin))]
+    [Authorize(Roles = nameof(Role.User))]
     public class StockItemController
         : UserBoundCrudController<CreateStockItem, StockItem, UpdateStockItem, ResultStockItem>
     {
@@ -29,7 +30,16 @@
         )
             : base(
                 domainService,
-                transformer)
+                transformer,
+                new[]
+                {
+                    new Claim(
+                        ClaimTypes.Role,
+                        Role.User.ToString()),
+                    new Claim(
+                        ClaimTypes.Role,
+                        Role.Accessor.ToString())
+                })
         {
         }
 

@@ -5,7 +5,6 @@ using Generic.Base.Api.Middleware.ErrorHandling;
 using Generic.Base.Api.MongoDb;
 using Generic.Base.Api.MongoDb.AuthServices;
 using Microsoft.OpenApi.Models;
-using Warehouse.Api.ShoppingItems;
 using Warehouse.Api.StockItems;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +17,6 @@ builder.AddJwtTokenService();
 builder.AddApiKey();
 builder.AddAuthServices();
 
-builder
-    .AddUserBoundServices<CreateShoppingItem, ShoppingItem, UpdateShoppingItem, ResultShoppingItem, ShoppingItem,
-        ShoppingItemTransformer, ShoppingItemDatabaseConfiguration>();
 builder
     .AddUserBoundServices<CreateStockItem, StockItem, UpdateStockItem, ResultStockItem, StockItem, StockItemTransformer,
         StockItemDatabaseConfiguration>();
@@ -118,3 +114,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+}

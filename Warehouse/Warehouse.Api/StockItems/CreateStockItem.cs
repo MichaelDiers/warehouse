@@ -3,6 +3,9 @@
     using System.ComponentModel.DataAnnotations;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+    /// <summary>
+    ///     The required data for creating a stock item.
+    /// </summary>
     public class CreateStockItem
     {
         /// <summary>
@@ -31,38 +34,38 @@
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
         /// <param name="minimumQuantity">The minimal required quantity.</param>
-        public CreateStockItem(string name, int quantity, int minimumQuantity)
+        public CreateStockItem(int minimumQuantity, string name, int quantity)
         {
+            this.MinimumQuantity = minimumQuantity;
             this.Name = name;
             this.Quantity = quantity;
-            this.MinimumQuantity = minimumQuantity;
         }
 
         /// <summary>
-        ///     Gets or sets the minimum required quantity of the item in stock.
+        ///     Gets the minimum required quantity of the item in stock.
         /// </summary>
         [BindRequired]
         [Range(
             CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
-        public int MinimumQuantity { get; set; }
+        public int MinimumQuantity { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the item.
+        ///     Gets the name of the item.
         /// </summary>
         [Required]
         [StringLength(
             CreateStockItem.NameMaxLength,
             MinimumLength = CreateStockItem.NameMinLength)]
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
-        ///     Gets or sets the quantity of the item in stock.
+        ///     Gets the quantity of the item in stock.
         /// </summary>
         [BindRequired]
         [Range(
             CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
-        public int Quantity { get; set; }
+        public int Quantity { get; }
     }
 }

@@ -20,10 +20,10 @@
         public ResultStockItem Transform(StockItem entry, IEnumerable<Link> links)
         {
             return new ResultStockItem(
-                entry.Name,
-                entry.Quantity,
+                links,
                 entry.MinimumQuantity,
-                links);
+                entry.Name,
+                entry.Quantity);
         }
 
         /// <summary>

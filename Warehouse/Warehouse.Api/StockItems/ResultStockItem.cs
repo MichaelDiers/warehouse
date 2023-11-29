@@ -2,6 +2,10 @@
 {
     using Generic.Base.Api.Models;
 
+    /// <summary>
+    ///     The stock item data that are sent to the client.
+    /// </summary>
+    /// <seealso cref="Generic.Base.Api.Models.LinkResult" />
     public class ResultStockItem : LinkResult
     {
         /// <summary>
@@ -12,10 +16,10 @@
         /// <param name="minimumQuantity">The minimal required quantity.</param>
         /// <param name="links">The links to valid operations.</param>
         public ResultStockItem(
-            string name,
-            int quantity,
+            IEnumerable<Link> links,
             int minimumQuantity,
-            IEnumerable<Link> links
+            string name,
+            int quantity
         )
             : base(links)
         {
@@ -25,18 +29,18 @@
         }
 
         /// <summary>
-        ///     Gets or sets the minimum required quantity of the item in stock.
+        ///     Gets the minimum required quantity of the item in stock.
         /// </summary>
-        public int MinimumQuantity { get; set; }
+        public int MinimumQuantity { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the item.
+        ///     Gets the name of the item.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
-        ///     Gets or sets the quantity of the item in stock.
+        ///     Gets the quantity of the item in stock.
         /// </summary>
-        public int Quantity { get; set; }
+        public int Quantity { get; }
     }
 }
