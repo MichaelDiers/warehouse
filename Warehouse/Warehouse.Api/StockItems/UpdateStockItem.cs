@@ -3,6 +3,9 @@
     using System.ComponentModel.DataAnnotations;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
 
+    /// <summary>
+    ///     The data for updating a stock item.
+    /// </summary>
     public class UpdateStockItem
     {
         /// <summary>
@@ -25,14 +28,14 @@
         [Range(
             0,
             CreateStockItem.MaxQuantity)]
-        public int MinimumQuantity { get; set; }
+        public int MinimumQuantity { get; }
 
         /// <summary>
         ///     Gets or sets the name of the item.
         /// </summary>
         [Required]
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         ///     Gets or sets the quantity of the item in stock.
@@ -41,6 +44,6 @@
         [Range(
             0,
             CreateStockItem.MaxQuantity)]
-        public int Quantity { get; set; }
+        public int Quantity { get; }
     }
 }

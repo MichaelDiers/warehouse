@@ -5,6 +5,9 @@
     /// <summary>
     ///     Tests for <see cref="CreateStockItem" />.
     /// </summary>
+    [Trait(
+        "TestType",
+        "UnitTest")]
     public class CreateStockItemTests
     {
         [Theory]

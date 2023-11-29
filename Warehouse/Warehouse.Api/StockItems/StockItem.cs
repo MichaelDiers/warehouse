@@ -2,6 +2,10 @@
 {
     using Generic.Base.Api.Database;
 
+    /// <summary>
+    ///     Describes a stock item.
+    /// </summary>
+    /// <seealso cref="Generic.Base.Api.Database.IUserBoundEntry" />
     public class StockItem : IUserBoundEntry
     {
         /// <summary>
@@ -28,28 +32,28 @@
         }
 
         /// <summary>
-        ///     Gets or sets the minimum required quantity of the item in stock.
+        ///     Gets the minimum required quantity of the item in stock.
         /// </summary>
-        public int MinimumQuantity { get; set; }
+        public int MinimumQuantity { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the item.
+        ///     Gets the name of the item.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
-        ///     Gets or sets the quantity of the item in stock.
+        ///     Gets the quantity of the item in stock.
         /// </summary>
-        public int Quantity { get; set; }
+        public int Quantity { get; }
 
         /// <summary>
-        ///     Gets or sets the id of the item.
+        ///     Gets the id of the item.
         /// </summary>
-        public string Id { get; set; }
+        public string Id { get; }
 
         /// <summary>
-        ///     Gets or sets the unique identifier of the owner.
+        ///     Gets the unique identifier of the owner.
         /// </summary>
-        public string UserId { get; set; }
+        public string UserId { get; }
     }
 }
