@@ -45,7 +45,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
       - run: 'dotnet build -c Release'
         working-directory: ${{ env.working-directory }}
-      - run: 'dotnet test --configuration Release /p:AltCover=true --no-build --no-restore /p:AltCoverReport="${{ env.ALTCOVER_XML }}" "TestType=UnitTest"'
+      - run: 'dotnet test --configuration Release /p:AltCover=true --no-build --no-restore /p:AltCoverReport="${{ env.ALTCOVER_XML }}" --filter "TestType=UnitTest"'
         working-directory: ${{ env.working-directory }}
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
