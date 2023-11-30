@@ -29,26 +29,26 @@
             CreateDataValidationFailsTestData =>
             new[]
             {
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"MinimumQuantity lower than {CreateStockItem.MinQuantity}.",
                     CreateStockItem.MinQuantity - 1),
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"MinimumQuantity larger than {CreateStockItem.MaxQuantity}.",
                     CreateStockItem.MaxQuantity + 1),
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"Length of name too small {CreateStockItem.NameMinLength}.",
                     name: new string(
                         'a',
                         CreateStockItem.NameMinLength - 1)),
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"Length of name too large {CreateStockItem.NameMaxLength}.",
                     name: new string(
                         'a',
                         CreateStockItem.NameMaxLength + 1)),
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"Quantity lower than {CreateStockItem.MinQuantity}.",
                     quantity: CreateStockItem.MinQuantity - 1),
-                this.BadRequestCreateData(
+                StockItemServicesTest.BadRequestCreateData(
                     $"Quantity larger than {CreateStockItem.MaxQuantity}.",
                     quantity: CreateStockItem.MaxQuantity + 1)
             };
@@ -91,7 +91,7 @@
                 10);
         }
 
-        private (CreateStockItem createData, string testInfo) BadRequestCreateData(
+        private static (CreateStockItem createData, string testInfo) BadRequestCreateData(
             string testInfo,
             int minimumQuantity = 0,
             string name = "name",
