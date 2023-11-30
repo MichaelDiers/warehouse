@@ -11,43 +11,69 @@
         : UserBoundCrudTests<Program, TestFactory, CreateStockItem, ResultStockItem, ResultStockItem, UpdateStockItem,
             ResultStockItem>
     {
+        private readonly Role[] defaultRoles =
+        {
+            Role.User,
+            Role.Accessor
+        };
+
         public StockItemServicesTest()
-            : base(
-                nameof(StockItemController)[..^10],
-                "api/Options",
-                TestFactory.ApiKey,
-                new[]
-                {
-                    Role.User,
-                    Role.Accessor
-                },
-                new[]
-                {
-                    Role.Accessor,
-                    Role.User
-                },
-                new[]
-                {
-                    Role.Accessor,
-                    Role.User
-                },
-                new[]
-                {
-                    Role.Accessor,
-                    Role.User
-                },
-                new[]
-                {
-                    Role.Accessor,
-                    Role.User
-                },
-                new[]
-                {
-                    Role.Accessor,
-                    Role.User
-                })
+            : base(TestFactory.ApiKey)
         {
         }
+
+        /// <summary>
+        ///     Gets test data for that the data validation fails in the create context.
+        /// </summary>
+        protected override IEnumerable<(CreateStockItem createData, string testInfo)>
+            CreateDataValidationFailsTestData =>
+            new[]
+            {
+                this.BadRequestCreateData(
+                    $"MinimumQuantity lower than {CreateStockItem.MinQuantity}.",
+                    CreateStockItem.MinQuantity - 1),
+                this.BadRequestCreateData(
+                    $"MinimumQuantity larger than {CreateStockItem.MaxQuantity}.",
+                    CreateStockItem.MaxQuantity + 1),
+                this.BadRequestCreateData(
+                    $"Length of name too small {CreateStockItem.NameMinLength}.",
+                    name: new string(
+                        'a',
+                        CreateStockItem.NameMinLength - 1)),
+                this.BadRequestCreateData(
+                    $"Length of name too large {CreateStockItem.NameMaxLength}.",
+                    name: new string(
+                        'a',
+                        CreateStockItem.NameMaxLength + 1)),
+                this.BadRequestCreateData(
+                    $"Quantity lower than {CreateStockItem.MinQuantity}.",
+                    quantity: CreateStockItem.MinQuantity - 1),
+                this.BadRequestCreateData(
+                    $"Quantity larger than {CreateStockItem.MaxQuantity}.",
+                    quantity: CreateStockItem.MaxQuantity + 1)
+            };
+
+        /// <summary>
+        ///     Gets the entry point URL that is supposed to be an options operation.
+        /// </summary>
+        protected override string EntryPointUrl => "api/Options";
+
+        /// <summary>
+        ///     Gets the roles that are required for options requests.
+        /// </summary>
+        protected override IEnumerable<Role> OptionsRoles => this.defaultRoles;
+
+        protected override IEnumerable<Role> RequiredCreateRoles => this.defaultRoles;
+
+        protected override IEnumerable<Role> RequiredDeleteRoles => this.defaultRoles;
+
+        protected override IEnumerable<Role> RequiredReadAllRoles => this.defaultRoles;
+
+        protected override IEnumerable<Role> RequiredReadByIdRoles => this.defaultRoles;
+
+        protected override IEnumerable<Role> RequiredUpdateRoles => this.defaultRoles;
+
+        protected override string UrnNamespace => nameof(StockItemController)[..^10];
 
         protected override CreateStockItem GetValidCreateEntry()
         {
@@ -63,6 +89,19 @@
                 Guid.NewGuid().ToString(),
                 20,
                 10);
+        }
+
+        private (CreateStockItem createData, string testInfo) BadRequestCreateData(
+            string testInfo,
+            int minimumQuantity = 0,
+            string name = "name",
+            int quantity = 0
+        )
+        {
+            return (new CreateStockItem(
+                minimumQuantity,
+                name,
+                quantity), testInfo);
         }
     }
 }
