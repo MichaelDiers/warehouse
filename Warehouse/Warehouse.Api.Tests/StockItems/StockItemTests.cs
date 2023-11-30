@@ -31,6 +31,22 @@
                 quantity,
                 minimumQuantity,
                 userId);
+
+            Assert.Equal(
+                id,
+                stockItem.Id);
+            Assert.Equal(
+                name,
+                stockItem.Name);
+            Assert.Equal(
+                quantity,
+                stockItem.Quantity);
+            Assert.Equal(
+                minimumQuantity,
+                stockItem.MinimumQuantity);
+            Assert.Equal(
+                userId,
+                stockItem.UserId);
         }
     }
 }

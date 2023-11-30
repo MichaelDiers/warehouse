@@ -18,21 +18,21 @@
         {
             base.ConfigureWebHost(builder);
 
-            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
-                .Build()
-                .GetSection(JwtConfiguration.ConfigurationSection)
-                .Get<JwtConfiguration>();
-            Assert.NotNull(config);
+            var config = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
+            var jwtConfig = config.GetSection(JwtConfiguration.ConfigurationSection).Get<JwtConfiguration>();
+            Assert.NotNull(jwtConfig);
 
             Environment.SetEnvironmentVariable(
-                config.KeyName,
+                jwtConfig.KeyName,
                 TestFactory.JwtKey);
             Environment.SetEnvironmentVariable(
                 "X_API_KEY",
                 TestFactory.ApiKey);
+
+            const string mongoDbKey = "GENERIC_AUTH_SERVICES_MONGO";
             Environment.SetEnvironmentVariable(
-                "GENERIC_AUTH_SERVICES_MONGO",
-                "mongodb://localhost:27017/?replicaSet=warehouse_replSet");
+                mongoDbKey,
+                config.GetValue<string>(mongoDbKey));
         }
     }
 }
