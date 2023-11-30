@@ -7,6 +7,12 @@
     /// <summary>
     ///     Tests for <see cref="StockItemTransformer" />.
     /// </summary>
+    /// <summary>
+    ///     Tests for <see cref="StockItem" />.
+    /// </summary>
+    [Trait(
+        "TestType",
+        "UnitTest")]
     public class StockItemTransformerTests
     {
         [Fact]
