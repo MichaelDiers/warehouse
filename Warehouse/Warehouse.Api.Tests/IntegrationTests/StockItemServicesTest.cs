@@ -75,6 +75,24 @@
 
         protected override string UrnNamespace => nameof(StockItemController)[..^10];
 
+        /// <summary>
+        ///     Asserts that the created entry matches the read result.
+        /// </summary>
+        /// <param name="createResult">The expected created result.</param>
+        /// <param name="readResult">The actual read result that should match the created result.</param>
+        protected override void AssertEntry(ResultStockItem createResult, ResultStockItem readResult)
+        {
+            Assert.Equal(
+                createResult.MinimumQuantity,
+                readResult.MinimumQuantity);
+            Assert.Equal(
+                createResult.Quantity,
+                readResult.Quantity);
+            Assert.Equal(
+                createResult.Name,
+                readResult.Name);
+        }
+
         protected override CreateStockItem GetValidCreateEntry()
         {
             return new CreateStockItem(
