@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="altcover" Version="8.6.68" />
-    <PackageReference Include="Generic.Base.Api.Test.Lib" Version="0.0.50" />
+    <PackageReference Include="Generic.Base.Api.Test.Lib" Version="0.0.51" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.14" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />

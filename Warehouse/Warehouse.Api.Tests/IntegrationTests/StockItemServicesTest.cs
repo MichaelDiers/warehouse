@@ -58,6 +58,9 @@
         /// </summary>
         protected override string EntryPointUrl => "api/Options";
 
+        protected override string GetInvalidId => Guid.NewGuid().ToString()[..^1];
+        protected override string GetValidId => Guid.NewGuid().ToString();
+
         /// <summary>
         ///     Gets the roles that are required for options requests.
         /// </summary>
