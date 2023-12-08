@@ -14,7 +14,7 @@
         /// <param name="name">The name.</param>
         /// <param name="quantity">The quantity.</param>
         /// <param name="minimumQuantity">The minimum required quantity.</param>
-        public UpdateStockItem(string name, int quantity, int minimumQuantity)
+        public UpdateStockItem(int minimumQuantity, string name, int quantity)
         {
             this.Name = name;
             this.Quantity = quantity;
@@ -22,27 +22,29 @@
         }
 
         /// <summary>
-        ///     Gets or sets the minimum required quantity of the item in stock.
+        ///     Gets the minimum required quantity of the item in stock.
         /// </summary>
         [BindRequired]
         [Range(
-            0,
+            CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
         public int MinimumQuantity { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the item.
+        ///     Gets the name of the item.
         /// </summary>
         [Required]
-        [StringLength(100)]
+        [StringLength(
+            CreateStockItem.NameMaxLength,
+            MinimumLength = CreateStockItem.NameMinLength)]
         public string Name { get; }
 
         /// <summary>
-        ///     Gets or sets the quantity of the item in stock.
+        ///     Gets the quantity of the item in stock.
         /// </summary>
         [BindRequired]
         [Range(
-            0,
+            CreateStockItem.MinQuantity,
             CreateStockItem.MaxQuantity)]
         public int Quantity { get; }
     }

@@ -18,9 +18,9 @@
         public void Ctor(string name, int quantity, int minimumQuantity)
         {
             var update = new UpdateStockItem(
+                minimumQuantity,
                 name,
-                quantity,
-                minimumQuantity);
+                quantity);
 
             Assert.Equal(
                 name,

@@ -8,8 +8,7 @@
         "TestType",
         "MongoDbIntegrationTest")]
     public class StockItemServicesTest
-        : UserBoundCrudTests<Program, TestFactory, CreateStockItem, ResultStockItem, ResultStockItem, UpdateStockItem,
-            ResultStockItem>
+        : UserBoundCrudTests<Program, TestFactory, CreateStockItem, ResultStockItem, ResultStockItem, UpdateStockItem>
     {
         private readonly Role[] defaultRoles =
         {
@@ -76,6 +75,37 @@
 
         protected override IEnumerable<Role> RequiredUpdateRoles => this.defaultRoles;
 
+        /// <summary>
+        ///     Gets test data for that the data validation fails in the update context.
+        /// </summary>
+        protected override IEnumerable<(UpdateStockItem updateData, string testInfo)>
+            UpdateDataValidationFailsTestData =>
+            new[]
+            {
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"MinimumQuantity lower than {CreateStockItem.MinQuantity}.",
+                    CreateStockItem.MinQuantity - 1),
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"MinimumQuantity larger than {CreateStockItem.MaxQuantity}.",
+                    CreateStockItem.MaxQuantity + 1),
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"Length of name too small {CreateStockItem.NameMinLength}.",
+                    name: new string(
+                        'a',
+                        CreateStockItem.NameMinLength - 1)),
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"Length of name too large {CreateStockItem.NameMaxLength}.",
+                    name: new string(
+                        'a',
+                        CreateStockItem.NameMaxLength + 1)),
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"Quantity lower than {CreateStockItem.MinQuantity}.",
+                    quantity: CreateStockItem.MinQuantity - 1),
+                StockItemServicesTest.BadRequestUpdateData(
+                    $"Quantity larger than {CreateStockItem.MaxQuantity}.",
+                    quantity: CreateStockItem.MaxQuantity + 1)
+            };
+
         protected override string UrnNamespace => nameof(StockItemController)[..^10];
 
         /// <summary>
@@ -107,8 +137,8 @@
         protected override UpdateStockItem GetValidUpdateEntry()
         {
             return new UpdateStockItem(
-                Guid.NewGuid().ToString(),
                 20,
+                Guid.NewGuid().ToString(),
                 10);
         }
 
@@ -120,6 +150,19 @@
         )
         {
             return (new CreateStockItem(
+                minimumQuantity,
+                name,
+                quantity), testInfo);
+        }
+
+        private static (UpdateStockItem updateData, string testInfo) BadRequestUpdateData(
+            string testInfo,
+            int minimumQuantity = 0,
+            string name = "name",
+            int quantity = 0
+        )
+        {
+            return (new UpdateStockItem(
                 minimumQuantity,
                 name,
                 quantity), testInfo);

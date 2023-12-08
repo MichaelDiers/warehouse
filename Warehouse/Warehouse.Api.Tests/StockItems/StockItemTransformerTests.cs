@@ -162,9 +162,9 @@
         )
         {
             var updateStockItem = new UpdateStockItem(
+                minimumQuantity,
                 name,
-                quantity,
-                minimumQuantity);
+                quantity);
 
             var stockItem = new StockItemTransformer().Transform(
                 updateStockItem,
