@@ -1,0 +1,14 @@
+{
+    "editor.detectIndentation": false,  
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.useTabStops": false,
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact"
+    },
+    "files.eol": "\n",
+    "typescript.preferences.quoteStyle": "single",
+    "autoDocstring.quoteStyle": "'''",
+    "autoDocstring.docstringFormat": "google",
+    "autoDocstring.startOnNewLine": true
+  }
