@@ -13,7 +13,9 @@ const deText: IText = {
   shoppingListHeader: 'Shopping List',
   signInSubmit: 'Anmelden',
   signUpSubmit: 'Registrieren',
-  userNameLabel: 'Benutzername'
+  userNameLabel: 'Benutzername',
+  userNameTooLongError: (length: number) => `Benutzername hat mehr als ${length} Zeichen`,
+  userNameTooShortError: (length: number) => `Benutzername hat weniger als ${length} Zeichen`,
 }
 
 export default deText;

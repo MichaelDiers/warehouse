@@ -30,12 +30,14 @@ export function SignUp({
   const [passwordRepeat, setPasswordRepeat] = useState(password);
   const [passwordRepeatError, setPasswordRepeatError] = useState(passwordError);
   const [id, setId] = useState('userName');
+  const [idError, setIdError] = useState('');
   const [error, setError] = useState('');
   const disabled = status === QueryStatus.pending
     || passwordError !== ''
     || passwordRepeatError !== ''
     || !password
     || !id
+    || idError !== ''
     || !passwordRepeat
     || !invitationCode
     || !displayName;
@@ -120,6 +122,8 @@ export function SignUp({
         <div>{status}</div>
 
         <UserName
+          error={idError}
+          setError={setIdError}
           setValue={setId}
           text={text}
           value={id}

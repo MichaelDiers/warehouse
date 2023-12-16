@@ -12,6 +12,8 @@ interface IText {
   signInSubmit: string;
   signUpSubmit: string;
   userNameLabel: string;
+  userNameTooLongError: (length: number) => string;
+  userNameTooShortError: (length: number) => string;
 }
 
 export default IText;

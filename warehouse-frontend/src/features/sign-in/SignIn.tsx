@@ -22,10 +22,12 @@ export function SignIn({
   const [password, setPassword] = useState('password');
   const [passwordError, setPasswordError] = useState('');
   const [id, setId] = useState('userName');
+  const [idError, setIdError] = useState('');
   const [error, setError] = useState('');
   const disabled = status === QueryStatus.pending
     || !password
     || !id
+    || idError !== ''
     || passwordError !== '';
 
   const user = useAppSelector(selectUser);
@@ -80,6 +82,8 @@ export function SignIn({
         <div>{status}</div>
 
         <UserName
+          error={idError}
+          setError={setIdError}
           setValue={setId}
           text={text}
           value={id}
