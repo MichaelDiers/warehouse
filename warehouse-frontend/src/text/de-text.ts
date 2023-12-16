@@ -2,6 +2,8 @@ import IText from "./text";
 
 const deText: IText = {
   displayName: 'Display Name',
+  displayNameTooLongError: (length: number) => `Display name hat mehr als ${length} Zeichen`,
+  displayNameTooShortError: (length: number) => `Display name hat weniger als ${length} Zeichen`,
   forbiddenPasswords: ['password', '12345678', '01234567', '76543210'],
   forbiddenPasswordsError: 'Passwort ist zu einfach',
   invitationCodeLabel: 'Invitation Code',

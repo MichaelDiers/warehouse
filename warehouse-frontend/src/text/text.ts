@@ -1,5 +1,7 @@
 interface IText {
   displayName: string;
+  displayNameTooLongError: (length: number) => string;
+  displayNameTooShortError: (length: number) => string;
   forbiddenPasswords: string[];
   forbiddenPasswordsError: string;
   invitationCodeLabel: string;

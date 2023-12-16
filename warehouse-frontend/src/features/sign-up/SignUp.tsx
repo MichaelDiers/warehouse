@@ -24,6 +24,7 @@ export function SignUp({
   const [signUp, { status }] = useSignUpMutation();
 
   const [displayName, setDisplayName] = useState(v4());
+  const [displayNameError, setDisplayNameError] = useState('');
   const [invitationCode, setInvitationCode] = useState('efdf22de-fbde-4a7f-b864-51858644399c');
   const [password, setPassword] = useState('password');
   const [passwordError, setPasswordError] = useState('');
@@ -40,7 +41,8 @@ export function SignUp({
     || idError !== ''
     || !passwordRepeat
     || !invitationCode
-    || !displayName;
+    || !displayName
+    || displayNameError !== '';
 
   const user = useAppSelector(selectUser);
   const validatePassword = (value: string) => {
@@ -129,6 +131,8 @@ export function SignUp({
           value={id}
         />
         <DisplayName
+          error={displayNameError}
+          setError={setDisplayNameError}
           setValue={setDisplayName}
           text={text}
           value={displayName}
