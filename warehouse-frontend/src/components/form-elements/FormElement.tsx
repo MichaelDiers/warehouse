@@ -1,5 +1,6 @@
 const FormElement = ({
   additionalValidation = (value: string) => '',
+  autoComplete = (value: string) => value,
   autoFocus,
   disabled,
   error,
@@ -25,6 +26,7 @@ const FormElement = ({
   width
 }: {
   additionalValidation?: (value: string) => string,
+  autoComplete?: (value: string) => string,
   autoFocus?: boolean,
   disabled?: boolean,
   error?: string,
@@ -50,7 +52,7 @@ const FormElement = ({
   width?: number
 }) => {
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
+    const value = autoComplete(e.currentTarget.value);
     if (setError) {
       if (maxLength && maxLengthError && value?.length > maxLength) {
         setError(maxLengthError(maxLength));
@@ -64,7 +66,7 @@ const FormElement = ({
     }
 
     if (setValue) {
-      setValue(e.currentTarget.value);
+      setValue(value);
     }
   }
 

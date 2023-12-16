@@ -26,6 +26,7 @@ export function SignUp({
   const [displayName, setDisplayName] = useState(v4());
   const [displayNameError, setDisplayNameError] = useState('');
   const [invitationCode, setInvitationCode] = useState('efdf22de-fbde-4a7f-b864-51858644399c');
+  const [invitationCodeError, setInvitationCodeError] = useState('');
   const [password, setPassword] = useState('password');
   const [passwordError, setPasswordError] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState(password);
@@ -41,6 +42,7 @@ export function SignUp({
     || idError !== ''
     || !passwordRepeat
     || !invitationCode
+    || invitationCodeError !== ''
     || !displayName
     || displayNameError !== '';
 
@@ -154,6 +156,8 @@ export function SignUp({
           value={passwordRepeat}
         />
         <InvitationCode
+          error={invitationCodeError}
+          setError={setInvitationCodeError}
           setValue={setInvitationCode}
           text={text}
           value={invitationCode}

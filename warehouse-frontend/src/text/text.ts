@@ -4,7 +4,10 @@ interface IText {
   displayNameTooShortError: (length: number) => string;
   forbiddenPasswords: string[];
   forbiddenPasswordsError: string;
+  invitationCodeFormatError: string;
   invitationCodeLabel: string;
+  invitationCodeTooLongError: (length: number) => string;
+  invitationCodeTooShortError: (length: number) => string;
   passwordLabel: string;
   passwordTooLongError: (length: number) => string;
   passwordTooShortError: (length: number) => string;
