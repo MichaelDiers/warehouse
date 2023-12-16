@@ -13,12 +13,8 @@ import { selectUser } from '../../app/selectors';
 import { updateUserThunk } from '../../app/user-slice';
 
 export function SignIn({
-  setAccessToken,
-  setRefreshToken,
   text
 }: {
-  setAccessToken: (token: string) => void,
-  setRefreshToken: (token: string) => void,
   text: IText
 }) {
   const [signIn, { status }] = useSignInMutation();
@@ -48,8 +44,6 @@ export function SignIn({
           setError('Unable to sign in. Internal error.');
         }
         else {
-          setAccessToken(accessToken);
-          setRefreshToken(refreshToken);
           dispatch(updateUserThunk(accessToken, refreshToken));
         }
       }).catch((err): void => {

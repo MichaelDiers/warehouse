@@ -17,29 +17,25 @@ import { selectUser } from "../../app/selectors";
 import { updateUserThunk } from "../../app/user-slice";
 
 export function SignUp({
-  setAccessToken,
-  setRefreshToken,
   text
 }: {
-  setAccessToken: (token: string) => void,
-  setRefreshToken: (token: string) => void,
   text: IText
 }) {
   const [signUp, {
     status }] = useSignUpMutation();
 
   const [displayName, setDisplayName] = useState(v4());
-  const [invitationCode, setInvitationCode] = useState('a40b8a6f-4abd-4281-9263-d38265baedcf');
-  const [password, setPassword] = useState(v4());
-  const [passwordRepeat, setPasswordRepeat] = useState(v4());
-  const [id, setId] = useState(v4());
+  const [invitationCode, setInvitationCode] = useState('efdf22de-fbde-4a7f-b864-51858644399c');
+  const [password, setPassword] = useState('password');
+  const [passwordRepeat, setPasswordRepeat] = useState(password);
+  const [id, setId] = useState('userName');
   const [error, setError] = useState('');
   const disabled = !(password && id && passwordRepeat && invitationCode && displayName) || status === QueryStatus.pending;
 
   const user = useAppSelector(selectUser);
-  
+
   const dispatch = useAppDispatch();
-  
+
   const onSubmit = () => {
     setError('');
 
@@ -58,8 +54,6 @@ export function SignUp({
           setError('Unable to sign up. Internal error.');
         }
         else {
-          setAccessToken(accessToken);
-          setRefreshToken(refreshToken);
           dispatch(updateUserThunk(accessToken, refreshToken));
         }
       }).catch((err): void => {
@@ -86,7 +80,6 @@ export function SignUp({
 
   return (
     <>
-
       <Form onSubmit={onSubmit}>
         <label>ERROR</label>
         <div>{error}</div>
