@@ -21,18 +21,49 @@ export function SignUp({
 }: {
   text: IText
 }) {
-  const [signUp, {
-    status }] = useSignUpMutation();
+  const [signUp, { status }] = useSignUpMutation();
 
   const [displayName, setDisplayName] = useState(v4());
   const [invitationCode, setInvitationCode] = useState('efdf22de-fbde-4a7f-b864-51858644399c');
   const [password, setPassword] = useState('password');
+  const [passwordError, setPasswordError] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState(password);
+  const [passwordRepeatError, setPasswordRepeatError] = useState(passwordError);
   const [id, setId] = useState('userName');
   const [error, setError] = useState('');
-  const disabled = !(password && id && passwordRepeat && invitationCode && displayName) || status === QueryStatus.pending;
+  const disabled = status === QueryStatus.pending
+    || passwordError !== ''
+    || passwordRepeatError !== ''
+    || !password
+    || !id
+    || !passwordRepeat
+    || !invitationCode
+    || !displayName;
 
   const user = useAppSelector(selectUser);
+  const validatePassword = (value: string) => {
+    if (value !== passwordRepeat) {
+      return text.passwordMismatchError;
+    } else {
+      if (passwordRepeatError === text.passwordMismatchError) {
+        setPasswordRepeatError('');
+      }
+
+      return '';
+    }
+  }
+
+  const validatePasswordRepeat = (value: string) => {
+    if (value !== password) {
+      return text.passwordMismatchError;
+    } else {
+      if (passwordError === text.passwordMismatchError) {
+        setPasswordError('');
+      }
+
+      return '';
+    }
+  }
 
   const dispatch = useAppDispatch();
 
@@ -81,10 +112,13 @@ export function SignUp({
   return (
     <>
       <Form onSubmit={onSubmit}>
+        <div></div>
         <label>ERROR</label>
         <div>{error}</div>
+        <div></div>
         <label>status</label>
         <div>{status}</div>
+
         <UserName
           setValue={setId}
           text={text}
@@ -96,11 +130,17 @@ export function SignUp({
           value={displayName}
         />
         <Password
+          additionalValidation={validatePassword}
+          error={passwordError}
+          setError={setPasswordError}
           setValue={setPassword}
           text={text}
           value={password}
         />
         <PasswordRepeat
+          additionalValidation={validatePasswordRepeat}
+          error={passwordRepeatError}
+          setError={setPasswordRepeatError}
           setValue={setPasswordRepeat}
           text={text}
           value={passwordRepeat}

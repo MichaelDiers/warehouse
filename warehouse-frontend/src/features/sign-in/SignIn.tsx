@@ -20,9 +20,13 @@ export function SignIn({
   const [signIn, { status }] = useSignInMutation();
 
   const [password, setPassword] = useState('password');
+  const [passwordError, setPasswordError] = useState('');
   const [id, setId] = useState('userName');
   const [error, setError] = useState('');
-  const disabled = !(password && id) || status === QueryStatus.pending;
+  const disabled = status === QueryStatus.pending
+    || !password
+    || !id
+    || passwordError !== '';
 
   const user = useAppSelector(selectUser);
 
@@ -64,20 +68,25 @@ export function SignIn({
   if (user) {
     return (<Navigate to={AppRoutes.SHOPPING_LIST} />)
   }
-  
+
   return (
     <>
       <Form onSubmit={onSubmit}>
+        <div></div>
         <label>ERROR</label>
         <div>{error}</div>
+        <div></div>
         <label>status</label>
         <div>{status}</div>
+
         <UserName
           setValue={setId}
           text={text}
           value={id}
         />
         <Password
+          error={passwordError}
+          setError={setPasswordError}
           setValue={setPassword}
           text={text}
           value={password}

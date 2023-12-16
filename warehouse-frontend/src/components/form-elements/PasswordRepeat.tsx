@@ -2,25 +2,48 @@ import IText from "../../text/text";
 import Password from "./Password";
 
 const PasswordRepeat = ({
-    id = 'passwordRepeat',
-    setValue,
-    text,
-    value
-} : {
-    id?: string,
-    setValue: (value: string) => void,
-    text: IText,
-    value: string
+  additionalValidation,
+  error,
+  id = 'passwordRepeat',
+  maxLength,
+  minLength,
+  setError,
+  setValue,
+  text,
+  value,
+  label = text.passwordRepeatLabel,
+  maxLengthError,
+  minLengthError,
+}: {
+  additionalValidation?: (value: string) => string,
+  error?: string,
+  id?: string,
+  maxLength?: number,
+  minLength?: number,
+  setError?: (error: string) => void,
+  setValue: (value: string) => void,
+  text: IText,
+  value: string,
+  label?: string,
+  maxLengthError?: (maxLength: number) => string,
+  minLengthError?: (minLength: number) => string,
 }) => {
-    return (
-        <Password
-            id={id}
-            label={text.passwordRepeatLabel}
-            setValue={setValue}
-            text={text}
-            value={value}
-        />
-    )
+  return (
+    <Password
+      additionalValidation={additionalValidation}
+      error={error}
+      id={id}
+      label={label}
+      maxLength={maxLength}
+      maxLengthError={maxLengthError}
+      minLength={minLength}
+      minLengthError={minLengthError}
+      setError={setError}
+      setValue={setValue}
+      text={text}
+      value={value}
+    />
+  )
 }
 
 export default PasswordRepeat;
