@@ -5,87 +5,96 @@ import SignInSubmit from "../../components/form-elements/SignInSubmit";
 import UserName from "../../components/form-elements/UserName";
 import IText from "../../text/text";
 import { ISignInRequest, useSignInMutation } from "./sign-in-api-slice";
-import { v4 } from 'uuid';
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectUser } from '../../app/selectors';
+import { updateUserThunk } from '../../app/user-slice';
 
 export function SignIn({
-    setAccessToken,
-    setRefreshToken,
-    text
+  setAccessToken,
+  setRefreshToken,
+  text
 }: {
-    setAccessToken: (token: string) => void,
-    setRefreshToken: (token: string) => void,
-    text: IText
+  setAccessToken: (token: string) => void,
+  setRefreshToken: (token: string) => void,
+  text: IText
 }) {
-    const [signIn, { status }] = useSignInMutation();
+  const [signIn, { status }] = useSignInMutation();
 
+  const [password, setPassword] = useState('password');
+  const [id, setId] = useState('userName');
+  const [error, setError] = useState('');
+  const disabled = !(password && id) || status === QueryStatus.pending;
 
+  const user = useAppSelector(selectUser);
 
-    const [password, setPassword] = useState(v4());
-    const [id, setId] = useState(v4());
-    const [error, setError] = useState('');
-    const disabled = !(password && id) || status === QueryStatus.pending;
+  const dispatch = useAppDispatch();
 
-    const onSubmit = () => {
-        setError('');
+  const onSubmit = () => {
+    setError('');
 
-        const args: ISignInRequest = {
-            password,
-            id
-        };
-
-        signIn(args)
-            .unwrap()
-            .then((result) => {
-                const { accessToken, refreshToken } = result;
-                if (!accessToken || !refreshToken) {
-                    setError('Unable to sign up. Internal error.');
-                }
-                else {
-                    setAccessToken(accessToken);
-                    setRefreshToken(refreshToken);
-                }
-            }).catch((err): void => {
-                const { status } = err;
-                if (status) {
-                    switch (status) {
-                        case 401:
-                            setError('Invalid invitation code');
-                            break;
-                        default:
-                            setError(JSON.stringify(err));
-                            break;
-                    }
-                }
-            });
+    const args: ISignInRequest = {
+      password,
+      id
     };
 
-    return (
-        <>
-            <Form onSubmit={onSubmit}>
-                <label>ERROR</label>
-                <div>{error}</div>
-                <label>status</label>
-                <div>{status}</div>
-                <UserName
-                    setValue={setId}
-                    text={text}
-                    value={id}
-                />
-                <Password
-                    setValue={setPassword}
-                    text={text}
-                    value={password}
-                />
-                <SignInSubmit
-                    disabled={disabled}
-                    text={text} />
-            </Form>
-            <Link to={AppRoutes.SIGN_UP}>
-                sign up
-            </Link>
-        </>
-    )
+    signIn(args)
+      .unwrap()
+      .then((result) => {
+        const { accessToken, refreshToken } = result;
+        if (!accessToken || !refreshToken) {
+          setError('Unable to sign in. Internal error.');
+        }
+        else {
+          setAccessToken(accessToken);
+          setRefreshToken(refreshToken);
+          dispatch(updateUserThunk(accessToken, refreshToken));
+        }
+      }).catch((err): void => {
+        const { status } = err;
+        if (status) {
+          switch (status) {
+            case 401:
+              setError('Invalid invitation code');
+              break;
+            default:
+              setError(JSON.stringify(err));
+              break;
+          }
+        }
+      });
+  };
+
+  if (user) {
+    return (<Navigate to={AppRoutes.SHOPPING_LIST} />)
+  }
+  
+  return (
+    <>
+      <Form onSubmit={onSubmit}>
+        <label>ERROR</label>
+        <div>{error}</div>
+        <label>status</label>
+        <div>{status}</div>
+        <UserName
+          setValue={setId}
+          text={text}
+          value={id}
+        />
+        <Password
+          setValue={setPassword}
+          text={text}
+          value={password}
+        />
+        <SignInSubmit
+          disabled={disabled}
+          text={text} />
+      </Form>
+      <Link to={AppRoutes.SIGN_UP}>
+        sign up
+      </Link>
+    </>
+  )
 }
