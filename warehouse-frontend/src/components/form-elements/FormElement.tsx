@@ -72,10 +72,11 @@ const FormElement = ({
 
   return (
     <>
-      <div>{error}</div>
-      <label htmlFor={id}>{label}</label>
+      <div className={error ? 'error' : ''}>{error}</div>
+      <label htmlFor={id} className={error ? 'error' : ''}>{label}</label>
       <input
         autoFocus={autoFocus}
+        className={error ? 'error' : ''}
         disabled={disabled}
         height={height}
         id={id}
