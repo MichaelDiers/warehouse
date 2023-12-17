@@ -5,6 +5,7 @@ using Generic.Base.Api.Middleware.ErrorHandling;
 using Generic.Base.Api.MongoDb;
 using Generic.Base.Api.MongoDb.AuthServices;
 using Microsoft.OpenApi.Models;
+using Warehouse.Api;
 using Warehouse.Api.StockItems;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,7 +104,7 @@ if (app.Environment.IsDevelopment())
 app.MapCustomHealthChecks();
 app.UseErrorHandling();
 app.UseApiKey();
-
+app.UseMiddleware<AccessControlAllowOriginMiddleware>();
 app.UseRouting();
 
 app.UseHttpsRedirection();
