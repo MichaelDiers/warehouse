@@ -74,13 +74,6 @@ export function SignIn({
   return (
     <>
       <Form onSubmit={onSubmit}>
-        <div></div>
-        <label>ERROR</label>
-        <div>{error}</div>
-        <div></div>
-        <label>status</label>
-        <div>{status}</div>
-
         <UserName
           error={idError}
           setError={setIdError}

@@ -1,4 +1,5 @@
 import apiSplice from '../../app/api-slice';
+import Urn from '../../types/urn.enum';
 
 export interface ISignUpRequest {
   displayName: string;
@@ -14,7 +15,7 @@ const signUpApiSlice = apiSplice.injectEndpoints({
   endpoints: builder => ({
     signUp: builder.mutation({
       query: (request: ISignUpRequest) => ({
-        url: 'http://localhost:5008/api/Auth/sign-up',
+        url: Urn.AUTH_SIGN_UP,
         method: 'POST',
         body: request,
       })
