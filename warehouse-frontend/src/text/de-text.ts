@@ -1,7 +1,7 @@
 import IText from "./text";
 
 const deText: IText = {
-  backLabel: 'Zurück',
+  genericBackLabel: 'Zurück',
   displayName: 'Display Name',
   displayNameTooLongError: (length: number) => `Display name hat mehr als ${length} Zeichen`,
   displayNameTooShortError: (length: number) => `Display name hat weniger als ${length} Zeichen`,

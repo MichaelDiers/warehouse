@@ -1,5 +1,5 @@
 interface IText {
-  backLabel: string;
+  genericBackLabel: string;
   displayName: string;
   displayNameTooLongError: (length: number) => string;
   displayNameTooShortError: (length: number) => string;

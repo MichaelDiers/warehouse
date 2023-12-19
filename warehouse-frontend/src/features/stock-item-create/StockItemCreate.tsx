@@ -97,7 +97,7 @@ export function StockItemCreate({
           onClick={() => setIsSubmitAndNew(true)}
         />
       </Form>
-      <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.backLabel}</Link>
+      <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
     </>
   )
 }
