@@ -15,6 +15,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/selectors";
 import { updateUserThunk } from "../../app/user-slice";
+import { reset } from '../../app/options-slice';
 
 export function SignUp({
   text
@@ -92,6 +93,7 @@ export function SignUp({
         }
         else {
           dispatch(updateUserThunk(accessToken, refreshToken));
+          dispatch(reset());
         }
       }).catch((err): void => {
         const { status } = err;
@@ -112,7 +114,7 @@ export function SignUp({
   };
 
   if (user) {
-    return (<Navigate to={AppRoutes.SHOPPING_LIST} />)
+    return (<Navigate to={AppRoutes.STOCK_ITEM_LIST} />)
   }
 
   return (

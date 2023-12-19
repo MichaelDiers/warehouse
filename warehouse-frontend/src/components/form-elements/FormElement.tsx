@@ -8,9 +8,11 @@ const FormElement = ({
   id,
   label,
   max,
+  maxError,
   maxLength,
   maxLengthError,
   min,
+  minError,
   minLength,
   minLengthError,
   pattern,
@@ -33,10 +35,12 @@ const FormElement = ({
   height?: number,
   id: string,
   label: string,
-  max?: string | number,
+  max?: number,
+  maxError?: (maximum: number) => string,
   maxLength?: number,
   maxLengthError?: (maxLength: number) => string,
-  min?: string | number,
+  min?: number,
+  minError?: (minumum: number) => string,
   minLength?: number,
   minLengthError?: (minLength: number) => string,
   pattern?: string,
@@ -44,7 +48,7 @@ const FormElement = ({
   size?: number,
   required?: boolean,
   setError?: (value: string) => void,
-  setValue: (value: string) => void,
+  setValue?: (value: string) => void,
   step?: number,
   title?: string,
   type?: 'password' | 'text',
@@ -59,6 +63,12 @@ const FormElement = ({
       }
       else if (minLength && minLengthError && (!value || value.length < minLength)) {
         setError(minLengthError(minLength));
+      }
+      else if (value && max && maxError && Number.isInteger(value) && Number(value) > max) {
+        setError(maxError(Number(value)));
+      }
+      else if (value && min && minError && Number.isInteger(value) && Number(value) < min) {
+        setError(minError(Number(value)));
       }
       else {
         setError(additionalValidation(value));
@@ -88,6 +98,7 @@ const FormElement = ({
         onChange={onChange}
         pattern={pattern}
         placeholder={placeholder}
+        readOnly={!setValue}
         required={required}
         size={size}
         step={step}

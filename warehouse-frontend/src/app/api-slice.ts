@@ -8,6 +8,7 @@ import type {
 import Urn from '../types/urn.enum';
 import { RootState } from './store';
 import { append } from './options-slice';
+import ApiTagTypes from '../types/api-tag-types';
 
 interface IData {
   links: ILink[];
@@ -20,18 +21,20 @@ interface ILink {
 const optionsQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:5008',
   method: 'OPTIONS',
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, {getState}) => {
     headers.set('Content-Type', 'application/json');
     headers.set('x-api-key', 'The api key');
+    headers.set('Authorization', `Bearer ${(getState() as RootState).user.current?.accessToken || ''}`);
     return headers;
   }
 })
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:5008',
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, {getState}) => {
     headers.set('Content-Type', 'application/json');
     headers.set('x-api-key', 'The api key');
+    headers.set('Authorization', `Bearer ${(getState() as RootState).user.current?.accessToken || ''}`);
     return headers;
   }
 })
@@ -85,10 +88,6 @@ const dynamicBaseQuery: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args: any, api, extraOptions) => {
-  console.log(args)
-  console.log(api)
-  console.log(extraOptions)
-  
   const url = await getUrl(args['url'], api);
   const adjustedArgs = {...args, url}
 
@@ -102,6 +101,7 @@ const dynamicBaseQuery: BaseQueryFn<
 export const apiSlice = createApi({
   baseQuery: dynamicBaseQuery,
   endpoints: () => ({}),
+  tagTypes: [ApiTagTypes.STOCK_ITEM]
 });
 
 export default apiSlice;

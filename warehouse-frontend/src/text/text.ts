@@ -1,4 +1,5 @@
 interface IText {
+  backLabel: string;
   displayName: string;
   displayNameTooLongError: (length: number) => string;
   displayNameTooShortError: (length: number) => string;
@@ -13,7 +14,20 @@ interface IText {
   passwordTooShortError: (length: number) => string;
   passwordRepeatLabel: string;
   passwordMismatchError: string;
-  shoppingListHeader: string;
+  stockItemCreateHeader: string;
+  stockItemCreateLinkLabel: string;
+  stockItemCreateSubmitLabel: string;
+  stockItemCreateSubmitAndNewLabel: string;
+  stockItemNameLabel: string;
+  stockItemMinimumQuantityLabel: string;
+  stockItemMinimumQuantityTooLarge: (maximum: number) => string;
+  stockItemMinimumQuantityTooSmall: (minimum: number) => string;
+  stockItemNameTooLongError: (length: number) => string;
+  stockItemNameTooShortError: (length: number) => string;
+  stockItemQuantityLabel: string;
+  stockItemQuantityTooLarge: (maximum: number) => string;
+  stockItemQuantityTooSmall: (minimum: number) => string;
+  stockItemListHeader: string;
   signInSubmit: string;
   signUpSubmit: string;
   userNameLabel: string;
