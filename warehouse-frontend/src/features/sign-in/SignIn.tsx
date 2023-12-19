@@ -1,17 +1,14 @@
 import { useState } from "react";
-import Form from "../../components/form-elements/Form";
-import Password from "../../components/form-elements/Password";
-import SignInSubmit from "../../components/form-elements/SignInSubmit";
-import UserName from "../../components/form-elements/UserName";
 import IText from "../../text/text";
 import { ISignInRequest, useSignInMutation } from "./sign-in-api-slice";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectUser } from '../../app/selectors';
 import { updateUserThunk } from '../../app/user-slice';
 import { reset } from '../../app/options-slice';
+import { SignInForm } from './SignInForm';
 
 export function SignIn({
   text
@@ -74,29 +71,18 @@ export function SignIn({
   }
 
   return (
-    <>
-      <Form onSubmit={onSubmit}>
-        <UserName
-          error={idError}
-          setError={setIdError}
-          setValue={setId}
-          text={text}
-          value={id}
-        />
-        <Password
-          error={passwordError}
-          setError={setPasswordError}
-          setValue={setPassword}
-          text={text}
-          value={password}
-        />
-        <SignInSubmit
-          disabled={disabled}
-          text={text} />
-      </Form>
-      <Link to={AppRoutes.SIGN_UP}>
-        sign up
-      </Link>
-    </>
+    <SignInForm
+      disabled={disabled}
+      id={id}
+      idError={idError}
+      onSubmit={onSubmit}
+      password={password}
+      passwordError={passwordError}
+      setId={setId}
+      setIdError={setIdError}
+      setPassword={setPassword}
+      setPasswordError={setPasswordError}
+      text={text}
+    />
   )
 }

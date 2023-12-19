@@ -1,21 +1,15 @@
 import { useState } from "react";
-import Form from "../../components/form-elements/Form";
-import Password from "../../components/form-elements/Password";
-import SignUpSubmit from "../../components/form-elements/SignUpSubmit";
-import UserName from "../../components/form-elements/UserName";
 import IText from "../../text/text";
-import PasswordRepeat from "../../components/form-elements/PasswordRepeat";
-import InvitationCode from "../../components/form-elements/InvitationCode";
 import { ISignUpRequest, useSignUpMutation } from "./sign-up-api-slice";
-import DisplayName from "../../components/form-elements/DisplayName";
 import { v4 } from 'uuid';
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/selectors";
 import { updateUserThunk } from "../../app/user-slice";
 import { reset } from '../../app/options-slice';
+import { SignUpForm } from './SignUpForm';
 
 export function SignUp({
   text
@@ -118,52 +112,32 @@ export function SignUp({
   }
 
   return (
-    <>
-      <Form onSubmit={onSubmit}>
-        <UserName
-          error={idError}
-          setError={setIdError}
-          setValue={setId}
-          text={text}
-          value={id}
-        />
-        <DisplayName
-          error={displayNameError}
-          setError={setDisplayNameError}
-          setValue={setDisplayName}
-          text={text}
-          value={displayName}
-        />
-        <Password
-          additionalValidation={validatePassword}
-          error={passwordError}
-          setError={setPasswordError}
-          setValue={setPassword}
-          text={text}
-          value={password}
-        />
-        <PasswordRepeat
-          additionalValidation={validatePasswordRepeat}
-          error={passwordRepeatError}
-          setError={setPasswordRepeatError}
-          setValue={setPasswordRepeat}
-          text={text}
-          value={passwordRepeat}
-        />
-        <InvitationCode
-          error={invitationCodeError}
-          setError={setInvitationCodeError}
-          setValue={setInvitationCode}
-          text={text}
-          value={invitationCode}
-        />
-        <SignUpSubmit
-          disabled={disabled}
-          text={text} />
-      </Form>
-      <Link to={AppRoutes.SIGN_IN}>
-        sign in
-      </Link>
-    </>
+    <SignUpForm
+      disabled={disabled}
+      displayName={displayName}
+      displayNameError={displayNameError}
+      id={id}
+      idError={idError}
+      invitationCode={invitationCode}
+      invitationCodeError={invitationCodeError}
+      onSubmit={onSubmit}
+      password={password}
+      passwordError={passwordError}
+      passwordRepeat={passwordRepeat}
+      passwordRepeatError={passwordRepeatError}
+      setDisplayName={setDisplayName}
+      setDisplayNameError={setDisplayNameError}
+      setId={setId}
+      setIdError={setIdError}
+      setInvitationCode={setInvitationCode}
+      setInvitationCodeError={setInvitationCodeError}
+      setPassword={setPassword}
+      setPasswordError={setPasswordError}
+      setPasswordRepeat={setPasswordRepeat}
+      setPasswordRepeatError={setPasswordRepeatError}
+      validatePassword={validatePassword}
+      validatePasswordRepeat={validatePasswordRepeat}
+      text={text}
+    />
   )
 }

@@ -1,5 +1,7 @@
 interface IText {
   genericBackLabel: string;
+  genericSignInLabel: string;
+  genericSignUpLabel: string;
   displayName: string;
   displayNameTooLongError: (length: number) => string;
   displayNameTooShortError: (length: number) => string;
@@ -28,8 +30,6 @@ interface IText {
   stockItemQuantityTooLarge: (maximum: number) => string;
   stockItemQuantityTooSmall: (minimum: number) => string;
   stockItemListHeader: string;
-  signInSubmit: string;
-  signUpSubmit: string;
   userNameLabel: string;
   userNameTooLongError: (length: number) => string;
   userNameTooShortError: (length: number) => string;

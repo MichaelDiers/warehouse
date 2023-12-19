@@ -1,6 +1,6 @@
-import IText from "../../text/text";
-import Validation from '../../types/validation-enum';
-import FormElement from "./FormElement";
+import IText from "../../../text/text";
+import Validation from '../../../types/validation-enum';
+import FormElement from "../generic/FormElement";
 
 const Password = ({
   additionalValidation = (value: string) => '',

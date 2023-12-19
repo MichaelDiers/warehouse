@@ -1,19 +1,19 @@
-import IText from "../../text/text";
-import Validation from '../../types/validation-enum';
-import FormElement from "./FormElement";
+import IText from "../../../text/text";
+import Validation from '../../../types/validation-enum';
+import FormElement from "../generic/FormElement";
 
-const DisplayName = ({
+const StockItemName = ({
   error,
-  id = 'displayName',
-  maxLength = Validation.DISPLAY_NAME_MAX_LENGTH,
-  minLength = Validation.DISPLAY_NAME_MIN_LENGTH,
+  id = 'name',
+  maxLength = Validation.STOCK_ITEM_NAME_MAX_LENGTH,
+  minLength = Validation.STOCK_ITEM_NAME_MIN_LENGTH,
   setError,
   setValue,
   text,
   value,
-  label = text.displayName,
-  maxLengthError = text.displayNameTooLongError,
-  minLengthError = text.displayNameTooShortError,
+  label = text.stockItemNameLabel,
+  maxLengthError = text.stockItemNameTooLongError,
+  minLengthError = text.stockItemNameTooShortError,
 }: {
   error?: string,
   id?: string,
@@ -23,7 +23,7 @@ const DisplayName = ({
   minLength?: number,
   minLengthError?: (minLength: number) => string,
   setError?: (value: string) => void,
-  setValue: (value: string) => void,
+  setValue?: (value: string) => void,
   text: IText,
   value: string
 }) => {
@@ -44,4 +44,4 @@ const DisplayName = ({
   )
 }
 
-export default DisplayName;
+export default StockItemName;

@@ -1,19 +1,19 @@
-import IText from "../../text/text";
-import Validation from '../../types/validation-enum';
-import Quantity from './Quantity';
+import IText from "../../../text/text";
+import Validation from '../../../types/validation-enum';
+import FormElement from "../generic/FormElement";
 
-const MinimumQuantity = ({
+const Quantity = ({
   error,
-  id = 'minimumQuantity',
-  max = Validation.STOCK_ITEM_MINIMUM_QUANTITY_MAX,
-  min = Validation.STOCK_ITEM_MINIMUM_QUANTITY_MIN,
+  id = 'quantity',
+  max = Validation.STOCK_ITEM_QUANTITY_MAX,
+  min = Validation.STOCK_ITEM_QUANTITY_MIN,
   setError,
   setValue,
   text,
   value,
-  label = text.stockItemMinimumQuantityLabel,
-  maxError = text.stockItemMinimumQuantityTooLarge,
-  minError = text.stockItemMinimumQuantityTooSmall,
+  label = text.stockItemQuantityLabel,
+  maxError = text.stockItemQuantityTooLarge,
+  minError = text.stockItemQuantityTooSmall,
 }: {
   error?: string,
   id?: string,
@@ -28,7 +28,7 @@ const MinimumQuantity = ({
   value: string
 }) => {
   return (
-    <Quantity
+    <FormElement
       error={error}
       id={id}
       label={label}
@@ -38,10 +38,10 @@ const MinimumQuantity = ({
       minError={minError}
       setError={setError}
       setValue={setValue}
-      text={text}
+      type="text"
       value={value}
     />
   )
 }
 
-export default MinimumQuantity;
+export default Quantity;

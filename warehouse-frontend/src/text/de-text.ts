@@ -2,6 +2,8 @@ import IText from "./text";
 
 const deText: IText = {
   genericBackLabel: 'Zurück',
+  genericSignInLabel: 'Anmelden',
+  genericSignUpLabel: 'Registrieren',
   displayName: 'Display Name',
   displayNameTooLongError: (length: number) => `Display name hat mehr als ${length} Zeichen`,
   displayNameTooShortError: (length: number) => `Display name hat weniger als ${length} Zeichen`,
@@ -30,8 +32,6 @@ const deText: IText = {
   stockItemQuantityTooLarge: (maximum: number) => `Maximalwert von ${maximum} überschritten.`,
   stockItemQuantityTooSmall: (minimum: number) => `Minimalwert von ${minimum} unterschritten`,
   stockItemListHeader: 'Stock Item List',
-  signInSubmit: 'Anmelden',
-  signUpSubmit: 'Registrieren',
   userNameLabel: 'Benutzername',
   userNameTooLongError: (length: number) => `Benutzername hat mehr als ${length} Zeichen`,
   userNameTooShortError: (length: number) => `Benutzername hat weniger als ${length} Zeichen`,

@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import IText from "../../text/text";
 import AppRoutes from '../../types/app-routes.enum';
 import { useGetStockItemsQuery } from './stock-item-list-api-slice';
-import StockItemName from '../../components/form-elements/StockItemName';
-import Quantity from '../../components/form-elements/Quantity';
-import MinimumQuantity from '../../components/form-elements/MinimumQuantity';
+import StockItemName from '../../components/form-elements/stock-item/StockItemName';
+import Quantity from '../../components/form-elements/stock-item/Quantity';
+import MinimumQuantity from '../../components/form-elements/stock-item/MinimumQuantity';
 
 export function StockItemList({
   text

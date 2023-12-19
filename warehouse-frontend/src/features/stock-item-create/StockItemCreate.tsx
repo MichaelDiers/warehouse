@@ -2,11 +2,11 @@ import { Link, redirect, useNavigate } from 'react-router-dom';
 import IText from "../../text/text";
 import AppRoutes from '../../types/app-routes.enum';
 import { useState } from 'react';
-import StockItemName from '../../components/form-elements/StockItemName';
-import Quantity from '../../components/form-elements/Quantity';
-import MinimumQuantity from '../../components/form-elements/MinimumQuantity';
-import Submit from '../../components/form-elements/Submit';
-import Form from '../../components/form-elements/Form';
+import StockItemName from '../../components/form-elements/stock-item/StockItemName';
+import Quantity from '../../components/form-elements/stock-item/Quantity';
+import MinimumQuantity from '../../components/form-elements/stock-item/MinimumQuantity';
+import Submit from '../../components/form-elements/generic/Submit';
+import Form from '../../components/form-elements/generic/Form';
 import { ICreateStockItemRequest, useCreateStockItemMutation } from './stock-item-create-api-slice';
 
 export function StockItemCreate({

@@ -1,5 +1,5 @@
-import IText from "../../text/text";
-import Password from "./Password";
+import IText from "../../../text/text";
+import Password from './Password';
 
 const PasswordRepeat = ({
   additionalValidation,
