@@ -37,7 +37,7 @@ const DisplayName = ({
       minLength={minLength}
       minLengthError={minLengthError}
       setError={setError}
-      setValue={setValue}
+      setValue={(value) => setValue(value as string)}
       type="text"
       value={value}
     />

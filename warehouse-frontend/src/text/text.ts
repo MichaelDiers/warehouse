@@ -20,6 +20,7 @@ interface IText {
   stockItemCreateLinkLabel: string;
   stockItemCreateSubmitLabel: string;
   stockItemCreateSubmitAndNewLabel: string;
+  stockItemDetailsHeader: string;
   stockItemNameLabel: string;
   stockItemMinimumQuantityLabel: string;
   stockItemMinimumQuantityTooLarge: (maximum: number) => string;

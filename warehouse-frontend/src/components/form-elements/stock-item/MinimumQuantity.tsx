@@ -23,9 +23,9 @@ const MinimumQuantity = ({
   min?: number,
   minError?: (minimum: number) => string,
   setError?: (value: string) => void,
-  setValue?: (value: string) => void,
+  setValue?: (value: number) => void,
   text: IText,
-  value: string
+  value?: number
 }) => {
   return (
     <Quantity
@@ -37,7 +37,7 @@ const MinimumQuantity = ({
       min={min}
       minError={minError}
       setError={setError}
-      setValue={setValue}
+      setValue={setValue ? (value) => setValue(value as number) : undefined}
       text={text}
       value={value}
     />

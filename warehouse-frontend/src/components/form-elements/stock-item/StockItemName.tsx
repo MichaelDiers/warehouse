@@ -25,7 +25,7 @@ const StockItemName = ({
   setError?: (value: string) => void,
   setValue?: (value: string) => void,
   text: IText,
-  value: string
+  value?: string
 }) => {
   return (
     <FormElement
@@ -37,7 +37,7 @@ const StockItemName = ({
       minLength={minLength}
       minLengthError={minLengthError}
       setError={setError}
-      setValue={setValue}
+      setValue={setValue ? (value) => setValue(value as string) : undefined}
       type="text"
       value={value}
     />

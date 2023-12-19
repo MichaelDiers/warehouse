@@ -21,7 +21,7 @@ interface ILink {
 const optionsQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:5008',
   method: 'OPTIONS',
-  prepareHeaders: (headers, {getState}) => {
+  prepareHeaders: (headers, { getState }) => {
     headers.set('Content-Type', 'application/json');
     headers.set('x-api-key', 'The api key');
     headers.set('Authorization', `Bearer ${(getState() as RootState).user.current?.accessToken || ''}`);
@@ -31,15 +31,15 @@ const optionsQuery = fetchBaseQuery({
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:5008',
-  prepareHeaders: (headers, {getState}) => {
+  prepareHeaders: (headers, { getState }) => {
     headers.set('Content-Type', 'application/json');
     headers.set('x-api-key', 'The api key');
     headers.set('Authorization', `Bearer ${(getState() as RootState).user.current?.accessToken || ''}`);
     return headers;
-  }
+  },
 })
 
-const getUrlForUrnFromCache = (urn: Urn, api: BaseQueryApi): string|undefined => {
+const getUrlForUrnFromCache = (urn: Urn, api: BaseQueryApi): string | undefined => {
   const state = api.getState() as RootState;
   const links = state.options.links;
   const link = links.find((link: ILink) => link.urn === urn);
@@ -47,7 +47,7 @@ const getUrlForUrnFromCache = (urn: Urn, api: BaseQueryApi): string|undefined =>
 }
 
 const getUrlForUrnFromRequest = async (url: string, urn: Urn, api: BaseQueryApi): Promise<string> => {
-  const options = await optionsQuery({url }, api, {});
+  const options = await optionsQuery({ url }, api, {});
   const linkData: IData = options.data as IData;
 
   if (options.error || !linkData.links) {
@@ -74,13 +74,11 @@ const getUrlForUrn = async (url: string, urn: Urn, api: BaseQueryApi): Promise<s
   return getUrlForUrnFromRequest(url, urn, api);
 }
 
-const getUrl  = async (urn: Urn, api: BaseQueryApi): Promise<string> => {
+const getUrl = async (urn: Urn, api: BaseQueryApi): Promise<string> => {
   const optionsUrn = `urn:${urn.split(':')[1]}:Options`;
   const optionsUrl = await getUrlForUrn('/api/Options', optionsUrn as Urn, api);
 
-  const url = await getUrlForUrn(optionsUrl, urn, api);
-  
-  return url;
+  return getUrlForUrn(optionsUrl, urn, api);
 }
 
 const dynamicBaseQuery: BaseQueryFn<
@@ -88,8 +86,14 @@ const dynamicBaseQuery: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args: any, api, extraOptions) => {
-  const url = await getUrl(args['url'], api);
-  const adjustedArgs = {...args, url}
+  const providedUrl: string = args['url'];
+  const url = providedUrl.toLocaleLowerCase().startsWith('urn:') ? await getUrl(providedUrl as Urn, api) : providedUrl;
+
+  if (!url) {
+    throw new Error('empty url');
+  }
+
+  const adjustedArgs = { ...args, url }
 
   return rawBaseQuery(adjustedArgs, api, extraOptions)
 }

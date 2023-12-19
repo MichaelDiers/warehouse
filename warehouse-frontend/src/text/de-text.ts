@@ -22,6 +22,7 @@ const deText: IText = {
   stockItemCreateLinkLabel: 'Neu',
   stockItemCreateSubmitLabel: 'Anlegen',
   stockItemCreateSubmitAndNewLabel: 'Anlegen und nächstes Anlegen',
+  stockItemDetailsHeader: 'Stock Item Details',
   stockItemMinimumQuantityLabel: 'Min. Anzahl',
   stockItemMinimumQuantityTooLarge: (maximum: number) => `Maximalwert von ${maximum} überschritten.`,
   stockItemMinimumQuantityTooSmall: (minimum: number) => `Minimalwert von ${minimum} unterschritten`,

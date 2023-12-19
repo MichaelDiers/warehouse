@@ -37,7 +37,7 @@ const UserName = ({
       minLength={minLength}
       minLengthError={minLengthError}
       setError={setError}
-      setValue={setValue}
+      setValue={(userName) => setValue(userName as string)}
       type="text"
       value={value}
     />

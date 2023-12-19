@@ -42,7 +42,7 @@ const InvitationCode = ({
     if (value && value.length > newValue.length) {
       return newValue;
     }
-    
+
     const update = newValue.replace(/-+/g, '-');
     switch (update.length) {
       case 8:
@@ -67,7 +67,7 @@ const InvitationCode = ({
       minLength={minLength}
       minLengthError={minLengthError}
       setError={setError}
-      setValue={setValue}
+      setValue={(value) => setValue(value as string)}
       type="text"
       value={value}
     />

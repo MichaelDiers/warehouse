@@ -48,11 +48,11 @@ const FormElement = ({
   size?: number,
   required?: boolean,
   setError?: (value: string) => void,
-  setValue?: (value: string) => void,
+  setValue?: (value: string | number) => void,
   step?: number,
   title?: string,
   type?: 'password' | 'text',
-  value?: string,
+  value?: string | number,
   width?: number
 }) => {
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {

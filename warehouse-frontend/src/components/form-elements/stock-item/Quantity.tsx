@@ -23,10 +23,11 @@ const Quantity = ({
   min?: number,
   minError?: (minimum: number) => string,
   setError?: (value: string) => void,
-  setValue?: (value: string) => void,
+  setValue?: (value: number) => void,
   text: IText,
-  value: string
+  value?: number
 }) => {
+
   return (
     <FormElement
       error={error}
@@ -37,7 +38,7 @@ const Quantity = ({
       min={min}
       minError={minError}
       setError={setError}
-      setValue={setValue}
+      setValue={setValue ? (value) => setValue(value as number) : undefined}
       type="text"
       value={value}
     />

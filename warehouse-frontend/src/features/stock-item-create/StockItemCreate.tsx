@@ -1,103 +1,46 @@
-import { Link, redirect, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import IText from "../../text/text";
 import AppRoutes from '../../types/app-routes.enum';
+import { useCreateStockItemMutation } from './stock-item-create-api-slice';
+import StockItem from '../../components/form-elements/stock-item/StockItem';
+import ICreateStockItem from '../../types/create-stock-item';
 import { useState } from 'react';
-import StockItemName from '../../components/form-elements/stock-item/StockItemName';
-import Quantity from '../../components/form-elements/stock-item/Quantity';
-import MinimumQuantity from '../../components/form-elements/stock-item/MinimumQuantity';
-import Submit from '../../components/form-elements/generic/Submit';
-import Form from '../../components/form-elements/generic/Form';
-import { ICreateStockItemRequest, useCreateStockItemMutation } from './stock-item-create-api-slice';
 
 export function StockItemCreate({
   text
 }: {
   text: IText
 }) {
-  
-  const [createStockItem, { status }] = useCreateStockItemMutation();
+  const [createStockItem] = useCreateStockItemMutation();
+  const [globalError, setGlobalError] = useState('');
+  const [isInProgress, setIsInProgress] = useState(false);
 
-  const [error, setError] = useState('');
-  const [name, setName] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [quantityError, setQuantityError] = useState('');
-  const [minimumQuantity, setMinimumQuantity] = useState('');
-  const [minimumQuantityError, setMinimumQuantityError] = useState('');
-  const [isSubmitAndNew, setIsSubmitAndNew] = useState(false);
   const navigate = useNavigate();
 
-  const disabled: boolean = 
-    !name
-    || nameError !== ''
-    || !quantity
-    || quantityError !== ''
-    || !minimumQuantity
-    || minimumQuantityError !== '';
-
-    const onSubmit = () => {
-      setError('');
-
-      const request : ICreateStockItemRequest = {
-        minimumQuantity,
-        name,
-        quantity
-      };
-
-      createStockItem(request).unwrap().then((result) => {
-        if (isSubmitAndNew) {
-          setName('');
-          setQuantity('');
-          setMinimumQuantity('');
-        } else {
+  const handleSubmit = (stockItem: ICreateStockItem, isSubmitAndNew: boolean) => {
+    setIsInProgress(true);
+    createStockItem(stockItem)
+      .unwrap()
+      .then(() => {
+        if (!isSubmitAndNew) {
           navigate(AppRoutes.STOCK_ITEM_LIST);
         }
-        
       }).catch((err) => {
-        setError(JSON.stringify(err));
-      })
-    }
+        setGlobalError(JSON.stringify(err));
+      }).finally(() => {
+        setIsInProgress(false);
+      });
+  }
 
   return (
     <>
-      <h1>{text.stockItemCreateHeader}</h1>
-      <Form onSubmit={onSubmit}>
-
-        <StockItemName
-          error={nameError}
-          setError={setNameError}
-          setValue={setName}
-          text={text}
-          value={name}
-        />
-        <Quantity
-          error={quantityError}
-          setError={setQuantityError}
-          setValue={setQuantity}
-          text={text}
-          value={quantity}
-        />
-        <MinimumQuantity
-          error={minimumQuantityError}
-          setError={setMinimumQuantityError}
-          setValue={setMinimumQuantity}
-          text={text}
-          value={minimumQuantity}
-        />
-        <Submit
-          disabled={disabled}
-          id='StockItemCreateSubmit'
-          label={text.stockItemCreateSubmitLabel}
-          onClick={() => setIsSubmitAndNew(false)}
-        />
-        <Submit
-          disabled={disabled}
-          id='StockItemCreateAndNewSubmit'
-          label={text.stockItemCreateSubmitAndNewLabel}
-          onClick={() => setIsSubmitAndNew(true)}
-        />
-      </Form>
-      <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
+      <StockItem
+        headlineText={text.stockItemCreateHeader}
+        globalError={globalError}
+        isInProgress={isInProgress}
+        text={text}
+        create={handleSubmit}
+      />
     </>
   )
 }

@@ -29,7 +29,7 @@ const Password = ({
   maxLengthError?: (maxLength: number) => string,
   minLengthError?: (minLength: number) => string,
 }) => {
-  const passwortValidation = (value: string) => {
+  const passwordValidation = (value: string) => {
     if (text.forbiddenPasswords.some(password => password.toLowerCase() === value.toLocaleLowerCase())) {
       return text.forbiddenPasswordsError;
     }
@@ -39,7 +39,7 @@ const Password = ({
 
   return (
     <FormElement
-      additionalValidation={passwortValidation}
+      additionalValidation={passwordValidation}
       error={error}
       id={id}
       label={label || text.passwordLabel}
@@ -48,7 +48,7 @@ const Password = ({
       minLength={minLength}
       minLengthError={minLengthError}
       setError={setError}
-      setValue={setValue}
+      setValue={(password) => setValue(password as string)}
       type='password'
       value={value}
     />
