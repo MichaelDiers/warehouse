@@ -9,6 +9,7 @@ import { selectUser } from '../../app/selectors';
 import { updateUserThunk } from '../../app/user-slice';
 import { reset } from '../../app/options-slice';
 import { SignInForm } from './SignInForm';
+import { InProgressIndicator } from '../../components/InProgress';
 
 export function SignIn({
   text
@@ -71,18 +72,20 @@ export function SignIn({
   }
 
   return (
-    <SignInForm
-      disabled={disabled}
-      id={id}
-      idError={idError}
-      onSubmit={onSubmit}
-      password={password}
-      passwordError={passwordError}
-      setId={setId}
-      setIdError={setIdError}
-      setPassword={setPassword}
-      setPasswordError={setPasswordError}
-      text={text}
-    />
+    <InProgressIndicator isInProgress={status === QueryStatus.pending}>
+      <SignInForm
+        disabled={disabled}
+        id={id}
+        idError={idError}
+        onSubmit={onSubmit}
+        password={password}
+        passwordError={passwordError}
+        setId={setId}
+        setIdError={setIdError}
+        setPassword={setPassword}
+        setPasswordError={setPasswordError}
+        text={text}
+      />
+    </InProgressIndicator>
   )
 }
