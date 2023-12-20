@@ -66,12 +66,21 @@ const deText: IText = {
 
   stockItemUnknownTypeError: (unknownType: string): string => `Service nicht verfügbar. Bitte versuchen sie später noch einmal. [14, ${unknownType}]`,
 
-  stockItemDelete401: 'Fehlende Berechtigung zur Löschung des Eintrages',
+  stockItemDelete401: 'Fehlende Berechtigung zur Löschung des Eintrages.',
   stockItemDelete403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [15]',
   stockItemDelete404: 'Eintrag existiert nicht und kann nicht gelöscht werden.',
   stockItemDelete500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [16]',
   stockItemDelete500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [17]',
   stockItemDelete500_3: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [18]',
+
+  stockItemUpdate400: 'Ungültige Daten gefunden. [19]',
+  stockItemUpdate401: 'Fehlende Berechtigung zur Aktualisierung des Eintrages.',
+  stockItemUpdate403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [20]',
+  stockItemUpdate404: 'Eintrag existiert nicht und kann nicht aktualisiert werden.',
+  stockItemUpdate409: 'Eintrag mit den aktualisierten Daten exisitiert bereits.',
+  stockItemUpdate500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [21]',
+  stockItemUpdate500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [22]',
+  stockItemUpdate500_3: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [23]',
 }
 
 export default deText;

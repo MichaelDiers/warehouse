@@ -7,6 +7,9 @@ import IUpdateStockItem from '../../types/update-stock-item';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
+import { InProgressIndicator } from '../../components/InProgress';
+import { QueryStatus } from '@reduxjs/toolkit/dist/query';
+import ApplicationError from '../../types/application-error';
 
 export function StockItemUpdate({
   text
@@ -15,15 +18,15 @@ export function StockItemUpdate({
 }) {
   const stockItem = useSelector((state) => (state as RootState).selectedStockItem.current);
 
-  const [updateStockItem] = useUpdateStockItemMutation();
-  const [globalError, setGlobalError] = useState('');
+  const [updateStockItem, { status }] = useUpdateStockItemMutation();
+  const [error, setError] = useState('');
   const [isInProgress, setIsInProgress] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = (request: IUpdateStockItem) => {
     if (!stockItem || !stockItem.updateUrl) {
-      setGlobalError('Cannot update stock item');
+      setError(text.stockItemUpdate500_1);
       return;
     }
 
@@ -33,21 +36,51 @@ export function StockItemUpdate({
       .then(() => {
         navigate(AppRoutes.STOCK_ITEM_LIST);
       }).catch((err) => {
-        setGlobalError(JSON.stringify(err));
+        if (err.name === ApplicationError.name) {
+          setError(err.message);
+        } else {
+          const { status } = err;
+          if (status) {
+            switch (status) {
+              case 400:
+                setError(text.stockItemUpdate400);
+                break;
+              case 401:
+                setError(text.stockItemUpdate401);
+                break;
+              case 403:
+                setError(text.stockItemUpdate403);
+                break;
+              case 404:
+                setError(text.stockItemUpdate404);
+                break;
+              case 409:
+                setError(text.stockItemUpdate409);
+                break;
+              default:
+                setError(text.stockItemUpdate500_2);
+                break;
+            }
+          } else {
+            setError(text.stockItemUpdate500_3);
+          }
+        }
       }).finally(() => {
         setIsInProgress(false);
       });
   }
 
   return (
-    <StockItem
-      globalError={globalError}
-      headlineText={text.stockItemUpdateHeader}
-      isInProgress={isInProgress}
-      stockItem={stockItem}
-      text={text}
-      type='update'
-      update={handleSubmit}
-    />
+    <InProgressIndicator isInProgress={status === QueryStatus.pending}>
+      <StockItem
+        globalError={error}
+        headlineText={text.stockItemUpdateHeader}
+        isInProgress={isInProgress}
+        stockItem={stockItem}
+        text={text}
+        type='update'
+        update={handleSubmit}
+      />
+    </InProgressIndicator>
   )
 }

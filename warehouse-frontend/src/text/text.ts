@@ -69,6 +69,15 @@ interface IText {
   stockItemDelete500_1: string;
   stockItemDelete500_2: string;
   stockItemDelete500_3: string;
+
+  stockItemUpdate400: string;
+  stockItemUpdate401: string;
+  stockItemUpdate403: string;
+  stockItemUpdate404: string;
+  stockItemUpdate409: string;
+  stockItemUpdate500_1: string;
+  stockItemUpdate500_2: string;
+  stockItemUpdate500_3: string;
 }
 
 
