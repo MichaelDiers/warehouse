@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - warehouse-frontend/**
-      - .github\workflows\warehouse-frontend.yaml
+      - .github/workflows/warehouse-frontend.yaml
   workflow_dispatch:
 permissions:
   contents: read
