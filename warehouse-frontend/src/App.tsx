@@ -22,7 +22,7 @@ function App() {
           <Route path={AppRoutes.SIGN_IN} element={<SignIn />} />
           <Route path={AppRoutes.SIGN_UP} element={<SignUp />} />
           <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate text={text} />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails text={text} />}</RequiresUser>} />
+          <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails />}</RequiresUser>} />
           <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate text={text} />}</RequiresUser>} />
         </Routes>
       </HashRouter>

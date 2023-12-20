@@ -62,6 +62,13 @@ interface IText {
   stockItemListRejected: string;
 
   stockItemUnknownTypeError: (unknownType: string) => string;
+
+  stockItemDelete401: string;
+  stockItemDelete403: string;
+  stockItemDelete404: string;
+  stockItemDelete500_1: string;
+  stockItemDelete500_2: string;
+  stockItemDelete500_3: string;
 }
 
 
