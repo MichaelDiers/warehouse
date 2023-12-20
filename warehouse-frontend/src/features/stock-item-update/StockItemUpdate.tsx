@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import IText from "../../text/text";
 import AppRoutes from '../../types/app-routes.enum';
 import { useUpdateStockItemMutation } from './stock-item-update-api-slice';
 import StockItem from '../../components/form-elements/stock-item/StockItem';
