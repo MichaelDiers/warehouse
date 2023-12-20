@@ -7,6 +7,13 @@ import Urn from '../../types/urn.enum';
 
 const stockItemDetailsApiSlice = apiSplice.injectEndpoints({
   endpoints: builder => ({
+    deleteStockIten: builder.mutation({
+      query: (url: string) => ({
+        url,
+        method: 'DELETE'
+      }),
+      invalidatesTags: [ApiTagTypes.STOCK_ITEM]
+    }),
     getStockItem: builder.query<IFrontendStockItem, string>({
       query: (url: string) => ({
         url,
@@ -26,5 +33,6 @@ const stockItemDetailsApiSlice = apiSplice.injectEndpoints({
 });
 
 export const {
+  useDeleteStockItenMutation,
   useGetStockItemQuery,
 } = stockItemDetailsApiSlice;

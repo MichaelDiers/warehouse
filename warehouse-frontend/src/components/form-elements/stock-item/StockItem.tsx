@@ -15,6 +15,7 @@ import { setSelectedStockItem } from '../../../app/selected-stock-item-slice';
 
 const StockItem = ({
   create,
+  deleteStockItem,
   globalError,
   headlineText,
   isInProgress,
@@ -24,6 +25,7 @@ const StockItem = ({
   update,
 }: {
   create?: (stockItem: ICreateStockItem, isSubmitAndNew: boolean) => void,
+  deleteStockItem?: () => void,
   globalError?: string,
   headlineText?: string,
   isInProgress?: boolean,
@@ -93,10 +95,21 @@ const StockItem = ({
   }
 
   if (type === 'details') {
+    const handleDelete = () => {
+      if (!deleteStockItem) {
+        return;
+      }
+
+      deleteStockItem();
+    }
+
     return (
       <>
         {headlineElement}
         {stockItemElement}
+        <Form onSubmit={handleDelete}>
+          <Submit id='deleteStockItemSubmit' label={text.stockItemDeleteDeleteSubmitLabel}/>
+        </Form>
         <Link to={AppRoutes.STOCK_ITEM_UPDATE}>{text.stockItemUpdateLinkLabel}</Link>
         <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
       </>
