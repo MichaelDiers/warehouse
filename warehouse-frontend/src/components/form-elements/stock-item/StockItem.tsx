@@ -12,6 +12,7 @@ import IUpdateStockItem from '../../../types/update-stock-item';
 import IFrontendStockItem from '../../../types/frontend-stock-item';
 import { useDispatch } from 'react-redux';
 import { setSelectedStockItem } from '../../../app/selected-stock-item-slice';
+import ApplicationError from '../../../types/application-error';
 
 const StockItem = ({
   create,
@@ -44,7 +45,7 @@ const StockItem = ({
   const [localQuantityError, setLocalQuantityError] = useState('');
 
   const [isSubmitAndNew, setIsSubmitAndNew] = useState<boolean>(false);
-  
+
   const isReadOnly = type === 'details' || type === 'list';
 
   const headlineElement = (headlineText ? <h1>{headlineText}</h1> : <></>);
@@ -108,7 +109,7 @@ const StockItem = ({
         {headlineElement}
         {stockItemElement}
         <Form onSubmit={handleDelete}>
-          <Submit id='deleteStockItemSubmit' label={text.stockItemDeleteDeleteSubmitLabel}/>
+          <Submit id='deleteStockItemSubmit' label={text.stockItemDeleteDeleteSubmitLabel} />
         </Form>
         <Link to={AppRoutes.STOCK_ITEM_UPDATE}>{text.stockItemUpdateLinkLabel}</Link>
         <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
@@ -207,7 +208,7 @@ const StockItem = ({
     )
   }
 
-  throw new Error(`Unknown type ${type}`);
+  throw new ApplicationError(text.stockItemUnknownTypeError(type));
 }
 
 export default StockItem;

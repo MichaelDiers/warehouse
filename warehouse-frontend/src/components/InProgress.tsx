@@ -2,7 +2,7 @@ export function InProgressIndicator({
   children,
   isInProgress
 }:{
-  children: JSX.Element,
+  children: JSX.Element | JSX.Element[],
   isInProgress?: boolean
 }) {
   const indicator = (

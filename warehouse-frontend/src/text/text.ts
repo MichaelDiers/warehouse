@@ -57,6 +57,11 @@ interface IText {
   signUp500_1: string;
   signUp500_2: string;
   signUp500_3: string;
+
+  stockItemListPending: string;
+  stockItemListRejected: string;
+
+  stockItemUnknownTypeError: (unknownType: string) => string;
 }
 
 

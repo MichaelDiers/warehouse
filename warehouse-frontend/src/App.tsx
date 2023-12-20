@@ -17,8 +17,8 @@ function App() {
     <div className="App">
       <HashRouter>
         <Routes>
-          <Route index element={<RequiresUser roles={['User']}>{<StockItemList text={text} />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_LIST} element={<RequiresUser roles={[]}>{<StockItemList text={text} />}</RequiresUser>} />
+          <Route index element={<RequiresUser roles={['User']}>{<StockItemList />}</RequiresUser>} />
+          <Route path={AppRoutes.STOCK_ITEM_LIST} element={<RequiresUser roles={[]}>{<StockItemList />}</RequiresUser>} />
           <Route path={AppRoutes.SIGN_IN} element={<SignIn />} />
           <Route path={AppRoutes.SIGN_UP} element={<SignUp />} />
           <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate text={text} />}</RequiresUser>} />
