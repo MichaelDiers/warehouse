@@ -78,6 +78,14 @@ interface IText {
   stockItemUpdate500_1: string;
   stockItemUpdate500_2: string;
   stockItemUpdate500_3: string;
+
+  stockItemCreate400: string;
+  stockItemCreate401: string;
+  stockItemCreate403: string;
+  stockItemCreate409: string;
+  stockItemCreate500_1: string;
+  stockItemCreate500_2: string;
+  
 }
 
 

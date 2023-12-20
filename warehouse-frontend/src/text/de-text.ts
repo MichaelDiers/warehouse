@@ -81,6 +81,13 @@ const deText: IText = {
   stockItemUpdate500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [21]',
   stockItemUpdate500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [22]',
   stockItemUpdate500_3: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [23]',
+
+  stockItemCreate400: 'Ungültige Daten gefunden. [24]',
+  stockItemCreate401: 'Fehlende Berechtigung zur Anlage des Eintrages.',
+  stockItemCreate403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [25]',
+  stockItemCreate409: 'Eintrag existiert bereits.',
+  stockItemCreate500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [26]',
+  stockItemCreate500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [27]',
 }
 
 export default deText;
