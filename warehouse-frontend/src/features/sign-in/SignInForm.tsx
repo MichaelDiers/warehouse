@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 
 export function SignInForm({
   disabled,
+  error,
   id,
   idError,
   onSubmit,
@@ -22,6 +23,7 @@ export function SignInForm({
   disabled: boolean,
   id: string,
   idError: string,
+  error?: string,
   onSubmit: () => void,
   password: string,
   passwordError: string,
@@ -33,6 +35,7 @@ export function SignInForm({
 }) {
   return (
     <>
+      <div>{error}</div>
       <Form onSubmit={onSubmit}>
         <UserName
           error={idError}

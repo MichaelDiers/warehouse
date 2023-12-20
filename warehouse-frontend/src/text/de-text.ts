@@ -40,6 +40,16 @@ const deText: IText = {
   userNameLabel: 'Benutzername',
   userNameTooLongError: (length: number) => `Benutzername hat mehr als ${length} Zeichen`,
   userNameTooShortError: (length: number) => `Benutzername hat weniger als ${length} Zeichen`,
+
+  optionsError: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [1]',
+  cannotFindUrlForUrnError: (urn: string) => `Service nicht verfügbar. Bitte versuchen sie später noch einmal. [${urn}]`,
+  cannotFindUrlError: (url: string) => `Service nicht verfügbar. Bitte versuchen sie später noch einmal. [${url}]`,
+  signIn400: 'Ungültiger Benutzer oder Passwort [2]',
+  signIn401: 'Unbekannte Kombination aus Benutzername und Passwort',
+  signIn403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [3]',
+  signIn404: 'Unbekannte Kombination aus Benutzername und Passwort',
+  signIn500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [4]',
+  signIn500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [5]',
 }
 
 export default deText;

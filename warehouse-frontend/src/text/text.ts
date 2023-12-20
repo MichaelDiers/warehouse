@@ -38,6 +38,16 @@ interface IText {
   userNameLabel: string;
   userNameTooLongError: (length: number) => string;
   userNameTooShortError: (length: number) => string;
+
+  optionsError: string;
+  cannotFindUrlForUrnError: (urn: string) => string;
+  cannotFindUrlError: (url: string) => string;
+  signIn400: string;
+  signIn401: string;
+  signIn403: string;
+  signIn404: string;
+  signIn500_1: string;
+  signIn500_2: string;
 }
 
 export default IText;

@@ -3,13 +3,15 @@ import apiSlice from './api-slice';
 import { userSlice } from './user-slice';
 import optionsReducer from './options-slice';
 import selectedStockItemReducer from './selected-stock-item-slice';
+import selectedLanguageReducer from './selected-language-slice';
 
 export const store = configureStore({
   reducer: {
     api: apiSlice.reducer,
     user: userSlice.reducer,
     options: optionsReducer,
-    selectedStockItem: selectedStockItemReducer
+    selectedStockItem: selectedStockItemReducer,
+    selectedLanguage: selectedLanguageReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
