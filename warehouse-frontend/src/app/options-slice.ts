@@ -1,10 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-
-export interface ILink {
-  urn: string;
-  url: string;
-}
+import ILink from '../types/link';
 
 export interface OptionsState {
   links: ILink[];
