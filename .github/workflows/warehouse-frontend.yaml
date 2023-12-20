@@ -3,28 +3,60 @@ on:
   push:
     paths:
       - warehouse-frontend/**
+      - Warehouse/**
       - .github/workflows/warehouse-frontend.yaml
+      - .github/workflows/warehouse-api.yaml
   workflow_dispatch:
 permissions:
   contents: read
   packages: write
   pages: write
   id-token: write
+  packages: read
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAGES_PATH: warehouse-frontend/build
-      WORKING_DIRECTORY: warehouse-frontend
+      WORKING_DIRECTORY_FRONTEND: warehouse-frontend
+      WORKING_DIRECTORY_API: Warehouse
+      ALTCOVER_XML: ../../doc/coverage/altcover.xml
+      REPORT_XML: doc/coverage/altcover.xml
+      REPORT_TARGET: warehouse-frontend/build/static/coverage/
     steps:
     - name: checkout
       uses: actions/checkout@v3
-    - name: install
+    - name: npm install frontend
       run: npm i
-      working-directory: ${{env.WORKING_DIRECTORY}}  
-    - name: build
+      working-directory: ${{env.WORKING_DIRECTORY_FRONTEND}}  
+    - name: build frontend
       run: npm run build
-      working-directory: ${{env.WORKING_DIRECTORY}}
+      working-directory: ${{env.WORKING_DIRECTORY_FRONTEND}}
+    - name: add package source api
+        run: |
+          dotnet new nugetconfig
+          dotnet nuget add source https://nuget.pkg.github.com/MichaelDiers/index.json --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text 
+        working-directory: ${{ env.WORKING_DIRECTORY_API }}
+      - run: 'dotnet build -c Release'
+        working-directory: ${{ env.WORKING_DIRECTORY_API }}
+      - run: 'dotnet test --configuration Release /p:AltCover=true --no-build --no-restore /p:AltCoverReport="${{ env.ALTCOVER_XML }}" --filter "TestType=UnitTest"'
+        working-directory: ${{ env.WORKING_DIRECTORY_API }}
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.x
+          dotnet-quality: 'ga'
+      - name: ReportGenerator
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.26
+        with:
+          reports: ${{ env.REPORT_XML }}
+          targetdir: ${{ env.REPORT_TARGET }}
+          reporttypes: Html_Dark
+          assemblyfilters: +Warehouse.Api
+          classfilters: -Microsoft.*;-System.*;-*Program
     - name: Setup Pages
       uses: actions/configure-pages@v3
     - name: Upload artifact
