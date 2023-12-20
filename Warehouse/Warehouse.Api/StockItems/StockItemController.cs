@@ -52,10 +52,7 @@
         /// </returns>
         protected override bool IsIdValid(string id)
         {
-            return Guid.TryParse(
-                       id,
-                       out var guid) &&
-                   guid != Guid.Empty;
+            return !string.IsNullOrWhiteSpace(id) && id.Length > 1;
         }
     }
 }
