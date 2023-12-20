@@ -10,14 +10,13 @@ import { RootState } from '../../app/store';
 import { InProgressIndicator } from '../../components/InProgress';
 import { QueryStatus } from '@reduxjs/toolkit/dist/query';
 import ApplicationError from '../../types/application-error';
+import { useAppSelector } from '../../app/hooks';
+import { selectText } from '../../app/selectors';
 
-export function StockItemUpdate({
-  text
-}: {
-  text: IText
-}) {
+export function StockItemUpdate() {
   const stockItem = useSelector((state) => (state as RootState).selectedStockItem.current);
-
+  const text = useAppSelector(selectText);
+  
   const [updateStockItem, { status }] = useUpdateStockItemMutation();
   const [error, setError] = useState('');
   const [isInProgress, setIsInProgress] = useState(false);

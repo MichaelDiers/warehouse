@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { SignIn } from './features/sign-in/SignIn';
 import { SignUp } from './features/sign-up/SignUp';
-import deText from './text/de-text';
 import RequiresUser from './features/requires-token/RequiresUser';
 import { StockItemList } from './features/stock-item-list/StockItemList';
 import AppRoutes from './types/app-routes.enum';
@@ -11,8 +9,6 @@ import { StockItemDetails } from './features/stock-item-details/StockItemDetails
 import { StockItemUpdate } from './features/stock-item-update/StockItemUpdate';
 
 function App() {
-  const [text] = useState(deText);
-
   return (
     <div className="App">
       <HashRouter>
@@ -21,9 +17,9 @@ function App() {
           <Route path={AppRoutes.STOCK_ITEM_LIST} element={<RequiresUser roles={[]}>{<StockItemList />}</RequiresUser>} />
           <Route path={AppRoutes.SIGN_IN} element={<SignIn />} />
           <Route path={AppRoutes.SIGN_UP} element={<SignUp />} />
-          <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate text={text} />}</RequiresUser>} />
+          <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate />}</RequiresUser>} />
           <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate text={text} />}</RequiresUser>} />
+          <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate />}</RequiresUser>} />
         </Routes>
       </HashRouter>
     </div>
