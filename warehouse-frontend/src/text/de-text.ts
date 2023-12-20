@@ -44,12 +44,22 @@ const deText: IText = {
   optionsError: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [1]',
   cannotFindUrlForUrnError: (urn: string) => `Service nicht verfügbar. Bitte versuchen sie später noch einmal. [${urn}]`,
   cannotFindUrlError: (url: string) => `Service nicht verfügbar. Bitte versuchen sie später noch einmal. [${url}]`,
-  signIn400: 'Ungültiger Benutzer oder Passwort [2]',
-  signIn401: 'Unbekannte Kombination aus Benutzername und Passwort',
+  
+  signIn400: 'Ungültiger Benutzer oder Passwort. [2]',
+  signIn401: 'Unbekannte Kombination aus Benutzername und Passwort.',
   signIn403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [3]',
   signIn404: 'Unbekannte Kombination aus Benutzername und Passwort',
   signIn500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [4]',
   signIn500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [5]',
+  signIn500_3: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [6]',
+
+  signUp400: 'Ungültige Eingabedaten [7]',
+  signUp401: 'Inivatation Code ist ungültig.',
+  signUp403: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [8]',
+  signUp409: 'Benutzer existiert bereits.',
+  signUp500_1: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [10]',
+  signUp500_2: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [11]',
+  signUp500_3: 'Service nicht verfügbar. Bitte versuchen sie später noch einmal. [12]',
 }
 
 export default deText;

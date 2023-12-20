@@ -4,7 +4,6 @@ import Urn from '../../types/urn.enum';
 export interface ISignInRequest {
 	id: string;
 	password: string;
-
 }
 
 /**

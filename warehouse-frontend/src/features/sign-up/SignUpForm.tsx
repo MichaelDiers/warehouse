@@ -13,6 +13,7 @@ export function SignUpForm({
   disabled,
   displayName,
   displayNameError,
+  error,
   id,
   idError,
   invitationCode,
@@ -39,6 +40,7 @@ export function SignUpForm({
   disabled: boolean,
   displayName: string,
   displayNameError: string,
+  error?: string,
   id: string,
   idError: string,
   invitationCode: string,
@@ -64,6 +66,7 @@ export function SignUpForm({
 }) {
   return (
     <>
+      <div>{error}</div>
       <Form onSubmit={onSubmit}>
         <UserName
           error={idError}
@@ -103,9 +106,9 @@ export function SignUpForm({
           value={invitationCode}
         />
         <Submit
-            disabled={disabled}
-            id='signUpSubmit'
-            label={text.genericSignUpLabel}
+          disabled={disabled}
+          id='signUpSubmit'
+          label={text.genericSignUpLabel}
         />
       </Form>
       <Link to={AppRoutes.SIGN_IN}>{text.genericSignInLabel}</Link>

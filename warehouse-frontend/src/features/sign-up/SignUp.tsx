@@ -1,22 +1,20 @@
 import { useState } from "react";
-import IText from "../../text/text";
 import { ISignUpRequest, useSignUpMutation } from "./sign-up-api-slice";
 import { v4 } from 'uuid';
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
 import { Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectUser } from "../../app/selectors";
+import { selectText, selectUser } from "../../app/selectors";
 import { updateUserThunk } from "../../app/user-slice";
 import { reset } from '../../app/options-slice';
 import { SignUpForm } from './SignUpForm';
+import { InProgressIndicator } from '../../components/InProgress';
+import ApplicationError from '../../types/application-error';
 
-export function SignUp({
-  text
-}: {
-  text: IText
-}) {
+export function SignUp() {
   const [signUp, { status }] = useSignUpMutation();
+  const text = useAppSelector(selectText);
 
   const [displayName, setDisplayName] = useState(v4());
   const [displayNameError, setDisplayNameError] = useState('');
@@ -83,25 +81,39 @@ export function SignUp({
       .then((result) => {
         const { accessToken, refreshToken } = result;
         if (!accessToken || !refreshToken) {
-          setError('Unable to sign up. Internal error.');
+          setError(text.signUp500_1);
         }
         else {
           dispatch(updateUserThunk(accessToken, refreshToken));
           dispatch(reset());
         }
       }).catch((err): void => {
-        const { status } = err;
-        if (status) {
-          switch (status) {
-            case 401:
-              setError('Invalid invitation code');
-              break;
-            case 409:
-              setError('User already exists');
-              break;
-            default:
-              setError(JSON.stringify(err));
-              break;
+        if (err.name === ApplicationError.name) {
+          setError(err.message);
+        } else {
+
+
+          const { status } = err;
+          if (status) {
+            switch (status) {
+              case 400:
+                setError(text.signUp400);
+                break;
+              case 401:
+                setError(text.signUp401);
+                break;
+              case 403:
+                setError(text.signUp403);
+                break;
+              case 409:
+                setError(text.signUp409);
+                break;
+              default:
+                setError(text.signUp500_2);
+                break;
+            }
+          } else {
+            setError(text.signUp500_3);
           }
         }
       });
@@ -112,32 +124,35 @@ export function SignUp({
   }
 
   return (
-    <SignUpForm
-      disabled={disabled}
-      displayName={displayName}
-      displayNameError={displayNameError}
-      id={id}
-      idError={idError}
-      invitationCode={invitationCode}
-      invitationCodeError={invitationCodeError}
-      onSubmit={onSubmit}
-      password={password}
-      passwordError={passwordError}
-      passwordRepeat={passwordRepeat}
-      passwordRepeatError={passwordRepeatError}
-      setDisplayName={setDisplayName}
-      setDisplayNameError={setDisplayNameError}
-      setId={setId}
-      setIdError={setIdError}
-      setInvitationCode={setInvitationCode}
-      setInvitationCodeError={setInvitationCodeError}
-      setPassword={setPassword}
-      setPasswordError={setPasswordError}
-      setPasswordRepeat={setPasswordRepeat}
-      setPasswordRepeatError={setPasswordRepeatError}
-      validatePassword={validatePassword}
-      validatePasswordRepeat={validatePasswordRepeat}
-      text={text}
-    />
+    <InProgressIndicator isInProgress={status === QueryStatus.pending}>
+      <SignUpForm
+        disabled={disabled}
+        displayName={displayName}
+        displayNameError={displayNameError}
+        error={error}
+        id={id}
+        idError={idError}
+        invitationCode={invitationCode}
+        invitationCodeError={invitationCodeError}
+        onSubmit={onSubmit}
+        password={password}
+        passwordError={passwordError}
+        passwordRepeat={passwordRepeat}
+        passwordRepeatError={passwordRepeatError}
+        setDisplayName={setDisplayName}
+        setDisplayNameError={setDisplayNameError}
+        setId={setId}
+        setIdError={setIdError}
+        setInvitationCode={setInvitationCode}
+        setInvitationCodeError={setInvitationCodeError}
+        setPassword={setPassword}
+        setPasswordError={setPasswordError}
+        setPasswordRepeat={setPasswordRepeat}
+        setPasswordRepeatError={setPasswordRepeatError}
+        validatePassword={validatePassword}
+        validatePasswordRepeat={validatePasswordRepeat}
+        text={text}
+      />
+    </InProgressIndicator>
   )
 }

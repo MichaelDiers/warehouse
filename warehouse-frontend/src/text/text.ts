@@ -48,6 +48,16 @@ interface IText {
   signIn404: string;
   signIn500_1: string;
   signIn500_2: string;
+  signIn500_3: string;
+
+  signUp400: string;
+  signUp401: string;
+  signUp403: string;
+  signUp409: string;
+  signUp500_1: string;
+  signUp500_2: string;
+  signUp500_3: string;
 }
+
 
 export default IText;

@@ -72,6 +72,8 @@ export function SignIn() {
                 setError(text.signIn500_2);
                 break;
             }
+          } else {
+            setError(text.signIn500_3);
           }
         }
       });
