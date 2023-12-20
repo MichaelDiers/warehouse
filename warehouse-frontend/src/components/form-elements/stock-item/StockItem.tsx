@@ -8,69 +8,46 @@ import Form from '../generic/Form';
 import Submit from '../generic/Submit';
 import ICreateStockItem from '../../../types/create-stock-item';
 import AppRoutes from '../../../types/app-routes.enum';
+import IUpdateStockItem from '../../../types/update-stock-item';
+import IFrontendStockItem from '../../../types/frontend-stock-item';
+import { useDispatch } from 'react-redux';
+import { setSelectedStockItem } from '../../../app/selected-stock-item-slice';
 
 const StockItem = ({
   create,
-  detailsUrl,
   globalError,
   headlineText,
   isInProgress,
-  minimumQuantity,
-  name,
-  quantity,
-  text
+  stockItem,
+  text,
+  type = 'details',
+  update,
 }: {
   create?: (stockItem: ICreateStockItem, isSubmitAndNew: boolean) => void,
-  detailsUrl?: string,
   globalError?: string,
   headlineText?: string,
   isInProgress?: boolean,
-  minimumQuantity?: number,
-  minimumQuantityError?: string,
-  name?: string
-  quantity?: number,
-  text: IText
+  stockItem?: IFrontendStockItem,
+  text: IText,
+  type: 'create' | 'details' | 'list' | 'update',
+  update?: (stockItem: IUpdateStockItem) => void,
 }) => {
-  const [localMinimumQuantity, setLocalMinimumQuantity] = useState(minimumQuantity || 0);
+  const dispatch = useDispatch();
+
+  const [localMinimumQuantity, setLocalMinimumQuantity] = useState(stockItem?.minimumQuantity || 0);
   const [localMinimumQuantityError, setLocalMinimumQuantityError] = useState('');
-  const [localName, setLocalName] = useState(name || '');
+  const [localName, setLocalName] = useState(stockItem?.name || '');
   const [localNameError, setLocalNameError] = useState('');
-  const [localQuantity, setLocalQuantity] = useState(quantity || 0);
+  const [localQuantity, setLocalQuantity] = useState(stockItem?.quantity || 0);
   const [localQuantityError, setLocalQuantityError] = useState('');
 
   const [isSubmitAndNew, setIsSubmitAndNew] = useState<boolean>(false);
+  
+  const isReadOnly = type === 'details' || type === 'list';
 
-  const isReadOnly = !create;
+  const headlineElement = (headlineText ? <h1>{headlineText}</h1> : <></>);
 
-  const createSubmitDisabled =
-    isInProgress
-    || localMinimumQuantity === undefined
-    || localMinimumQuantityError !== ''
-    || !localName
-    || localNameError !== ''
-    || localQuantity === undefined
-    || localQuantityError !== '';
-
-  const handleCreateSubmit = () => {
-    if (!create
-      || localMinimumQuantity === undefined
-      || localName === undefined
-      || localQuantity === undefined) {
-      return;
-    }
-
-    const stockItem: ICreateStockItem = {
-      minimumQuantity: localMinimumQuantity,
-      name: localName,
-      quantity: localQuantity
-    };
-
-    create(stockItem, isSubmitAndNew);
-  }
-
-  const headline = (headlineText ? <h1>{headlineText}</h1> : <></>);
-
-  const stockItem = (
+  const stockItemElement = (
     <>
       <StockItemName
         error={isReadOnly ? undefined : localNameError}
@@ -96,32 +73,81 @@ const StockItem = ({
     </>
   );
 
-  if (detailsUrl) {
+  if (type === 'list') {
+    const handleClickEvent = () => {
+      if (stockItem) {
+        dispatch(setSelectedStockItem(stockItem));
+      }
+    }
+
     return (
       <>
-        {headline}
-        <Link to={detailsUrl}>{stockItem}</Link>
+        {headlineElement}
+        <Link
+          onClick={handleClickEvent}
+          to={AppRoutes.STOCK_ITEM_DETAILS}>
+          {stockItemElement}
+        </Link>
       </>
     )
   }
 
-  if (create) {
+  if (type === 'details') {
     return (
       <>
-        {headline}
-        <div>{globalError}</div>
+        {headlineElement}
+        {stockItemElement}
+        <Link to={AppRoutes.STOCK_ITEM_UPDATE}>{text.stockItemUpdateLinkLabel}</Link>
+        <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
+      </>
+    );
+  }
+
+  const globalErrorElement = (<div>{globalError}</div>)
+  const disabled =
+    isInProgress
+    || localMinimumQuantity === undefined
+    || localMinimumQuantityError !== ''
+    || !localName
+    || localNameError !== ''
+    || localQuantity === undefined
+    || localQuantityError !== '';
+
+  if (type === 'create') {
+    const handleCreateSubmit = () => {
+      if (!create
+        || localMinimumQuantity === undefined
+        || !localName
+        || localQuantity === undefined
+        || disabled) {
+        return;
+      }
+
+      const stockItem: ICreateStockItem = {
+        minimumQuantity: localMinimumQuantity,
+        name: localName,
+        quantity: localQuantity
+      };
+
+      create(stockItem, isSubmitAndNew);
+    }
+
+    return (
+      <>
+        {headlineElement}
+        {globalErrorElement}
         <Form
           onSubmit={handleCreateSubmit}
         >
-          {stockItem}
+          {stockItemElement}
           <Submit
-            disabled={createSubmitDisabled}
+            disabled={disabled}
             id='StockItemCreateSubmit'
             label={text.stockItemCreateSubmitLabel}
             onClick={() => setIsSubmitAndNew(false)}
           />
           <Submit
-            disabled={createSubmitDisabled}
+            disabled={disabled}
             id='StockItemCreateAndNewSubmit'
             label={text.stockItemCreateSubmitAndNewLabel}
             onClick={() => setIsSubmitAndNew(true)}
@@ -132,13 +158,43 @@ const StockItem = ({
     )
   }
 
-  return (
-    <>
-      {headline}
-      {stockItem}
-      <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
-    </>
-  );
+  if (type === 'update') {
+    const handleUpdateSubmit = () => {
+      if (!update
+        || localMinimumQuantity === undefined
+        || !localName
+        || localQuantity === undefined
+        || disabled) {
+        return;
+      }
+
+      const stockItem: ICreateStockItem = {
+        minimumQuantity: localMinimumQuantity,
+        name: localName,
+        quantity: localQuantity
+      };
+
+      update(stockItem);
+    }
+
+    return (
+      <>
+        {headlineElement}
+        {globalErrorElement}
+        <Form onSubmit={handleUpdateSubmit}>
+          {stockItemElement}
+          <Submit
+            disabled={disabled}
+            id='StockItemUpdateSubmit'
+            label={text.stockItemUpdateSubmitLabel}
+          />
+        </Form>
+        <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
+      </>
+    )
+  }
+
+  throw new Error(`Unknown type ${type}`);
 }
 
 export default StockItem;

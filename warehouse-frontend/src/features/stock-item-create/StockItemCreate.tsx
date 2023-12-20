@@ -35,11 +35,12 @@ export function StockItemCreate({
   return (
     <>
       <StockItem
-        headlineText={text.stockItemCreateHeader}
+        create={handleSubmit}
         globalError={globalError}
+        headlineText={text.stockItemCreateHeader}
         isInProgress={isInProgress}
         text={text}
-        create={handleSubmit}
+        type={'create'}
       />
     </>
   )

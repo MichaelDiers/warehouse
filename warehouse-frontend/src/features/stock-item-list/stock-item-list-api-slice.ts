@@ -20,8 +20,10 @@ const stockItemsGetApiSlice = apiSplice.injectEndpoints({
       transformResponse: (response: IFrontendStockItem[]) => {
         return response.map((stockItem: IFrontendStockItem) => {
           const backendStockItem = stockItem as IStockItem;
+          const deleteUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_DELETE)?.url;
           const detailsUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_READ_BY_ID)?.url;
-          return { ...stockItem, detailsUrl };
+          const updateUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_UPDATE)?.url;
+          return { ...stockItem, deleteUrl, detailsUrl, updateUrl };
         });
       }
     }),

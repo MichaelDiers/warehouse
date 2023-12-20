@@ -3,13 +3,14 @@ import IText from "../../text/text";
 import AppRoutes from '../../types/app-routes.enum';
 import { useGetStockItemsQuery } from './stock-item-list-api-slice';
 import StockItem from '../../components/form-elements/stock-item/StockItem';
+import { QueryStatus } from '@reduxjs/toolkit/dist/query';
 
 export function StockItemList({
   text
 }: {
   text: IText
 }) {
-  const { data: stockItems } = useGetStockItemsQuery();
+  const { data: stockItems, status } = useGetStockItemsQuery();
 
   return (
     <>
@@ -18,11 +19,10 @@ export function StockItemList({
         {stockItems?.map((stockItem, index) => (
           <li key={index}>
             <StockItem
-              detailsUrl={`${AppRoutes.STOCK_ITEM_DETAILS}?url=${stockItem.detailsUrl}`}
-              minimumQuantity={stockItem.minimumQuantity}
+              isInProgress={status === QueryStatus.pending}
+              stockItem={stockItem}
               text={text}
-              quantity={stockItem.quantity}
-              name={stockItem.name}
+              type='list'
             />
           </li>
         ))}

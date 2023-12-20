@@ -31,6 +31,9 @@ interface IText {
   stockItemQuantityTooLarge: (maximum: number) => string;
   stockItemQuantityTooSmall: (minimum: number) => string;
   stockItemListHeader: string;
+  stockItemUpdateHeader: string;
+  stockItemUpdateLinkLabel: string;
+  stockItemUpdateSubmitLabel: string;
   userNameLabel: string;
   userNameTooLongError: (length: number) => string;
   userNameTooShortError: (length: number) => string;

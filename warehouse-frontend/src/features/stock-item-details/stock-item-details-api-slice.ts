@@ -15,8 +15,10 @@ const stockItemDetailsApiSlice = apiSplice.injectEndpoints({
       providesTags: [ApiTagTypes.STOCK_ITEM],
       transformResponse: (response: IFrontendStockItem) => {
         const backendStockItem = response as IStockItem;
+        const deleteUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_DELETE)?.url;
         const detailsUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_READ_BY_ID)?.url;
-        return { ...response, detailsUrl };
+        const updateUrl = backendStockItem.links.find((link: ILink) => link.urn === Urn.STOCK_ITEM_UPDATE)?.url;
+        return { ...response, deleteUrl, detailsUrl, updateUrl };
       }
     }),
   }),

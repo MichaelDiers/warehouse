@@ -8,6 +8,7 @@ import { StockItemList } from './features/stock-item-list/StockItemList';
 import AppRoutes from './types/app-routes.enum';
 import { StockItemCreate } from './features/stock-item-create/StockItemCreate';
 import { StockItemDetails } from './features/stock-item-details/StockItemDetails';
+import { StockItemUpdate } from './features/stock-item-update/StockItemUpdate';
 
 function App() {
   const [text] = useState(deText);
@@ -22,6 +23,7 @@ function App() {
           <Route path={AppRoutes.SIGN_UP} element={<SignUp text={text} />} />
           <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate text={text} />}</RequiresUser>} />
           <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails text={text} />}</RequiresUser>} />
+          <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate text={text} />}</RequiresUser>} />
         </Routes>
       </HashRouter>
     </div>
