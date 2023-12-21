@@ -1,4 +1,5 @@
 const enum Urn {
+  AUTH_REFRESH = 'urn:Auth:Refresh',
   AUTH_SIGN_IN = 'urn:Auth:SignIn',
   AUTH_SIGN_UP = 'urn:Auth:SignUp',
   STOCK_ITEM_CREATE = 'urn:StockItem:Create',

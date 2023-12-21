@@ -4,6 +4,8 @@ import { userSlice } from './user-slice';
 import optionsReducer from './options-slice';
 import selectedStockItemReducer from './selected-stock-item-slice';
 import selectedLanguageReducer from './selected-language-slice';
+import apiKeyReducer from './api-key-slice';
+import baseUrlReducer from './base-url-slice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +13,9 @@ export const store = configureStore({
     user: userSlice.reducer,
     options: optionsReducer,
     selectedStockItem: selectedStockItemReducer,
-    selectedLanguage: selectedLanguageReducer
+    selectedLanguage: selectedLanguageReducer,
+    apiKey: apiKeyReducer,
+    baseUrl: baseUrlReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
