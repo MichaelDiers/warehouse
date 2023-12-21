@@ -57,7 +57,14 @@
         /// </summary>
         protected override string EntryPointUrl => "api/Options";
 
-        protected override string GetInvalidId => Guid.NewGuid().ToString()[..^1];
+        /// <summary>
+        ///     Gets an invalid id of an entry.
+        /// </summary>
+        protected override string GetInvalidId => "a";
+
+        /// <summary>
+        ///     Gets a valid id of an entry.
+        /// </summary>
         protected override string GetValidId => Guid.NewGuid().ToString();
 
         /// <summary>
