@@ -1,3 +1,11 @@
-@import 'abstracts';
+/// Uses the 7-1 pattern as described at https://sass-guidelin.es/#the-7-1-pattern and
+/// the boilerplate from https://github.com/KittyGiraudel/sass-boilerplate.
+
+// 1. Configuration and helpers
+@import 
+  'abstracts/variables',
+  'abstracts/functions',
+  'abstracts/mixins';
+
 @import 'base/base';
 @import 'components/components';
