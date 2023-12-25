@@ -6,8 +6,20 @@
 /// @type Color
 $error-color: rgb(240,10,10);
 
+/// The default text color.
+/// @type Color
+$text-color: rgb(10, 10, 10);
+
 /// Relative or absolute URL where all assets are served from
 /// @type String
 /// @example scss - When using a CDN
 ///   $base-url: 'https://cdn.example.com/assets/';
 $base-url: './../../assets/' !default;
+
+/// Regular font family
+/// @type List
+$text-font-stack: 'Raleway', 'Open Sans', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif !default;
+
+/// Container's maximum width
+/// @type Length
+$max-width: 1180px !default;

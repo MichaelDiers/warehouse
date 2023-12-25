@@ -1,0 +1,11 @@
+// -----------------------------------------------------------------------------
+// This file contains all @font-face declarations, if any.
+// -----------------------------------------------------------------------------
+
+/// @author Designed by Matt McInerney, Pablo Impallari, Rodrigo Fuenzalida
+/// @link https://fonts.google.com/specimen/Raleway
+@font-face {
+  font-family: Raleway;
+  src: font('Raleway/Raleway-VariableFont_wght.ttf');
+  font-weight: normal;
+}
