@@ -34,7 +34,8 @@ export function SignInForm({
   text: IText
 }) {
   return (
-    <>
+    <div id='sign-in'>
+      <h1>{text.signInHeadline}</h1>
       <div>{error}</div>
       <Form onSubmit={onSubmit}>
         <UserName
@@ -58,6 +59,6 @@ export function SignInForm({
         />
       </Form>
       <Link to={AppRoutes.SIGN_UP}>{text.genericSignUpLabel}</Link>
-    </>
+    </div>
   )
 }

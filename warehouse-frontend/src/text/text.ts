@@ -49,6 +49,7 @@ interface IText {
   signIn500_1: string;
   signIn500_2: string;
   signIn500_3: string;
+  signInHeadline: string;
 
   signUp400: string;
   signUp401: string;
