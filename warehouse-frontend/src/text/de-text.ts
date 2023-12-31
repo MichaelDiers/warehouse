@@ -61,6 +61,7 @@ const deText: IText = {
   signUp500_1: 'Service nicht verfügbar. Bitte versuchen sie es später noch einmal. [10]',
   signUp500_2: 'Service nicht verfügbar. Bitte versuchen sie es später noch einmal. [11]',
   signUp500_3: 'Service nicht verfügbar. Bitte versuchen sie es später noch einmal. [12]',
+  signUpHeadline: 'Registrieren',
 
   stockItemListPending: 'Lade Daten',
   stockItemListRejected: 'Service nicht verfügbar. Bitte versuchen sie es später noch einmal. [13]',

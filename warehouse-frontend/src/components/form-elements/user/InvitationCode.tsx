@@ -8,6 +8,7 @@ const InvitationCode = ({
   id = 'invitationCode',
   maxLength = Validation.INVITATION_CODE_MAX_LENGTH,
   minLength = Validation.INVITATION_CODE_MIN_LENGTH,
+  minWidth = Validation.INVITATION_CODE_MAX_LENGTH, 
   setError,
   setValue,
   text,
@@ -25,6 +26,7 @@ const InvitationCode = ({
   maxLengthError?: (maxLength: number) => string,
   minLength?: number,
   minLengthError?: (minLength: number) => string,
+  minWidth?: number,
   setError?: (value: string) => void,
   setValue: (value: string) => void,
   text: IText,
@@ -66,6 +68,7 @@ const InvitationCode = ({
       maxLengthError={maxLengthError}
       minLength={minLength}
       minLengthError={minLengthError}
+      minWidth={minWidth}
       setError={setError}
       setValue={(value) => setValue(value as string)}
       type="text"

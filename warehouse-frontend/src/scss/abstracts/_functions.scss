@@ -19,3 +19,30 @@
 @function font($path, $base: $base-url) {
   @return asset($base, 'fonts/', $path);
 }
+
+/// Adds a default if the given value is 0, otherwise the given value without modification.
+/// @param {number} $value - a value
+/// @return The given $value or 0#{$default}
+@function default-unit($value, $default: 'px') {
+  @if ($value == 0) {
+    @return #{$value}#{$default};
+  }
+
+  @return $value;
+}
+
+/// Estimates a width depending on the number of charaters given in rem
+/// @param {number-characters} The number of required characters
+/// @return {Length} - the length in rem
+@function to-rem($number-characters) {
+  @return calc(
+    $number-characters 
+    * 0.66 
+    * 1rem 
+    + default-unit($input-border-left-width)
+    + default-unit($input-border-right-width)
+    + default-unit($input-margin-left) 
+    + default-unit($input-margin-right)
+    + default-unit($input-padding-left)
+    + default-unit($input-padding-right));
+}

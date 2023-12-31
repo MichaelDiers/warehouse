@@ -18,7 +18,7 @@ const Submit = ({
   width?: number
 }) => {
   return (
-    <>
+    <div className='form-element'>
       <input
         autoFocus={autoFocus}
         disabled={disabled}
@@ -29,7 +29,7 @@ const Submit = ({
         value={label}
         width={width}
       />
-    </>
+    </div>
   )
 }
 

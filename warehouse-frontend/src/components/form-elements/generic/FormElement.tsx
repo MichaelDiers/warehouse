@@ -1,3 +1,8 @@
+import { 
+  className as elementErrorClassName,
+  ElementError 
+} from './ElementError';
+
 const FormElement = ({
   additionalValidation = (value: string) => '',
   autoComplete = (value: string) => value,
@@ -15,6 +20,7 @@ const FormElement = ({
   minError,
   minLength,
   minLengthError,
+  minWidth,
   pattern,
   placeholder,
   required,
@@ -43,6 +49,7 @@ const FormElement = ({
   minError?: (minumum: number) => string,
   minLength?: number,
   minLengthError?: (minLength: number) => string,
+  minWidth?: number,
   pattern?: string,
   placeholder?: string,
   size?: number,
@@ -80,12 +87,15 @@ const FormElement = ({
     }
   }
 
+  const className = `${error ? elementErrorClassName : ''} ${minWidth ? `min-width-${minWidth}` : ''}`;
+
   return (
-    <>
-      <label htmlFor={id} className={error ? 'error' : ''}>{label}</label>
+    <div className='form-element'>
+      <label htmlFor={id} className={error ? elementErrorClassName : ''}>{label}</label>
+      <ElementError error={error}/>
       <input
         autoFocus={autoFocus}
-        className={error ? 'error' : ''}
+        className={className}
         disabled={disabled}
         height={height}
         id={id}
@@ -106,8 +116,7 @@ const FormElement = ({
         value={value}
         width={width}
       />
-      <div className={error ? 'error' : ''}>{error}</div>
-    </>
+    </div>
   )
 }
 

@@ -66,8 +66,11 @@ export function SignUpForm({
 }) {
   return (
     <>
-      <div>{error}</div>
-      <Form onSubmit={onSubmit}>
+      <Form
+        error={error}
+        header={text.signUpHeadline}
+        id='sign-up-form'
+        onSubmit={onSubmit}>
         <UserName
           error={idError}
           setError={setIdError}

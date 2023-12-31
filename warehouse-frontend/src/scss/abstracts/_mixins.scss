@@ -1,3 +1,11 @@
 // -----------------------------------------------------------------------------
 // This file contains all application-wide Sass mixins.
 // -----------------------------------------------------------------------------
+
+/// Add a min width definition for the given number of characters.
+/// @param {numberCharacters} - the width is estimated depending of the given number of characters.
+@mixin min-width($numberCharacters) {
+  .min-width-#{$numberCharacters} {
+    min-width: to-rem(#{$numberCharacters});
+  }
+}

@@ -58,6 +58,7 @@ interface IText {
   signUp500_1: string;
   signUp500_2: string;
   signUp500_3: string;
+  signUpHeadline: string;
 
   stockItemListPending: string;
   stockItemListRejected: string;

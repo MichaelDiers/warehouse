@@ -12,15 +12,17 @@ function App() {
   return (
     <div className="App">
       <HashRouter>
-        <Routes>
-          <Route index element={<RequiresUser roles={['User']}>{<StockItemList />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_LIST} element={<RequiresUser roles={[]}>{<StockItemList />}</RequiresUser>} />
-          <Route path={AppRoutes.SIGN_IN} element={<SignIn />} />
-          <Route path={AppRoutes.SIGN_UP} element={<SignUp />} />
-          <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails />}</RequiresUser>} />
-          <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate />}</RequiresUser>} />
-        </Routes>
+        <main>
+          <Routes>
+            <Route index element={<RequiresUser roles={['User']}>{<StockItemList />}</RequiresUser>} />
+            <Route path={AppRoutes.STOCK_ITEM_LIST} element={<RequiresUser roles={[]}>{<StockItemList />}</RequiresUser>} />
+            <Route path={AppRoutes.SIGN_IN} element={<SignIn />} />
+            <Route path={AppRoutes.SIGN_UP} element={<SignUp />} />
+            <Route path={AppRoutes.STOCK_ITEM_CREATE} element={<RequiresUser roles={[]}>{<StockItemCreate />}</RequiresUser>} />
+            <Route path={AppRoutes.STOCK_ITEM_DETAILS} element={<RequiresUser roles={[]}>{<StockItemDetails />}</RequiresUser>} />
+            <Route path={AppRoutes.STOCK_ITEM_UPDATE} element={<RequiresUser roles={[]}>{<StockItemUpdate />}</RequiresUser>} />
+          </Routes>
+        </main>
       </HashRouter>
     </div>
   );

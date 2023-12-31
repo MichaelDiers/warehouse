@@ -1,7 +1,15 @@
+import GlobalError from './GlobalError';
+
 const Form = ({
+    error,
+    header,
+    id,
     children,
     onSubmit
 } : {
+    error?: string,
+    header?: string,
+    id?: string,
     children: string | JSX.Element | JSX.Element[],
     onSubmit: () => void
 }): JSX.Element =>  {
@@ -10,8 +18,13 @@ const Form = ({
         onSubmit();
     };
 
+    const headerElement = header ? (<h2>{header}</h2>) : (<></>);
     return (
-        <form onSubmit={onFormSubmit}>
+        <form
+          id={id} 
+          onSubmit={onFormSubmit}>
+            {headerElement}
+            <GlobalError error={error}/>
             {children}
         </form>
     )

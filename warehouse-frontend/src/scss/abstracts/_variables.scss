@@ -23,3 +23,50 @@ $text-font-stack: 'Raleway', 'Open Sans', 'Helvetica Neue Light', 'Helvetica Neu
 /// Container's maximum width
 /// @type Length
 $max-width: 1180px !default;
+
+/// Default border radius
+/// @type Length
+$border-radius: 10px;
+
+/// Default padding
+/// @type Length
+$padding: 10px;
+
+/// Default grid gap
+/// @type Length
+$grid-gap: 25px;
+
+/// The maximal font size, e.g. h1
+/// @type
+$max-font-size: 1.4rem;
+
+/// The difference between two font sizes, e.g. h1 and h2
+/// @type
+$font-size-diff: 0.1rem;
+
+/// The default border width of an input element.
+/// @type {Length}
+$input-border-default: 2px;
+$input-border-top-width: $input-border-default;
+$input-border-right-width: $input-border-default;
+$input-border-bottom-width: $input-border-default;
+$input-border-left-width: $input-border-default;
+$input-border-width: $input-border-top-width $input-border-right-width $input-border-bottom-width $input-border-left-width;
+
+/// The default padding of an input element.
+/// @type {Length}
+$input-padding-default: 10px;
+$input-padding-top: $input-padding-default;
+$input-padding-right: $input-padding-default;
+$input-padding-bottom: $input-padding-default;
+$input-padding-left: $input-padding-default;
+$input-padding: $input-padding-top $input-padding-right $input-padding-bottom $input-padding-left;
+
+/// The default margin of an input element.
+/// @type {Length}
+$input-margin-default: 0;
+$input-margin-top: $input-margin-default;
+$input-margin-right: $input-margin-default;
+$input-margin-bottom: $input-margin-default;
+$input-margin-left: $input-margin-default;
+$input-margin: $input-margin-top $input-margin-right $input-margin-bottom $input-margin-left;

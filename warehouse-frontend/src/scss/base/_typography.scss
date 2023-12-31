@@ -3,5 +3,17 @@
  */
  body {
   color: $text-color;
-  font: normal 125% / 1.4 $text-font-stack;
+  font: normal 100% / 1.4 $text-font-stack;
+}
+
+h1 {
+  font-size: $max-font-size;
+}
+
+h2 {
+  font-size: calc($max-font-size - $font-size-diff);
+}
+
+h3 {
+  font-size: calc($max-font-size - (2 * $font-size-diff));
 }

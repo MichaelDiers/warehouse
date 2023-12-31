@@ -1,3 +1,22 @@
 // -----------------------------------------------------------------------------
 // This file contains all styles related to the forms of the site/application.
 // -----------------------------------------------------------------------------
+
+form {
+  display: grid;
+  gap: $grid-gap;
+  grid-template-columns: auto;
+}
+
+.form-element {
+  display: grid;
+  gap: calc($grid-gap / 2);
+  grid-template-columns: auto;
+}
+
+input {
+  border-radius: $border-radius;
+  border-width: $input-border-width;
+  margin: $input-margin;
+  padding: $input-padding;
+}
