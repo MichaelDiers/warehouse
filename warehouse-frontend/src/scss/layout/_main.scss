@@ -6,4 +6,22 @@ main {
   display: grid;
   grid-template-columns: auto;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
+
+main::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  z-index: -1;
+  background: image('background.png');
+  background-position: center;
+  background-repeat: repeat-y;
+  transform: rotate(-30deg) translateX(50px);
+  opacity: 0.1;
+}
+

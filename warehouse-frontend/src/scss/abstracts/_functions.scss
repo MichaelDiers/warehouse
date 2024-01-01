@@ -20,6 +20,15 @@
   @return asset($base, 'fonts/', $path);
 }
 
+/// Returns URL to an image based on its path
+/// @param {String} $path - image path
+/// @param {String} $base [$base-url] - base URL
+/// @return {Url}
+/// @require $base-url
+@function image($path, $base: $base-url) {
+  @return asset($base, 'images/', $path);
+}
+
 /// Adds a default if the given value is 0, otherwise the given value without modification.
 /// @param {number} $value - a value
 /// @return The given $value or 0#{$default}
