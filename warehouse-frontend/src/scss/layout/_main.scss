@@ -6,6 +6,7 @@ main {
   display: grid;
   grid-template-columns: auto;
   justify-content: center;
+  padding: $default-padding;
   position: relative;
   overflow: hidden;
 }
@@ -18,10 +19,8 @@ main::before {
   top: -50%;
   left: -50%;
   z-index: -1;
-  background: image('background.png');
   background-position: center;
   background-repeat: repeat-y;
   transform: rotate(-30deg) translateX(50px);
-  opacity: 0.1;
 }
 

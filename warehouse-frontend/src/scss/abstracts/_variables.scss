@@ -44,6 +44,10 @@ $max-font-size: 1.4rem;
 /// @type
 $font-size-diff: 0.1rem;
 
+/// The default padding.
+/// @type {Length}
+$default-padding: 25px;
+
 /// The default border width of an input element.
 /// @type {Length}
 $input-border-default: 2px;
