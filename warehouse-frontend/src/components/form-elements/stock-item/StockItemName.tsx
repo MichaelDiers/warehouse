@@ -5,6 +5,7 @@ import FormElement from "../generic/FormElement";
 const StockItemName = ({
   error,
   id = 'name',
+  isReadOnly = false,
   maxLength = Validation.STOCK_ITEM_NAME_MAX_LENGTH,
   minLength = Validation.STOCK_ITEM_NAME_MIN_LENGTH,
   setError,
@@ -17,6 +18,7 @@ const StockItemName = ({
 }: {
   error?: string,
   id?: string,
+  isReadOnly?: boolean,
   label?: string,
   maxLength?: number,
   maxLengthError?: (maxLength: number) => string,
@@ -31,6 +33,7 @@ const StockItemName = ({
     <FormElement
       error={error}
       id={id}
+      isReadOnly={isReadOnly}
       label={label}
       maxLength={maxLength}
       maxLengthError={maxLengthError}

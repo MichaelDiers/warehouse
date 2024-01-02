@@ -5,6 +5,7 @@ import Quantity from './Quantity';
 const MinimumQuantity = ({
   error,
   id = 'minimumQuantity',
+  isReadOnly = false,
   max = Validation.STOCK_ITEM_MINIMUM_QUANTITY_MAX,
   min = Validation.STOCK_ITEM_MINIMUM_QUANTITY_MIN,
   setError,
@@ -17,6 +18,7 @@ const MinimumQuantity = ({
 }: {
   error?: string,
   id?: string,
+  isReadOnly?: boolean,
   label?: string,
   max?: number,
   maxError?: (maximum: number) => string,
@@ -31,6 +33,7 @@ const MinimumQuantity = ({
     <Quantity
       error={error}
       id={id}
+      isReadOnly={isReadOnly}
       label={label}
       max={max}
       maxError={maxError}

@@ -11,12 +11,12 @@ const StockItem = ({
   nameError,
   quantity,
   quantityError,
-  setMinimumQuantity,
-  setMinimumQuantityError,
-  setName,
-  setNameError,
-  setQuantity,
-  setQuantityError,
+  setMinimumQuantity = () => { },
+  setMinimumQuantityError = () => { },
+  setName = () => { },
+  setNameError = () => { },
+  setQuantity = () => { },
+  setQuantityError = () => { },
   text,
 }: {
   isReadOnly?: boolean,
@@ -26,18 +26,19 @@ const StockItem = ({
   nameError?: string,
   quantity?: number,
   quantityError?: string,
-  setMinimumQuantity: (minumumQuantity: number) => void,
-  setMinimumQuantityError: (minumumQuantityError: string) => void,
-  setName: (name: string) => void,
-  setNameError: (nameError: string) => void,
-  setQuantity: (quantity: number) => void,
-  setQuantityError: (quantityError: string) => void,
+  setMinimumQuantity?: (minumumQuantity: number) => void,
+  setMinimumQuantityError?: (minumumQuantityError: string) => void,
+  setName?: (name: string) => void,
+  setNameError?: (nameError: string) => void,
+  setQuantity?: (quantity: number) => void,
+  setQuantityError?: (quantityError: string) => void,
   text: IText,
 }) => {
   return (
     <>
       <StockItemName
         error={nameError}
+        isReadOnly={isReadOnly}
         setError={setNameError}
         setValue={setName}
         text={text}
@@ -45,6 +46,7 @@ const StockItem = ({
       />
       <Quantity
         error={quantityError}
+        isReadOnly={isReadOnly}
         setError={setQuantityError}
         setValue={setQuantity}
         text={text}
@@ -52,6 +54,7 @@ const StockItem = ({
       />
       <MinimumQuantity
         error={minimumQuantityError}
+        isReadOnly={isReadOnly}
         setError={setMinimumQuantityError}
         setValue={setMinimumQuantity}
         text={text}

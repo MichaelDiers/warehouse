@@ -11,6 +11,7 @@ const FormElement = ({
   error,
   height,
   id,
+  isReadOnly = false,
   label,
   max,
   maxError,
@@ -40,6 +41,7 @@ const FormElement = ({
   error?: string,
   height?: number,
   id: string,
+  isReadOnly?: boolean,
   label: string,
   max?: number,
   maxError?: (maximum: number) => string,
@@ -96,7 +98,7 @@ const FormElement = ({
       <input
         autoFocus={autoFocus}
         className={className}
-        disabled={disabled}
+        disabled={disabled || isReadOnly}
         height={height}
         id={id}
         max={max}

@@ -1,18 +1,19 @@
-import StockItem from '../../components/form-elements/stock-item/StockItem';
+import StockItem from '../../components/form-elements/stock-item/StockItem2';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { useDeleteStockItenMutation } from './stock-item-details-api-slice';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AppRoutes from '../../types/app-routes.enum';
 import { InProgressIndicator } from '../../components/InProgress';
 import { QueryStatus } from '@reduxjs/toolkit/dist/query';
 import { useAppSelector } from '../../app/hooks';
 import { selectText } from '../../app/selectors';
 import ApplicationError from '../../types/application-error';
+import Form from '../../components/form-elements/generic/Form';
+import Submit from '../../components/form-elements/generic/Submit';
 
 export function StockItemDetails() {
-  const [isInProgress, setIsInProgress] = useState(false);
   const [error, setError] = useState('');
 
   const [deleteStockItem, { status }] = useDeleteStockItenMutation();
@@ -27,7 +28,6 @@ export function StockItemDetails() {
       return;
     }
 
-    setIsInProgress(true);
     deleteStockItem(stockItem.deleteUrl)
       .then(() => {
         navigate(AppRoutes.STOCK_ITEM_LIST);
@@ -55,22 +55,33 @@ export function StockItemDetails() {
             setError(text.stockItemDelete500_3);
           }
         }
-      }).finally(() => {
-        setIsInProgress(false);
-      })
+      });
   }
 
   return (
-    <InProgressIndicator isInProgress={status === QueryStatus.pending}>
-      <StockItem
-        deleteStockItem={handleDelete}
-        globalError={error}
-        headlineText={text.stockItemDetailsHeader}
-        isInProgress={isInProgress}
-        stockItem={stockItem}
-        text={text}
-        type='details'
-      />
+    <InProgressIndicator
+      className='grid-large'
+      isInProgress={status === QueryStatus.pending}>
+      <Form
+        className={'stock-item stock-item-create'}
+        error={error}
+        header={text.stockItemDetailsHeader}
+        onSubmit={handleDelete}
+      >
+        <StockItem
+          isReadOnly={true}
+          minimumQuantity={stockItem?.minimumQuantity}
+          name={stockItem?.name}
+          quantity={stockItem?.quantity}
+          text={text}
+        />
+        <div className='element-group-2 form-element'>
+          <Submit id='deleteStockItemSubmit' label={text.stockItemDeleteDeleteSubmitLabel} />
+          <Link to={AppRoutes.STOCK_ITEM_UPDATE}>{text.stockItemUpdateLinkLabel}</Link>
+        </div>
+
+      </Form>
+      <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
     </InProgressIndicator>
   )
 }

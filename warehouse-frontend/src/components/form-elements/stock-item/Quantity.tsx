@@ -5,6 +5,7 @@ import FormElement from "../generic/FormElement";
 const Quantity = ({
   error,
   id = 'quantity',
+  isReadOnly = false,
   max = Validation.STOCK_ITEM_QUANTITY_MAX,
   min = Validation.STOCK_ITEM_QUANTITY_MIN,
   setError,
@@ -17,6 +18,7 @@ const Quantity = ({
 }: {
   error?: string,
   id?: string,
+  isReadOnly?: boolean,
   label?: string,
   max?: number,
   maxError?: (maximum: number) => string,
@@ -32,6 +34,7 @@ const Quantity = ({
     <FormElement
       error={error}
       id={id}
+      isReadOnly={isReadOnly}
       label={label}
       max={max}
       maxError={maxError}
@@ -39,7 +42,7 @@ const Quantity = ({
       minError={minError}
       setError={setError}
       setValue={setValue ? (value) => setValue(value as number) : undefined}
-      type='number'
+      type={isReadOnly ? 'text' : 'number'}
       value={value}
     />
   )

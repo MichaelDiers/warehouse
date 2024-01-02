@@ -157,7 +157,7 @@ const StockItem = ({
           onSubmit={handleCreateSubmit}
         >
           {stockItemElement}
-          <div className='submit-group-2 form-element'>
+          <div className='element-group-2 form-element'>
             <Submit
               disabled={disabled}
               id='StockItemCreateSubmit'
