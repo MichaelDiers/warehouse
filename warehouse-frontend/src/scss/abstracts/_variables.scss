@@ -32,10 +32,6 @@ $border-radius: 10px;
 /// @type Length
 $padding: 10px;
 
-/// Default grid gap
-/// @type Length
-$grid-gap: 25px;
-
 /// The maximal font size, e.g. h1
 /// @type
 $max-font-size: 1.4rem;
@@ -74,3 +70,36 @@ $input-margin-right: $input-margin-default;
 $input-margin-bottom: $input-margin-default;
 $input-margin-left: $input-margin-default;
 $input-margin: $input-margin-top $input-margin-right $input-margin-bottom $input-margin-left;
+
+/// The pixel sizes for supported media queries
+/// @type {List}
+$breakpoints: 600px, 905px, 1240px, 1440px;
+
+/// The name entry of a responsive-* map
+/// @type {String}
+$property-name: 'property';
+
+/// The values entry of a responsive-* map
+/// @type {String}
+$property-values: 'values';
+
+/// The map for the gap property used in media queries
+/// @type {Map}
+$responsive-gap: (
+  $property-name: 'gap',
+  $property-values: (8px, 12px, 12px, 16px, 16px)
+);
+
+/// The map for the gap property for large grids used in media queries
+/// @type {Map}
+$responsive-gap-large: (
+  $property-name: 'gap',
+  $property-values: (24px, 24px, 32px, 32px, 32px)
+);
+
+/// The map for the padding property used in media queries
+/// @type {Map}
+$responsive-padding: (
+  property: 'padding',
+  values: (16px, 32px, 32px, 200px, 200px)
+);

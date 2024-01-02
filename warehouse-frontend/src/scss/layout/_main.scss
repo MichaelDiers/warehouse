@@ -3,12 +3,16 @@
 // -----------------------------------------------------------------------------
 
 main {
-  display: grid;
+  @extend %grid-shared;
+  overflow: hidden;
   grid-template-columns: auto;
   justify-content: center;
-  padding: $default-padding;
   position: relative;
-  overflow: hidden;
+  margin: 0;
+
+  @include responsive(
+    $responsive-padding
+  )
 }
 
 main::before {

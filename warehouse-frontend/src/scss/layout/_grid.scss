@@ -1,0 +1,11 @@
+%grid-shared {
+  display: grid;
+
+  @include responsive($responsive-gap);
+}
+
+%grid-shared-large {
+  display: grid;
+
+  @include responsive($responsive-gap-large);
+}

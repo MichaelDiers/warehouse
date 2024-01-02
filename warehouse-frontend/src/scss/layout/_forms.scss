@@ -3,16 +3,14 @@
 // -----------------------------------------------------------------------------
 
 form {
+  @extend %grid-shared-large;
   border-radius: 10px;
-  display: grid;
-  gap: $grid-gap;
   grid-template-columns: auto;
   padding: $default-padding;
 }
 
 .form-element {
-  display: grid;
-  gap: calc($grid-gap / 2);
+  @extend %grid-shared;
   grid-template-columns: auto;
 }
 

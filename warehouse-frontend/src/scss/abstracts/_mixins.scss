@@ -2,10 +2,43 @@
 // This file contains all application-wide Sass mixins.
 // -----------------------------------------------------------------------------
 
+@use 'sass:list';
+@use "sass:map";
+
 /// Add a min width definition for the given number of characters.
 /// @param {numberCharacters} - the width is estimated depending of the given number of characters.
 @mixin min-width($numberCharacters) {
   .min-width-#{$numberCharacters} {
     min-width: to-rem(#{$numberCharacters});
+  }
+}
+
+/// Add the value for a property for a certain breakpoint
+/// @param {property-info} - a map of ($property-name: 'name', $property-values: list of values)
+/// @param {index} - the values index that is used as property value
+@mixin responsive-for-breakpoint($property-info, $index) {
+  $property: map.get($property-info, $property-name);
+  $values: map.get($property-info, $property-values);
+
+  #{$property}: #{list.nth($values, $index)};
+}
+
+/// Add media queries for breakpoints
+/// @param {properties} - each entry in properties is a map of 
+///                       ($property-name: 'name', $property-values: list of values)
+///                       the property-values has to be one entry larger as $breakpoints
+/// @require {breakpoints} - a list of breakpoints
+@mixin responsive($properties...) {
+  @each $property-info in $properties {
+    @include responsive-for-breakpoint($property-info, 1);
+  }
+
+  @each $breakpoint in $breakpoints {
+    $index: list.index($breakpoints, $breakpoint);
+    @media screen and (min-width: #{$breakpoint}) {
+      @each $property-info in $properties {
+        @include responsive-for-breakpoint($property-info, ($index + 1));
+      }
+    };
   }
 }
