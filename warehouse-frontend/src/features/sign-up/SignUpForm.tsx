@@ -5,8 +5,6 @@ import IText from "../../text/text";
 import PasswordRepeat from "../../components/form-elements/user/PasswordRepeat";
 import InvitationCode from "../../components/form-elements/user/InvitationCode";
 import DisplayName from "../../components/form-elements/user/DisplayName";
-import AppRoutes from "../../types/app-routes.enum";
-import { Link } from "react-router-dom";
 import Submit from '../../components/form-elements/generic/Submit';
 
 export function SignUpForm({
@@ -65,56 +63,53 @@ export function SignUpForm({
   text: IText
 }) {
   return (
-    <>
-      <Form
-        error={error}
-        header={text.signUpHeadline}
-        id='sign-up-form'
-        onSubmit={onSubmit}>
-        <UserName
-          error={idError}
-          setError={setIdError}
-          setValue={setId}
-          text={text}
-          value={id}
-        />
-        <DisplayName
-          error={displayNameError}
-          setError={setDisplayNameError}
-          setValue={setDisplayName}
-          text={text}
-          value={displayName}
-        />
-        <Password
-          additionalValidation={validatePassword}
-          error={passwordError}
-          setError={setPasswordError}
-          setValue={setPassword}
-          text={text}
-          value={password}
-        />
-        <PasswordRepeat
-          additionalValidation={validatePasswordRepeat}
-          error={passwordRepeatError}
-          setError={setPasswordRepeatError}
-          setValue={setPasswordRepeat}
-          text={text}
-          value={passwordRepeat}
-        />
-        <InvitationCode
-          error={invitationCodeError}
-          setError={setInvitationCodeError}
-          setValue={setInvitationCode}
-          text={text}
-          value={invitationCode}
-        />
-        <Submit
-          disabled={disabled}
-          id='signUpSubmit'
-          label={text.genericSignUpLabel}
-        />
-      </Form>
-      <Link to={AppRoutes.SIGN_IN}>{text.genericSignInLabel}</Link>
-    </>
+    <Form
+      error={error}
+      header={text.signUpHeadline}
+      id='sign-up-form'
+      onSubmit={onSubmit}>
+      <UserName
+        error={idError}
+        setError={setIdError}
+        setValue={setId}
+        text={text}
+        value={id}
+      />
+      <DisplayName
+        error={displayNameError}
+        setError={setDisplayNameError}
+        setValue={setDisplayName}
+        text={text}
+        value={displayName}
+      />
+      <Password
+        additionalValidation={validatePassword}
+        error={passwordError}
+        setError={setPasswordError}
+        setValue={setPassword}
+        text={text}
+        value={password}
+      />
+      <PasswordRepeat
+        additionalValidation={validatePasswordRepeat}
+        error={passwordRepeatError}
+        setError={setPasswordRepeatError}
+        setValue={setPasswordRepeat}
+        text={text}
+        value={passwordRepeat}
+      />
+      <InvitationCode
+        error={invitationCodeError}
+        setError={setInvitationCodeError}
+        setValue={setInvitationCode}
+        text={text}
+        value={invitationCode}
+      />
+      <Submit
+        disabled={disabled}
+        id='signUpSubmit'
+        label={text.genericSignUpLabel}
+      />
+    </Form>
   )
 }

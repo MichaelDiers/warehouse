@@ -1,7 +1,9 @@
 interface IText {
   genericBackLabel: string;
   genericSignInLabel: string;
+  genericSignInLink: string;
   genericSignUpLabel: string;
+  genericSignUpLink: string;
   displayName: string;
   displayNameTooLongError: (length: number) => string;
   displayNameTooShortError: (length: number) => string;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ISignInRequest, useSignInMutation } from "./sign-in-api-slice";
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectText, selectUser } from '../../app/selectors';
 import { updateUserThunk } from '../../app/user-slice';
@@ -85,20 +85,23 @@ export function SignIn() {
 
   return (
     <InProgressIndicator isInProgress={status === QueryStatus.pending}>
-      <SignInForm
-        disabled={disabled}
-        error={error}
-        id={id}
-        idError={idError}
-        onSubmit={onSubmit}
-        password={password}
-        passwordError={passwordError}
-        setId={setId}
-        setIdError={setIdError}
-        setPassword={setPassword}
-        setPasswordError={setPasswordError}
-        text={text}
-      />
+      <div className='grid-large'>
+        <SignInForm
+          disabled={disabled}
+          error={error}
+          id={id}
+          idError={idError}
+          onSubmit={onSubmit}
+          password={password}
+          passwordError={passwordError}
+          setId={setId}
+          setIdError={setIdError}
+          setPassword={setPassword}
+          setPasswordError={setPasswordError}
+          text={text}
+        />
+        <Link to={AppRoutes.SIGN_UP}>{text.genericSignUpLink}</Link>
+      </div>
     </InProgressIndicator>
   )
 }

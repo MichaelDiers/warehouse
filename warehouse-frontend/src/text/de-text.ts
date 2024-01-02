@@ -3,7 +3,9 @@ import IText from "./text";
 const deText: IText = {
   genericBackLabel: 'Zurück',
   genericSignInLabel: 'Anmelden',
+  genericSignInLink: 'Ich habe bereits einen Account',
   genericSignUpLabel: 'Registrieren',
+  genericSignUpLink: 'Ich habe keinen Account',
   displayName: 'Display Name',
   displayNameTooLongError: (length: number) => `Display name hat mehr als ${length} Zeichen`,
   displayNameTooShortError: (length: number) => `Display name hat weniger als ${length} Zeichen`,

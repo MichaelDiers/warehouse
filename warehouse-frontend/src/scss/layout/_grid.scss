@@ -9,3 +9,9 @@
 
   @include responsive($responsive-gap-large);
 }
+
+.grid-large {
+  @extend %grid-shared-large;
+  grid-template-columns: auto;
+  justify-items: center;
+}

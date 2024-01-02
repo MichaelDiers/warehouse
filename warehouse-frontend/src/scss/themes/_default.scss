@@ -3,13 +3,16 @@
 // default one.
 // -----------------------------------------------------------------------------
 
+body {
+  color: $text-color;
+}
+
 form {
-  background: linear-gradient(4deg, rgba(9,30,168,0.7) 0%, rgba(9,68,121,0.7) 35%, rgba(0,212,255,0.7) 100%);
-  color: hsl(44, 87%, 94%);
+  background: $blue-gradient-light;
 }
 
 main::before {
   background-image: image('background.png');
-  background-image: image('background.png'), linear-gradient(4deg, rgba(5, 15, 79, 0.9) 0%, rgba(6, 44, 77, 0.9) 35%, rgba(13, 70, 108, 0.9) 100%);
+  background-image: image('background.png'), $blue-gradient-dark;
   opacity: 0.7;
 }

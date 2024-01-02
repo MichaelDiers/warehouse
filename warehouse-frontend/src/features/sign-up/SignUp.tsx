@@ -3,7 +3,7 @@ import { ISignUpRequest, useSignUpMutation } from "./sign-up-api-slice";
 import { v4 } from 'uuid';
 import { QueryStatus } from "@reduxjs/toolkit/dist/query";
 import AppRoutes from "../../types/app-routes.enum";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectText, selectUser } from "../../app/selectors";
 import { updateUserThunk } from "../../app/user-slice";
@@ -125,34 +125,37 @@ export function SignUp() {
 
   return (
     <InProgressIndicator isInProgress={status === QueryStatus.pending}>
-      <SignUpForm
-        disabled={disabled}
-        displayName={displayName}
-        displayNameError={displayNameError}
-        error={error}
-        id={id}
-        idError={idError}
-        invitationCode={invitationCode}
-        invitationCodeError={invitationCodeError}
-        onSubmit={onSubmit}
-        password={password}
-        passwordError={passwordError}
-        passwordRepeat={passwordRepeat}
-        passwordRepeatError={passwordRepeatError}
-        setDisplayName={setDisplayName}
-        setDisplayNameError={setDisplayNameError}
-        setId={setId}
-        setIdError={setIdError}
-        setInvitationCode={setInvitationCode}
-        setInvitationCodeError={setInvitationCodeError}
-        setPassword={setPassword}
-        setPasswordError={setPasswordError}
-        setPasswordRepeat={setPasswordRepeat}
-        setPasswordRepeatError={setPasswordRepeatError}
-        validatePassword={validatePassword}
-        validatePasswordRepeat={validatePasswordRepeat}
-        text={text}
-      />
+      <div className='grid-large'>
+        <SignUpForm
+          disabled={disabled}
+          displayName={displayName}
+          displayNameError={displayNameError}
+          error={error}
+          id={id}
+          idError={idError}
+          invitationCode={invitationCode}
+          invitationCodeError={invitationCodeError}
+          onSubmit={onSubmit}
+          password={password}
+          passwordError={passwordError}
+          passwordRepeat={passwordRepeat}
+          passwordRepeatError={passwordRepeatError}
+          setDisplayName={setDisplayName}
+          setDisplayNameError={setDisplayNameError}
+          setId={setId}
+          setIdError={setIdError}
+          setInvitationCode={setInvitationCode}
+          setInvitationCodeError={setInvitationCodeError}
+          setPassword={setPassword}
+          setPasswordError={setPasswordError}
+          setPasswordRepeat={setPasswordRepeat}
+          setPasswordRepeatError={setPasswordRepeatError}
+          validatePassword={validatePassword}
+          validatePasswordRepeat={validatePasswordRepeat}
+          text={text}
+        />
+        <Link to={AppRoutes.SIGN_IN}>{text.genericSignInLink}</Link>
+      </div>
     </InProgressIndicator>
   )
 }
