@@ -15,3 +15,5 @@
   grid-template-columns: auto;
   justify-items: center;
 }
+
+@include submit-group(2);

@@ -42,3 +42,28 @@
     };
   }
 }
+
+/// Add a submit group of the given size
+/// @param {size} - The number of elements of the submit group
+/// @require {breakpoints} - the defined breakpoints
+/// @require {grid-shared} - the shared grid definition
+@mixin submit-group($size) {
+  .submit-group-#{$size} {
+    @extend %grid-shared;
+    grid-template-columns: auto;
+    
+    $columns: '';
+    @for $i from 1 through $size {
+      $columns: $columns auto;
+    }
+
+    @each $breakpoint in $breakpoints {
+      $index: list.index($breakpoints, $breakpoint);
+      @if $index > 1 {
+        @media screen and (min-width: #{$breakpoint}) {
+          grid-template-columns: #{$columns};
+        }
+      }
+    }
+  }
+}

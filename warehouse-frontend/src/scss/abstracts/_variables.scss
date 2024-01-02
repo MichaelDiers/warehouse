@@ -111,3 +111,7 @@ $blue-gradient-light: linear-gradient(4deg, rgba(9,30,168,0.7) 0%, rgba(9,68,121
 /// A dark blue linear gradient
 /// @type {linear-gradient}
 $blue-gradient-dark: linear-gradient(4deg, rgba(5, 15, 79, 0.9) 0%, rgba(6, 44, 77, 0.9) 35%, rgba(13, 70, 108, 0.9) 100%);
+
+/// An orange linear gradient
+/// @type {linear-gradient}
+$orange-gradient: linear-gradient(0deg, rgba(224,85,70,1) 0%, rgba(224,109,70,1) 50%, rgba(224,160,70,1) 100%);//linear-gradient(0deg, rgba(127,53,176,1) 0%, rgba(230,26,26,1) 50%, rgba(224,160,70,1) 100%);

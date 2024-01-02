@@ -9,6 +9,10 @@ body {
 
 form {
   background: $blue-gradient-light;
+
+  &.stock-item-create {
+    background: $orange-gradient;
+  }
 }
 
 main::before {

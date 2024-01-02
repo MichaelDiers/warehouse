@@ -39,7 +39,7 @@ const Quantity = ({
       minError={minError}
       setError={setError}
       setValue={setValue ? (value) => setValue(value as number) : undefined}
-      type="text"
+      type='number'
       value={value}
     />
   )

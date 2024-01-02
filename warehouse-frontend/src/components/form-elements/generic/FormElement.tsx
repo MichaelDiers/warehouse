@@ -58,7 +58,7 @@ const FormElement = ({
   setValue?: (value: string | number) => void,
   step?: number,
   title?: string,
-  type?: 'password' | 'text',
+  type?: 'number' | 'password' | 'text',
   value?: string | number,
   width?: number
 }) => {

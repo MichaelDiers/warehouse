@@ -15,6 +15,7 @@ import { setSelectedStockItem } from '../../../app/selected-stock-item-slice';
 import ApplicationError from '../../../types/application-error';
 
 const StockItem = ({
+  className,
   create,
   deleteStockItem,
   globalError,
@@ -25,6 +26,7 @@ const StockItem = ({
   type = 'details',
   update,
 }: {
+  className?: string,
   create?: (stockItem: ICreateStockItem, isSubmitAndNew: boolean) => void,
   deleteStockItem?: () => void,
   globalError?: string,
@@ -148,24 +150,27 @@ const StockItem = ({
 
     return (
       <>
-        {headlineElement}
-        {globalErrorElement}
         <Form
+          className={'stock-item stock-item-create'}
+          error={globalError}
+          header={headlineText}
           onSubmit={handleCreateSubmit}
         >
           {stockItemElement}
-          <Submit
-            disabled={disabled}
-            id='StockItemCreateSubmit'
-            label={text.stockItemCreateSubmitLabel}
-            onClick={() => setIsSubmitAndNew(false)}
-          />
-          <Submit
-            disabled={disabled}
-            id='StockItemCreateAndNewSubmit'
-            label={text.stockItemCreateSubmitAndNewLabel}
-            onClick={() => setIsSubmitAndNew(true)}
-          />
+          <div className='submit-group-2 form-element'>
+            <Submit
+              disabled={disabled}
+              id='StockItemCreateSubmit'
+              label={text.stockItemCreateSubmitLabel}
+              onClick={() => setIsSubmitAndNew(false)}
+            />
+            <Submit
+              disabled={disabled}
+              id='StockItemCreateAndNewSubmit'
+              label={text.stockItemCreateSubmitAndNewLabel}
+              onClick={() => setIsSubmitAndNew(true)}
+            />
+          </div>
         </Form>
         <Link to={AppRoutes.STOCK_ITEM_LIST}>{text.genericBackLabel}</Link>
       </>
