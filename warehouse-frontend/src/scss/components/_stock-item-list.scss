@@ -1,0 +1,14 @@
+.stock-item-list {
+  @extend %grid-shared;
+  grid-template-columns: auto;
+
+  a, div {
+    display: grid;
+    grid-template-columns: auto auto;
+
+    div:last-child {
+      justify-self: end;
+    }
+  }
+}
+

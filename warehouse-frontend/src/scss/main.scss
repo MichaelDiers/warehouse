@@ -56,7 +56,8 @@
 // components/ since the whole site/application should be mostly composed of tiny modules.
 @import
   'components/error',
-  'components/progress_indicator';
+  'components/progress_indicator',
+  'components/stock-item-list';
 
 // 6. Page-specific styles
 // If you have page-specific styles, it is better to put them in a pages/ 

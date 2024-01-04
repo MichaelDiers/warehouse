@@ -101,7 +101,7 @@ export function StockItemCreate() {
       isInProgress={status === QueryStatus.pending || isInProgress}
     >
       <Form
-        className={'stock-item stock-item-create'}
+        className={'stock-item-form'}
         error={error}
         header={text.stockItemCreateHeader}
         onSubmit={handleSubmit}

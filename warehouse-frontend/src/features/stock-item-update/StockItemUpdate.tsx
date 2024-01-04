@@ -102,7 +102,7 @@ export function StockItemUpdate() {
       isInProgress={status === QueryStatus.pending || isInProgress}
     >
       <Form
-        className={'stock-item stock-item-create'}
+        className={'stock-item-form'}
         error={error}
         header={text.stockItemUpdateHeader}
         onSubmit={handleSubmit}
