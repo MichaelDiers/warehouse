@@ -9,6 +9,7 @@ const deText: IText = {
   displayName: 'Display Name',
   displayNameTooLongError: (length: number) => `Display name hat mehr als ${length} Zeichen`,
   displayNameTooShortError: (length: number) => `Display name hat weniger als ${length} Zeichen`,
+  emptyStockItemList: 'Noch keine Einträge vorhanden',
   forbiddenPasswords: ['password', '12345678', '01234567', '76543210'],
   forbiddenPasswordsError: 'Passwort ist zu einfach',
   invitationCodeFormatError: 'Bitte halten Sie sich an das gegebene Format: efdf22de-fbde-4a7f-b864-51858644399c',
