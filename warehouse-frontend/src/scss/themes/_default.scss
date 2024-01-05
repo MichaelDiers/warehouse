@@ -23,3 +23,7 @@ main::before {
 main::after {
   background: $blue-gradient-dark;
 }
+
+.stock-item-list a {
+  border-bottom: 1px solid $border-color;
+}

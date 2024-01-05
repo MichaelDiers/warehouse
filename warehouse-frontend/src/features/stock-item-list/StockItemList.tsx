@@ -52,11 +52,15 @@ export function StockItemList() {
 
   return (
     <InProgressIndicator isInProgress={status === QueryStatus.pending}>
-      <h1>{text.stockItemListHeader}</h1>
-      {stockItemList}
-      <Link to={AppRoutes.STOCK_ITEM_CREATE}>
-        {text.stockItemCreateLinkLabel}
-      </Link>
+      <div className='grid-large'>
+        <div className='stock-item-form'>
+          <h2>{text.stockItemListHeader}</h2>
+          {stockItemList}
+        </div>
+        <Link to={AppRoutes.STOCK_ITEM_CREATE}>
+          {text.stockItemCreateLinkLabel}
+        </Link>
+      </div>
     </InProgressIndicator>
   )
 }

@@ -1,8 +1,16 @@
 .stock-item-list {
   @extend %grid-shared;
+  border-radius: 10px;
   grid-template-columns: auto;
+  padding: $default-padding;
 
-  a, div {
+  a {
+    padding-bottom: 5px;
+    text-decoration: none;
+  }
+
+  a,
+  div {
     display: grid;
     grid-template-columns: auto auto;
 
@@ -10,5 +18,8 @@
       justify-self: end;
     }
   }
-}
 
+  div {
+    margin-left: 10px;
+  }
+}
