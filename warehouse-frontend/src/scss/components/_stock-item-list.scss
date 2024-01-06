@@ -4,22 +4,19 @@
   grid-template-columns: auto;
   padding: $default-padding;
 
-  a {
+  >a {
     padding-bottom: 5px;
     text-decoration: none;
   }
 
-  a,
-  div {
+  >a,
+  >div {
     display: grid;
+    gap: 10px;
     grid-template-columns: auto auto;
 
     div:last-child {
-      justify-self: end;
+      justify-self: center;
     }
-  }
-
-  div {
-    margin-left: 10px;
   }
 }

@@ -63,7 +63,7 @@ export function StockItemDetails() {
       className='grid-large'
       isInProgress={status === QueryStatus.pending}>
       <Form
-        className={'stock-item-form'}
+        className='container-grid stock-item'
         error={error}
         header={text.stockItemDetailsHeader}
         onSubmit={handleDelete}

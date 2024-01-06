@@ -53,7 +53,7 @@ export function StockItemList() {
   return (
     <InProgressIndicator isInProgress={status === QueryStatus.pending}>
       <div className='grid-large'>
-        <div className='stock-item-form'>
+        <div className='container-grid stock-item'>
           <h2>{text.stockItemListHeader}</h2>
           {stockItemList}
         </div>

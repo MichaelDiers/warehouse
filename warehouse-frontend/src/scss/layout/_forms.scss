@@ -2,7 +2,7 @@
 // This file contains all styles related to the forms of the site/application.
 // -----------------------------------------------------------------------------
 
-.stock-item-form {
+.container-grid {
   @extend %grid-shared-large;
   border-radius: 10px;
   grid-template-columns: auto;

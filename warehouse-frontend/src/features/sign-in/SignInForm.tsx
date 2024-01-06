@@ -33,6 +33,7 @@ export function SignInForm({
 }) {
   return (
     <Form
+      className='container-grid'
       error={error}
       header={text.signInHeadline}
       id='sign-in-form'

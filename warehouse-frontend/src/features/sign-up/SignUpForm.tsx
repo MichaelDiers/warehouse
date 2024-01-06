@@ -64,6 +64,7 @@ export function SignUpForm({
 }) {
   return (
     <Form
+      className='container-grid'
       error={error}
       header={text.signUpHeadline}
       id='sign-up-form'
